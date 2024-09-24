@@ -1,6 +1,7 @@
 import yaml
 from jinja2 import Template
 import sys
+import os
 
 
 def load_yaml(file_path):
@@ -20,12 +21,12 @@ def normalize_shortcuts(data):
     return normalized
 
 
-def generate_html(data):
+def generate_html(data, css_path):
     with open("src/cheatsheet_template.html", "r") as file:
         template = Template(file.read())
 
     data["shortcuts"] = normalize_shortcuts(data)
-    return template.render(**data)
+    return template.render(css_path=css_path, **data)
 
 
 def main():
@@ -35,14 +36,22 @@ def main():
 
     yaml_file = sys.argv[1]
     data = load_yaml(yaml_file)
-    html_content = generate_html(data)
 
-    output_file = f"output/{data['title'].lower().replace(' ', '_')}_cheatsheet.html"
-    with open(output_file, "w") as file:
+    css_path = "src/styles.css"
+    html_content = generate_html(data, css_path)
+
+    output_dir = "output"
+    os.makedirs(output_dir, exist_ok=True)
+
+    base_filename = f"{data['title'].lower().replace(' ', '_')}_cheatsheet"
+    html_output = os.path.join(output_dir, f"{base_filename}.html")
+
+    with open(html_output, "w") as file:
         file.write(html_content)
 
-    print(f"Cheatsheet generated: {output_file}")
+    print(f"Cheatsheet generated: {html_output}")
 
 
 if __name__ == "__main__":
     main()
+

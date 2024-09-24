@@ -1,12 +1,125 @@
-title: Neovim
+title: LazyVim Shortcuts
 shortcuts:
   File Operations:
-    "Cmd+C":
-      description: "Copy"
-    "Cmd+V":
-      description: "Paste"
-    "Cmd+S":
-      description: "Save"
+    "Space+f+f":
+      description: "Find Files (Root Dir)"
+    "Space+f+r":
+      description: "Recent Files"
+    "Ctrl+S":
+      description: "Save File"
+    "Space+f+n":
+      description: "New File"
+
+  Editing:
+    "Space+c+f":
+      description: "Format"
+    "Space+c+a":
+      description: "Code Action"
+    "g+c+c":
+      description: "Toggle Comment"
+    "Space+c+r":
+      description: "Rename Symbol"
+
+  Navigation:
+    "Ctrl+O":
+      description: "Jump Back"
+    "Ctrl+I":
+      description: "Jump Forward"
+    "g+d":
+      description: "Go to Definition"
+    "g+r":
+      description: "Go to References"
+
   Window Management:
-    "CMD+H":
-      description: "Hide Current Window"
+    "Ctrl+H":
+      description: "Go to Left Window"
+    "Ctrl+J":
+      description: "Go to Lower Window"
+    "Ctrl+K":
+      description: "Go to Upper Window"
+    "Ctrl+L":
+      description: "Go to Right Window"
+    "Space+-":
+      description: "Split Window Below"
+    "Space+|":
+      description: "Split Window Right"
+
+  Buffer Management:
+    "Shift+H":
+      description: "Prev Buffer"
+    "Shift+L":
+      description: "Next Buffer"
+    "Space+b+d":
+      description: "Delete Buffer"
+
+  Search:
+    "Space+/":
+      description: "Grep (Root Dir)"
+    "Space+s+g":
+      description: "Grep (Root Dir)"
+    "Space+s+w":
+      description: "Word (Root Dir)"
+
+  Git:
+    "Space+g+g":
+      description: "Lazygit (Root Dir)"
+    "Space+g+B":
+      description: "Git Browse"
+    "Space+g+c":
+      description: "Git Commits"
+
+  LSP:
+    "K":
+      description: "Hover Documentation"
+    "Space+c+d":
+      description: "Line Diagnostics"
+    "Space+c+l":
+      description: "Lsp Info"
+
+  Diagnostics:
+    "]d":
+      description: "Next Diagnostic"
+    "[d":
+      description: "Prev Diagnostic"
+    "]e":
+      description: "Next Error"
+    "[e":
+      description: "Prev Error"
+
+  QuickFix:
+    "Space+x+l":
+      description: "Location List"
+    "Space+x+q":
+      description: "Quickfix List"
+    "[q":
+      description: "Previous Quickfix"
+    "]q":
+      description: "Next Quickfix"
+
+  Telescope:
+    "Space+Space":
+      description: "Find Files (Root Dir)"
+    "Space+,":
+      description: "Switch Buffer"
+    "Space+:":
+      description: "Command History"
+
+  Toggles:
+    "Space+u+f":
+      description: "Toggle Auto Format (Global)"
+    "Space+u+s":
+      description: "Toggle Spelling"
+    "Space+u+w":
+      description: "Toggle Wrap"
+    "Space+u+l":
+      description: "Toggle Line Numbers"
+
+  Misc:
+    "Space+l":
+      description: "Lazy"
+    "Space+q+q":
+      description: "Quit All"
+    "Space+L":
+      description: "LazyVim Changelog"
+    "Cmd + H":
+      description: "Test Key"
