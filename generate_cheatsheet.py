@@ -10,7 +10,7 @@ def generate_html(data):
     with open('cheatsheet_template.html', 'r') as file:
         template = Template(file.read())
     
-    return template.render(title=data['Title'], categories=data['shortcuts'])
+    return template.render(title=data['title'], description=data['description'], sections=data['sections'])
 
 def main():
     if len(sys.argv) != 2:
@@ -21,7 +21,7 @@ def main():
     data = load_yaml(yaml_file)
     html_content = generate_html(data)
     
-    output_file = f"{data['Title'].lower().replace(' ', '_')}_cheatsheet.html"
+    output_file = f"{data['title'].lower().replace(' ', '_')}_cheatsheet.html"
     with open(output_file, 'w') as file:
         file.write(html_content)
     

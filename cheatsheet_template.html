@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ title }} Cheatsheet</title>
+    <title>{{ title }}</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -22,35 +22,38 @@
             border-bottom: 2px solid #3498db;
             padding-bottom: 5px;
         }
-        .category {
+        .section {
             margin-bottom: 30px;
         }
-        .shortcut {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
+        .item {
+            margin-bottom: 20px;
         }
-        .key {
+        .item-title {
             font-weight: bold;
-            background-color: #f1f1f1;
-            padding: 2px 6px;
-            border-radius: 3px;
         }
-        .description {
-            flex-grow: 1;
+        .item-description {
             margin-left: 20px;
+        }
+        .item-code {
+            background-color: #f1f1f1;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
         }
     </style>
 </head>
 <body>
-    <h1>{{ title }} Cheatsheet</h1>
-    {% for category, shortcuts in categories.items() %}
-    <div class="category">
-        <h2>{{ category }}</h2>
-        {% for shortcut, info in shortcuts.items() %}
-        <div class="shortcut">
-            <span class="key">{{ shortcut }}</span>
-            <span class="description">{{ info.description }}</span>
+    <h1>{{ title }}</h1>
+    <p>{{ description }}</p>
+    {% for section in sections %}
+    <div class="section">
+        <h2>{{ section.name }}</h2>
+        {% for item in section.items %}
+        <div class="item">
+            <div class="item-title">{{ item.title }}</div>
+            <div class="item-description">{{ item.description }}</div>
+            <pre class="item-code">{{ item.code }}</pre>
         </div>
         {% endfor %}
     </div>

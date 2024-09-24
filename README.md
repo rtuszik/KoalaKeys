@@ -29,18 +29,29 @@ This application generates HTML cheatsheets from YAML templates.
 
 ## Usage
 
-1. Create a YAML template file (e.g., `my_cheatsheet.yaml`) using the provided `template.yaml` as a guide.
+1. Create a YAML template file (e.g., `my_cheatsheet.yaml`) using the provided `template.yaml` as a guide. The YAML file should have the following structure:
+
+   ```yaml
+   title: "Your Cheatsheet Title"
+   description: "A brief description of your cheatsheet"
+   sections:
+     - name: "Section Name"
+       items:
+         - title: "Item Title"
+           description: "Item Description"
+           code: "Example code"
+   ```
 
 2. Run the generator script:
    ```
    python generate_cheatsheet.py my_cheatsheet.yaml
    ```
 
-3. The generated HTML cheatsheet will be saved in the same directory as the input YAML file.
+3. The generated HTML cheatsheet will be saved in the same directory as the input YAML file, with the name format: `your_cheatsheet_title_cheatsheet.html`.
 
 ## Customization
 
-You can customize the appearance of your cheatsheets by modifying the HTML template in `cheatsheet_template.html`.
+You can customize the appearance of your cheatsheets by modifying the HTML template in `cheatsheet_template.html`. The template uses Jinja2 for rendering, so you can adjust the HTML structure and CSS styles as needed.
 
 ## Contributing
 
