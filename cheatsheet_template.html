@@ -46,17 +46,21 @@
 <body>
     <h1>{{ title }}</h1>
     <p>{{ description }}</p>
-    {% for section in sections %}
-    <div class="section">
-        <h2>{{ section.name }}</h2>
-        {% for item in section.items %}
-        <div class="item">
-            <div class="item-title">{{ item.title }}</div>
-            <div class="item-description">{{ item.description }}</div>
-            <pre class="item-code">{{ item.code }}</pre>
+    {% if sections %}
+        {% for section in sections %}
+        <div class="section">
+            <h2>{{ section.name }}</h2>
+            {% if section.items %}
+                {% for item in section.items %}
+                <div class="item">
+                    <div class="item-title">{{ item.title }}</div>
+                    <div class="item-description">{{ item.description }}</div>
+                    <pre class="item-code">{{ item.code }}</pre>
+                </div>
+                {% endfor %}
+            {% endif %}
         </div>
         {% endfor %}
-    </div>
-    {% endfor %}
+    {% endif %}
 </body>
 </html>
