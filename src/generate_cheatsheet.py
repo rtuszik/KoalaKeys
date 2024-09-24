@@ -8,21 +8,23 @@ def load_yaml(file_path):
         return yaml.safe_load(file)
 
 
+def normalize_shortcuts(data):
+    normalized = {}
+    for section, shortcuts in data.get("shortcuts", {}).items():
+        normalized[section] = {}
+        for shortcut, details in shortcuts.items():
+            normalized_shortcut = "+".join(
+                key.strip().lower() for key in shortcut.split("+")
+            )
+            normalized[section][normalized_shortcut] = details
+    return normalized
+
+
 def generate_html(data):
-    with open("cheatsheet_template.html", "r") as file:
+    with open("src/cheatsheet_template.html", "r") as file:
         template = Template(file.read())
 
-    print("Debug: Data being passed to template:")
-    for key, value in data.items():
-        print(f"{key}: {type(value)}")
-        if isinstance(value, list):
-            print(f"  {key} contents:")
-            for item in value:
-                print(f"    {item}")
-                if isinstance(item, dict):
-                    for sub_key, sub_value in item.items():
-                        print(f"      {sub_key}: {type(sub_value)}")
-
+    data["shortcuts"] = normalize_shortcuts(data)
     return template.render(**data)
 
 
@@ -35,7 +37,7 @@ def main():
     data = load_yaml(yaml_file)
     html_content = generate_html(data)
 
-    output_file = f"{data['title'].lower().replace(' ', '_')}_cheatsheet.html"
+    output_file = f"output/{data['title'].lower().replace(' ', '_')}_cheatsheet.html"
     with open(output_file, "w") as file:
         file.write(html_content)
 

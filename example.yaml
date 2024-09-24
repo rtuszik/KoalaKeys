@@ -1,0 +1,12 @@
+title: Example
+shortcuts:
+  File Operations:
+    "Cmd+C":
+      description: "Copy"
+    "Cmd+V":
+      description: "Paste"
+    "Cmd+S":
+      description: "Save"
+  Window Management:
+    "CMD+H":
+      description: "Hide Current Window"
