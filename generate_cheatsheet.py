@@ -10,7 +10,7 @@ def generate_html(data):
     with open('cheatsheet_template.html', 'r') as file:
         template = Template(file.read())
     
-    return template.render(title=data['title'], description=data['description'], sections=data['sections'])
+    return template.render(**data)
 
 def main():
     if len(sys.argv) != 2:
