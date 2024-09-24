@@ -235,8 +235,14 @@
         const keys = shortcut.split("+");
 
         keys.forEach((key) => {
+          let keyToFind = key.trim().toLowerCase();
+          if (keyToFind === "⌘") keyToFind = "cmd";
+          if (keyToFind === "⌥") keyToFind = "alt";
+          if (keyToFind === "⌃") keyToFind = "ctrl";
+          if (keyToFind === "⇧") keyToFind = "shift";
+
           const keyElement = document.querySelector(
-            `.key[data-key="${key.trim()}"]`,
+            `.key[data-key="${keyToFind}"]`,
           );
           if (keyElement) {
             keyElement.classList.add("active");

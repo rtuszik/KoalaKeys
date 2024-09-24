@@ -9,14 +9,24 @@ def load_yaml(file_path):
         return yaml.safe_load(file)
 
 
+def replace_shortcut_names(shortcut):
+    replacements = {
+        "cmd": "⌘",
+        "command": "⌘",
+        "option": "⌥",
+        "alt": "⌥",
+        "ctrl": "⌃",
+        "shift": "⇧",
+    }
+    return "+".join(replacements.get(key.strip().lower(), key.strip()) for key in shortcut.split("+"))
+
+
 def normalize_shortcuts(data):
     normalized = {}
     for section, shortcuts in data.get("shortcuts", {}).items():
         normalized[section] = {}
         for shortcut, details in shortcuts.items():
-            normalized_shortcut = "+".join(
-                key.strip().lower() for key in shortcut.split("+")
-            )
+            normalized_shortcut = replace_shortcut_names(shortcut)
             normalized[section][normalized_shortcut] = details
     return normalized
 
