@@ -1,13 +1,23 @@
-# Keyboard Shortcut Cheatsheet Generator
+# easy-cheatsheets
 
-This project generates interactive HTML cheatsheets for keyboard shortcuts based on YAML configuration files. It creates visually appealing and user-friendly cheatsheets with a keyboard layout and categorized shortcuts.
+Create and manage your collection of interactive keyboard shortcut cheatsheets with ease!
+
+## Overview
+
+easy-cheatsheets is a powerful tool designed to help you create, organize, and view a collection of interactive HTML cheatsheets for keyboard shortcuts. Whether you're a developer, designer, or power user, this tool will help you keep all your essential shortcuts at your fingertips.
 
 ## Features
 
-- Generate HTML cheatsheets from YAML configuration files
-- Interactive keyboard layout
-- Categorized shortcuts with descriptions
+- Generate beautiful, interactive HTML cheatsheets from simple YAML files
+- Create a collection of cheatsheets for different applications or workflows
+- Interactive keyboard layout with real-time highlighting
+- Categorized shortcuts with descriptions for easy reference
 - Clickable shortcuts that highlight corresponding keys on the keyboard
+- Index page for quick access to all your cheatsheets
+- Search and sort functionality to find the right cheatsheet quickly
+- Responsive design for both cheatsheets and index page
+- Support for different keyboard layouts and system mappings
+- Dark mode toggle for comfortable viewing in any environment
 
 ## Requirements
 
@@ -15,28 +25,12 @@ This project generates interactive HTML cheatsheets for keyboard shortcuts based
 - PyYAML
 - Jinja2
 
-## Project Structure
-
-```
-.
-├── README.md
-├── example.yaml
-├── neovim.yaml
-├── output
-│   ├── example_cheatsheet.html
-├── requirements.txt
-└── src
-    ├── cheatsheet_template.html
-    └── generate_cheatsheet.py
-```
-
 ## Installation
 
 1. Clone this repository:
-
    ```
-   git clone https://github.com/yourusername/keyboard-shortcut-cheatsheet-generator.git
-   cd keyboard-shortcut-cheatsheet-generator
+   git clone https://github.com/yourusername/easy-cheatsheets.git
+   cd easy-cheatsheets
    ```
 
 2. Install the required dependencies:
@@ -46,116 +40,44 @@ This project generates interactive HTML cheatsheets for keyboard shortcuts based
 
 ## Usage
 
-1. Create a YAML file with your keyboard shortcuts in the root directory. Use the following format:
+1. Create YAML files for your cheatsheets in the `cheatsheets` directory at the root of the project. Use the following format:
 
    ```yaml
    title: Your Cheatsheet Title
+   layout:
+     keyboard: QWERTY
+     system: Darwin
    shortcuts:
      Category Name:
        "Shortcut Keys":
          description: "Shortcut Description"
    ```
 
-2. Run the script with your YAML file as an argument:
+2. Run the script to generate your cheatsheet collection:
 
    ```
-   python src/generate_cheatsheet.py your_shortcuts.yaml
+   python src/generate_cheatsheet.py
    ```
 
-3. The generated HTML cheatsheet will be saved in the `output` directory with the name `your_cheatsheet_title_cheatsheet.html`.
-
-## YAML File Structure and Key Formatting
-
-The YAML file structure is crucial for the correct generation of the cheatsheet. Here's a detailed breakdown:
-
-1. **Title**: The first line should be the title of your cheatsheet.
-
-   ```yaml
-   title: Your Cheatsheet Title
-   ```
-
-2. **Shortcuts**: All shortcuts are nested under the `shortcuts` key.
-
-   ```yaml
-   shortcuts:
-   ```
-
-3. **Categories**: Shortcuts are organized into categories. Each category is a key under `shortcuts`.
-
-   ```yaml
-   shortcuts:
-     File Operations:
-     Edit Operations:
-     Window Management:
-   ```
-
-4. **Individual Shortcuts**: Each shortcut is a key-value pair under its category. The key is the shortcut combination, and the value is an object with a `description` key.
-
-   ```yaml
-   shortcuts:
-     File Operations:
-       "Cmd+S":
-         description: "Save file"
-   ```
-
-5. **Key Formatting**:
-   - Use `+` to separate different keys in a combination.
-   - For function keys, use `F1`, `F2`, etc.
-   - Examples of correctly formatted keys:
-     - `"Cmd+S"`
-     - `"cmd+s"`
-     - `"Ctrl+C"`
-     - `"Shift+Tab"`
-     - `"Alt+F4"`
-     - `"Cmd+Shift+S"`
-     - `"Ctrl+Alt+Delete"`
-
-Here's a more comprehensive example:
-
-```yaml
-title: Text Editor Shortcuts
-shortcuts:
-  File Operations:
-    "Cmd+S":
-      description: "Save file"
-    "Cmd+Shift+S":
-      description: "Save as"
-    "Cmd+O":
-      description: "Open file"
-  Edit Operations:
-    "Cmd+C":
-      description: "Copy"
-    "Cmd+V":
-      description: "Paste"
-    "Cmd+X":
-      description: "Cut"
-  Window Management:
-    "Cmd+W":
-      description: "Close window"
-    "Cmd+Shift+F":
-      description: "Full screen"
-```
-
-## Example Files
-
-The project includes an example YAML file - `example.yaml` with a few shortcuts.
+3. Find your generated HTML cheatsheets in the `output` directory.
+4. Open `output/index.html` in your browser to view and navigate your cheatsheet collection.
 
 ## Customization
 
-You can customize the appearance of the cheatsheet by modifying the `src/cheatsheet_template.html` file. The template uses Jinja2 for rendering dynamic content.
+Customize the look and feel of your cheatsheets by modifying:
 
-## Example Outputs
-
-The `output` directory contains an example cheatsheet:
-
-- `example_cheatsheet.html`: Generated from `example.yaml`
-
-You can open this file in a web browser to see how the generated cheatsheets look and function.
+- `src/cheatsheet_template.html`: Individual cheatsheet template
+- `src/index_template.html`: Index page template
+- `src/styles.css`: Styles for cheatsheets and index
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+We welcome contributions! Feel free to submit issues, feature requests, or pull requests.
 
 ## License
 
 This project is open source and available under the [MIT License](LICENSE).
+
+## Get Started
+
+Start building your ultimate cheatsheet collection today with easy-cheatsheets!

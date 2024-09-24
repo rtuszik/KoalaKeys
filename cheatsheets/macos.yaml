@@ -1,0 +1,95 @@
+title: "Default macOS Keyboard Shortcuts"
+layout:
+  keyboard: US
+  system: Darwin
+shortcuts:
+  General:
+    "Cmd+C":
+      description: "Copy selected item"
+    "Cmd+X":
+      description: "Cut selected item"
+    "Cmd+V":
+      description: "Paste copied or cut item"
+    "Cmd+Z":
+      description: "Undo last action"
+    "Cmd+Shift+Z":
+      description: "Redo last undone action"
+    "Cmd+A":
+      description: "Select all items"
+    "Cmd+F":
+      description: "Find items in current document or window"
+    "Cmd+G":
+      description: "Find next occurrence of searched item"
+    "Cmd+Shift+G":
+      description: "Find previous occurrence of searched item"
+  "File and App Management":
+    "Cmd+N":
+      description: "Open new window or document"
+    "Cmd+O":
+      description: "Open selected item or display dialog to choose file to open"
+    "Cmd+S":
+      description: "Save current document"
+    "Cmd+W":
+      description: "Close current window"
+    "Cmd+Q":
+      description: "Quit current application"
+    "Cmd+Tab":
+      description: "Switch to next most recently used app"
+    "Cmd+Shift+Tab":
+      description: "Switch to previous most recently used app"
+  System:
+    "Cmd+Space":
+      description: "Show or hide Spotlight search"
+    "Ctrl+Cmd+Space":
+      description: "Show Character Viewer for emoji and special characters"
+    "Cmd+,":
+      description: "Open preferences for current app"
+    "Fn+F11":
+      description: "Show desktop"
+    "Cmd+Shift+3":
+      description: "Take a screenshot of the entire screen"
+    "Cmd+Shift+4":
+      description: "Take a screenshot of selected area"
+  "Text Editing":
+    "Cmd+B":
+      description: "Bold selected text"
+    "Cmd+I":
+      description: "Italicize selected text"
+    "Cmd+U":
+      description: "Underline selected text"
+    "Cmd+→":
+      description: "Move cursor to end of current line"
+    "Cmd+←":
+      description: "Move cursor to beginning of current line"
+    "Cmd+↑":
+      description: "Move cursor to beginning of document"
+    "Cmd+↓":
+      description: "Move cursor to end of document"
+  Finder:
+    "Cmd+Shift+N":
+      description: "Create new folder"
+    "Cmd+Delete":
+      description: "Move selected item to Trash"
+    "Cmd+Shift+Delete":
+      description: "Empty Trash"
+    "Cmd+1":
+      description: "View items as icons"
+    "Cmd+2":
+      description: "View items as list"
+    "Cmd+3":
+      description: "View items in columns"
+    "Cmd+4":
+      description: "View items in gallery"
+  "Web Browsing":
+    "Cmd+T":
+      description: "Open new tab"
+    "Cmd+Shift+T":
+      description: "Reopen last closed tab"
+    "Cmd+L":
+      description: "Select address bar"
+    "Cmd+R":
+      description: "Reload current page"
+    "Cmd+[":
+      description: "Go back to previous page"
+    "Cmd+]":
+      description: "Go forward to next page"

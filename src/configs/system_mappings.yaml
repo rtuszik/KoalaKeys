@@ -1,0 +1,20 @@
+Darwin:
+  cmd: "⌘"
+  alt: "⌥"
+  ctrl: "⌃"
+  shift: "Shift"
+  space: "Space"
+
+Linux:
+  cmd: "Super"
+  alt: "Alt"
+  ctrl: "Ctrl"
+  shift: "Shift"
+  space: "Space"
+
+Windows:
+  cmd: "Win"
+  alt: "Alt"
+  ctrl: "Ctrl"
+  shift: "Shift"
+  space: "Space"
