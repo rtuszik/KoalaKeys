@@ -10,6 +10,10 @@ def generate_html(data):
     with open('cheatsheet_template.html', 'r') as file:
         template = Template(file.read())
     
+    print("Debug: Data being passed to template:")
+    for key, value in data.items():
+        print(f"{key}: {type(value)}")
+    
     return template.render(**data)
 
 def main():
