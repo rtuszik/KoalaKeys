@@ -4,23 +4,23 @@ layout:
   system: Darwin
 shortcuts:
   General:
-    "cmd+C":
+    "CMD+C":
       description: "Copy selected item"
-    "cmd+X":
+    "CMD+X":
       description: "Cut selected item"
-    "cmd+V":
+    "CMD+V":
       description: "Paste copied or cut item"
-    "cmd+Z":
+    "CMD+Z":
       description: "Undo last action"
-    "cmd+shift+Z":
+    "CMD+SHIFT+Z":
       description: "Redo last undone action"
-    "cmd+A":
+    "CMD+A":
       description: "Select all items"
-    "cmd+F":
+    "CMD+F":
       description: "Find items in current document or window"
-    "cmd+G":
+    "CMD+G":
       description: "Find next occurrence of searched item"
-    "cmd+shift+G":
+    "CMD+SHIFT+G":
       description: "Find previous occurrence of searched item"
   "File and App Management":
     "cmd+N":

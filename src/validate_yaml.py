@@ -86,12 +86,20 @@ def fix_yaml(file_path):
 
     fixes = []
 
-    # Replace special characters
-    special_chars = {'⌘': 'cmd', '⌃': 'ctrl', '⌥': 'alt', '⇧': 'shift'}
+    # Replace special characters and convert to uppercase
+    special_chars = {'⌘': 'CMD', '⌃': 'CTRL', '⌥': 'ALT', '⇧': 'SHIFT'}
     for char, replacement in special_chars.items():
         if char in content:
             content = content.replace(char, replacement)
             fixes.append(f"Replaced '{char}' with '{replacement}'")
+
+    # Convert lowercase special keys to uppercase
+    lowercase_keys = ['cmd', 'ctrl', 'alt', 'shift']
+    for key in lowercase_keys:
+        pattern = re.compile(r'\b' + key + r'\b', re.IGNORECASE)
+        content = pattern.sub(key.upper(), content)
+        if pattern.search(content):
+            fixes.append(f"Converted '{key}' to uppercase")
 
     # Fix indentation
     lines = content.split('\n')
