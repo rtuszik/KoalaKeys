@@ -333,6 +333,15 @@
         width: 40px;
         font-size: 18px;
       }
+      .key-stack {
+        display: flex;
+        flex-direction: column;
+        width: 40px;
+      }
+      .key__arrow-half {
+        height: 25px;
+        font-size: 14px;
+      }
       #dark-mode-toggle {
         position: fixed;
         top: 20px;
@@ -727,8 +736,10 @@
             <div class="key key__bottom-funct" data-key="Alt">ALT</div>
             <div class="key key__bottom-funct" data-key="Ctrl">CTRL</div>
             <div class="key key__arrow" data-key="←">←</div>
-            <div class="key key__arrow" data-key="↓">↓</div>
-            <div class="key key__arrow" data-key="↑">↑</div>
+            <div class="key-stack">
+              <div class="key key__arrow key__arrow-half" data-key="↑">↑</div>
+              <div class="key key__arrow key__arrow-half" data-key="↓">↓</div>
+            </div>
             <div class="key key__arrow" data-key="→">→</div>
           </div>
         </div>
@@ -819,19 +830,40 @@
           rowDiv.className = "row";
 
           row.forEach((key) => {
-            const keyDiv = document.createElement("div");
-            keyDiv.className = "key";
-            keyDiv.setAttribute("data-key", key);
-            keyDiv.textContent = getKeyLabel(key, system);
+            if (key === "↑↓") {
+              const stackDiv = document.createElement("div");
+              stackDiv.className = "key-stack";
+              
+              const upKeyDiv = document.createElement("div");
+              upKeyDiv.className = "key key__arrow key__arrow-half";
+              upKeyDiv.setAttribute("data-key", "↑");
+              upKeyDiv.textContent = getKeyLabel("↑", system);
+              
+              const downKeyDiv = document.createElement("div");
+              downKeyDiv.className = "key key__arrow key__arrow-half";
+              downKeyDiv.setAttribute("data-key", "↓");
+              downKeyDiv.textContent = getKeyLabel("↓", system);
+              
+              stackDiv.appendChild(upKeyDiv);
+              stackDiv.appendChild(downKeyDiv);
+              rowDiv.appendChild(stackDiv);
+            } else {
+              const keyDiv = document.createElement("div");
+              keyDiv.className = "key";
+              keyDiv.setAttribute("data-key", key);
+              keyDiv.textContent = getKeyLabel(key, system);
 
-            // Add specific classes for special keys
-            if (["Backspace", "Tab", "CapsLock", "Enter", "Shift"].includes(key)) {
-              keyDiv.classList.add(`key__${key.toLowerCase()}`);
-            } else if (key === "Space") {
-              keyDiv.classList.add("key__spacebar");
+              // Add specific classes for special keys
+              if (["Backspace", "Tab", "CapsLock", "Enter", "Shift"].includes(key)) {
+                keyDiv.classList.add(`key__${key.toLowerCase()}`);
+              } else if (key === "Space") {
+                keyDiv.classList.add("key__spacebar");
+              } else if (["←", "→"].includes(key)) {
+                keyDiv.classList.add("key__arrow");
+              }
+
+              rowDiv.appendChild(keyDiv);
             }
-
-            rowDiv.appendChild(keyDiv);
           });
 
           keyboard.appendChild(rowDiv);
