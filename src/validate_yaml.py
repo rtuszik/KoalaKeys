@@ -78,3 +78,61 @@ def lint_yaml(file_path):
             warnings.append(f"Line {i} has trailing whitespace")
 
     return warnings
+
+def fix_yaml(file_path):
+    with open(file_path, 'r') as file:
+        content = file.read()
+
+    # Replace special characters
+    content = content.replace('⌘', 'cmd')
+    content = content.replace('⌃', 'ctrl')
+    content = content.replace('⌥', 'alt')
+
+    # Fix indentation
+    lines = content.split('\n')
+    fixed_lines = []
+    for line in lines:
+        stripped = line.lstrip()
+        indent = len(line) - len(stripped)
+        fixed_indent = (indent // 2) * 2  # Round down to nearest even number
+        fixed_lines.append(' ' * fixed_indent + stripped.rstrip())
+
+    fixed_content = '\n'.join(fixed_lines)
+
+    # Write fixed content back to file
+    with open(file_path, 'w') as file:
+        file.write(fixed_content)
+
+def process_yaml(file_path):
+    print(f"Processing {file_path}...")
+    
+    # Validate
+    errors = validate_yaml(file_path)
+    if errors:
+        print("Validation errors:")
+        for error in errors:
+            print(f"- {error}")
+    else:
+        print("Validation passed.")
+
+    # Lint
+    warnings = lint_yaml(file_path)
+    if warnings:
+        print("Linting warnings:")
+        for warning in warnings:
+            print(f"- {warning}")
+    else:
+        print("Linting passed.")
+
+    # Fix
+    fix_yaml(file_path)
+    print("YAML file has been fixed and special characters replaced.")
+
+if __name__ == "__main__":
+    import sys
+    if len(sys.argv) != 2:
+        print("Usage: python validate_yaml.py <path_to_yaml_file>")
+        sys.exit(1)
+    
+    yaml_file = sys.argv[1]
+    process_yaml(yaml_file)
