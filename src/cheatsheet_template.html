@@ -637,6 +637,7 @@
           data-layout="{{ layout.keyboard }}"
           data-system="{{ layout.system }}"
         >
+          <!-- Keyboard rows will be dynamically generated -->
           <div class="row">
             <div class="key" data-key="Esc">Esc</div>
             <div class="key" data-key="F1">F1</div>
@@ -741,6 +742,85 @@
     </div>
 
     <script>
+      // Key label mappings
+      const keyLabelMappings = {
+        Darwin: {
+          Cmd: "⌘",
+          Alt: "⌥",
+          Ctrl: "⌃",
+          Shift: "⇧",
+          CapsLock: "⇪",
+          Tab: "⇥",
+          Enter: "↩",
+          Backspace: "⌫",
+          Space: "Space",
+          Esc: "⎋",
+        },
+        Windows: {
+          Cmd: "Win",
+          Alt: "Alt",
+          Ctrl: "Ctrl",
+          Shift: "Shift",
+          CapsLock: "Caps",
+          Tab: "Tab",
+          Enter: "Enter",
+          Backspace: "Backspace",
+          Space: "Space",
+          Esc: "Esc",
+        },
+        Linux: {
+          Cmd: "Super",
+          Alt: "Alt",
+          Ctrl: "Ctrl",
+          Shift: "Shift",
+          CapsLock: "Caps",
+          Tab: "Tab",
+          Enter: "Enter",
+          Backspace: "Backspace",
+          Space: "Space",
+          Esc: "Esc",
+        },
+      };
+
+      function getKeyLabel(key, system) {
+        return keyLabelMappings[system][key] || key;
+      }
+
+      function generateKeyboard() {
+        const keyboard = document.getElementById("keyboard");
+        const layout = keyboard.getAttribute("data-layout");
+        const system = keyboard.getAttribute("data-system");
+        const keyboardLayout = {{ keyboard_layout | tojson | safe }};
+
+        keyboard.innerHTML = "";
+
+        keyboardLayout.forEach((row) => {
+          const rowDiv = document.createElement("div");
+          rowDiv.className = "row";
+
+          row.forEach((key) => {
+            const keyDiv = document.createElement("div");
+            keyDiv.className = "key";
+            keyDiv.setAttribute("data-key", key);
+            keyDiv.textContent = getKeyLabel(key, system);
+
+            // Add specific classes for special keys
+            if (["Backspace", "Tab", "CapsLock", "Enter", "Shift"].includes(key)) {
+              keyDiv.classList.add(`key__${key.toLowerCase()}`);
+            } else if (key === "Space") {
+              keyDiv.classList.add("key__spacebar");
+            }
+
+            rowDiv.appendChild(keyDiv);
+          });
+
+          keyboard.appendChild(rowDiv);
+        });
+      }
+
+      // Call generateKeyboard on page load
+      document.addEventListener("DOMContentLoaded", generateKeyboard);
+
       // Theme toggle functionality
       const themeToggle = document.getElementById("theme-toggle");
       const themeIcon = document.getElementById("theme-icon");
@@ -794,19 +874,24 @@
           .forEach((key) => key.classList.remove("active"));
 
         const keys = shortcut.split("+");
+        const system = document.getElementById("keyboard").getAttribute("data-system");
 
         keys.forEach((key) => {
-          let keyToFind = key.trim();
-          if (keyToFind === "CMD") keyToFind = "Cmd";
-          if (keyToFind === "CTRL") keyToFind = "Ctrl";
-          if (keyToFind === "ALT") keyToFind = "Alt";
-          if (keyToFind === "SHIFT") keyToFind = "Shift";
-          const keyElement = document.querySelector(
-            `.key[data-key="${keyToFind}"]`,
-          );
-          if (keyElement) {
-            keyElement.classList.add("active");
-          }
+          let keyToFind = key.trim().toLowerCase();
+          const keyElements = document.querySelectorAll(".key");
+
+          keyElements.forEach((element) => {
+            const dataKey = element.getAttribute("data-key").toLowerCase();
+            const keyLabel = element.textContent.toLowerCase();
+
+            if (
+              dataKey === keyToFind ||
+              keyLabel === keyToFind ||
+              (keyToFind === "cmd" && (dataKey === "cmd" || dataKey === "win" || dataKey === "super"))
+            ) {
+              element.classList.add("active");
+            }
+          });
         });
       }
 
