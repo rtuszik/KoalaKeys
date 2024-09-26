@@ -23,8 +23,14 @@ def load_configs():
 
 
 def replace_shortcut_names(shortcut, system_mappings):
+    arrow_key_mappings = {
+        "Up": "↑",
+        "Down": "↓",
+        "Left": "←",
+        "Right": "→"
+    }
     return "+".join(
-        system_mappings.get(key.strip(), key.strip())
+        arrow_key_mappings.get(key.strip(), system_mappings.get(key.strip(), key.strip()))
         for key in shortcut.split("+")
     )
 

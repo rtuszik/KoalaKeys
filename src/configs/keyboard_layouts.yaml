@@ -48,7 +48,7 @@ US:
         "Enter",
       ]
     - ["Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Shift"]
-    - ["Ctrl", "Alt", "Cmd", "Space", "Cmd", "Alt", "Ctrl", "←", "↑↓", "→"]
+    - ["Ctrl", "Alt", "Cmd", "Space", "Cmd", "Alt", "Ctrl", "Left", "Up", "Down", "Right"]
 
 UK:
   layout:
