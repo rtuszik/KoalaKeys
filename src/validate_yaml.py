@@ -2,6 +2,7 @@ import yaml
 from yaml.parser import ParserError
 from yaml.scanner import ScannerError
 import re
+from ruamel.yaml import YAML
 
 def validate_yaml(file_path):
     errors = []
@@ -83,11 +84,14 @@ def fix_yaml(file_path):
     with open(file_path, 'r') as file:
         content = file.read()
 
+    fixes = []
+
     # Replace special characters
-    content = content.replace('⌘', 'cmd')
-    content = content.replace('⌃', 'ctrl')
-    content = content.replace('⌥', 'alt')
-    content = content.replace('⇧', 'shift')
+    special_chars = {'⌘': 'cmd', '⌃': 'ctrl', '⌥': 'alt', '⇧': 'shift'}
+    for char, replacement in special_chars.items():
+        if char in content:
+            content = content.replace(char, replacement)
+            fixes.append(f"Replaced '{char}' with '{replacement}'")
 
     # Fix indentation
     lines = content.split('\n')
@@ -96,6 +100,8 @@ def fix_yaml(file_path):
         stripped = line.lstrip()
         indent = len(line) - len(stripped)
         fixed_indent = (indent // 2) * 2  # Round down to nearest even number
+        if fixed_indent != indent:
+            fixes.append(f"Fixed indentation in line: {line.strip()}")
         fixed_lines.append(' ' * fixed_indent + stripped.rstrip())
 
     fixed_content = '\n'.join(fixed_lines)
@@ -103,6 +109,22 @@ def fix_yaml(file_path):
     # Write fixed content back to file
     with open(file_path, 'w') as file:
         file.write(fixed_content)
+
+    return fixes
+
+def format_yaml(file_path):
+    yaml = YAML()
+    yaml.indent(mapping=2, sequence=4, offset=2)
+    yaml.preserve_quotes = True
+    yaml.width = 100
+
+    with open(file_path, 'r') as file:
+        data = yaml.load(file)
+
+    with open(file_path, 'w') as file:
+        yaml.dump(data, file)
+
+    return "YAML file has been formatted for improved readability."
 
 def process_yaml(file_path):
     print(f"Processing {file_path}...")
@@ -126,8 +148,17 @@ def process_yaml(file_path):
         print("Linting passed.")
 
     # Fix
-    fix_yaml(file_path)
-    print("YAML file has been fixed and special characters replaced.")
+    fixes = fix_yaml(file_path)
+    if fixes:
+        print("Fixes applied:")
+        for fix in fixes:
+            print(f"- {fix}")
+    else:
+        print("No fixes were necessary.")
+
+    # Format
+    format_message = format_yaml(file_path)
+    print(format_message)
 
 if __name__ == "__main__":
     import sys
