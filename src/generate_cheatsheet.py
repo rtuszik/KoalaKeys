@@ -24,7 +24,7 @@ def load_configs():
 
 def replace_shortcut_names(shortcut, system_mappings):
     return "+".join(
-        system_mappings.get(key.strip().lower(), key.strip())
+        system_mappings.get(key.strip(), key.strip())
         for key in shortcut.split("+")
     )
 

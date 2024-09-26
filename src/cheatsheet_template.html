@@ -714,13 +714,13 @@
             <div class="key key__right-shift" data-key="Shift">Shift</div>
           </div>
           <div class="row">
-            <div class="key key__bottom-funct" data-key="Ctrl">Ctrl</div>
-            <div class="key key__bottom-funct" data-key="Alt">Alt</div>
-            <div class="key key__bottom-funct" data-key="Cmd">Cmd</div>
-            <div class="key key__spacebar" data-key="Space">Space</div>
-            <div class="key key__bottom-funct" data-key="Cmd">Cmd</div>
-            <div class="key key__bottom-funct" data-key="Alt">Alt</div>
-            <div class="key key__bottom-funct" data-key="Ctrl">Ctrl</div>
+            <div class="key key__bottom-funct" data-key="Ctrl">CTRL</div>
+            <div class="key key__bottom-funct" data-key="Alt">ALT</div>
+            <div class="key key__bottom-funct" data-key="Cmd">CMD</div>
+            <div class="key key__spacebar" data-key="Space">SPACE</div>
+            <div class="key key__bottom-funct" data-key="Cmd">CMD</div>
+            <div class="key key__bottom-funct" data-key="Alt">ALT</div>
+            <div class="key key__bottom-funct" data-key="Ctrl">CTRL</div>
           </div>
         </div>
       </div>
@@ -796,8 +796,11 @@
         const keys = shortcut.split("+");
 
         keys.forEach((key) => {
-          let keyToFind = key.trim().toLowerCase();
-          if (keyToFind === "⌃") keyToFind = "ctrl";
+          let keyToFind = key.trim();
+          if (keyToFind === "CMD") keyToFind = "Cmd";
+          if (keyToFind === "CTRL") keyToFind = "Ctrl";
+          if (keyToFind === "ALT") keyToFind = "Alt";
+          if (keyToFind === "SHIFT") keyToFind = "Shift";
           const keyElement = document.querySelector(
             `.key[data-key="${keyToFind}"]`,
           );
@@ -814,10 +817,10 @@
         });
       });
 
-      // Normalize all key data-attributes to lowercase
+      // Keep original case for key data-attributes
       document.querySelectorAll(".key").forEach((key) => {
         const dataKey = key.getAttribute("data-key");
-        key.setAttribute("data-key", dataKey.toLowerCase());
+        key.setAttribute("data-key", dataKey);
       });
 
       // Category navigation
