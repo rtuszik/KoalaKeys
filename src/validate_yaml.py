@@ -87,6 +87,7 @@ def fix_yaml(file_path):
     content = content.replace('⌘', 'cmd')
     content = content.replace('⌃', 'ctrl')
     content = content.replace('⌥', 'alt')
+    content = content.replace('⇧', 'shift')
 
     # Fix indentation
     lines = content.split('\n')
