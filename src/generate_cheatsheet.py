@@ -96,16 +96,31 @@ def main(yaml_file):
     keyboard_layouts, system_mappings = load_configs()
     html_content = generate_html(data, keyboard_layouts, system_mappings)
 
-    output_dir = os.path.join(os.path.dirname(__file__), "..", "output")
-    os.makedirs(output_dir, exist_ok=True)
+    # Use the output directory from .env if specified, otherwise use the default
+    output_dir = os.getenv('CHEATSHEET_OUTPUT_DIR')
+    if not output_dir:
+        output_dir = os.path.join(os.path.dirname(__file__), "..", "output")
+        logging.info(f"Using default output directory: {output_dir}")
+    else:
+        logging.info(f"Using custom output directory from .env: {output_dir}")
+
+    try:
+        os.makedirs(output_dir, exist_ok=True)
+    except OSError as e:
+        logging.error(f"Error creating output directory: {e}")
+        return None, None
 
     base_filename = f"{data['title'].lower().replace(' ', '_')}_cheatsheet"
     html_output = os.path.join(output_dir, f"{base_filename}.html")
 
-    with open(html_output, "w") as file:
-        file.write(html_content)
+    try:
+        with open(html_output, "w") as file:
+            file.write(html_content)
+    except IOError as e:
+        logging.error(f"Error writing to output file: {e}")
+        return None, None
 
-    print(f"Cheatsheet generated: {html_output}")
+    logging.info(f"Cheatsheet generated: {html_output}")
 
     return data["title"], os.path.basename(html_output)
 
