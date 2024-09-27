@@ -166,13 +166,19 @@ def generate_index(cheatsheets):
 
     html_content = template.render(cheatsheets=cheatsheets)
 
-    output_dir = os.path.join(os.path.dirname(__file__), "..", "output")
+    output_dir = os.getenv('CHEATSHEET_OUTPUT_DIR')
+    if not output_dir:
+        output_dir = os.path.join(os.path.dirname(__file__), "..", "output")
+        logging.info(f"Using default output directory for index: {output_dir}")
+    else:
+        logging.info(f"Using custom output directory from .env for index: {output_dir}")
+
     index_output = os.path.join(output_dir, "index.html")
 
     with open(index_output, "w") as file:
         file.write(html_content)
 
-    print(f"Index page generated: {index_output}")
+    logging.info(f"Index page generated: {index_output}")
 
 
 if __name__ == "__main__":
