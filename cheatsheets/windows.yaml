@@ -1,0 +1,116 @@
+title: "Default Windows Keyboard Shortcuts"
+layout:
+  keyboard: US
+  system: Windows
+shortcuts:
+  General:
+    "Ctrl+C":
+      description: "Copy selected item"
+    "Ctrl+X":
+      description: "Cut selected item"
+    "Ctrl+V":
+      description: "Paste copied or cut item"
+    "Ctrl+Z":
+      description: "Undo last action"
+    "Ctrl+Y":
+      description: "Redo last undone action"
+    "Ctrl+A":
+      description: "Select all items"
+    "Ctrl+F":
+      description: "Find items in current document or window"
+    "F3":
+      description: "Find next occurrence of searched item"
+    "Shift+F3":
+      description: "Find previous occurrence of searched item"
+  "File and App Management":
+    "Ctrl+N":
+      description: "Open new window or document"
+    "Ctrl+O":
+      description: "Open selected item or display dialog to choose file to open"
+    "Ctrl+S":
+      description: "Save current document"
+    "Ctrl+W":
+      description: "Close current window"
+    "Alt+F4":
+      description: "Quit current application"
+    "Alt+Tab":
+      description: "Switch between open apps"
+    "Alt+Shift+Tab":
+      description: "Switch to previous app in Alt+Tab order"
+  System:
+    "Windows+S":
+      description: "Open Search"
+    "Windows+.":
+      description: "Open emoji panel"
+    "Ctrl+Shift+Esc":
+      description: "Open Task Manager"
+    "Windows+D":
+      description: "Show desktop"
+    "Windows+PrtScn":
+      description: "Take a screenshot of the entire screen and save it"
+    "Windows+Shift+S":
+      description: "Take a screenshot of selected area"
+  "Text Editing":
+    "Ctrl+B":
+      description: "Bold selected text"
+    "Ctrl+I":
+      description: "Italicize selected text"
+    "Ctrl+U":
+      description: "Underline selected text"
+    "End":
+      description: "Move cursor to end of current line"
+    "Home":
+      description: "Move cursor to beginning of current line"
+    "Ctrl+Home":
+      description: "Move cursor to beginning of document"
+    "Ctrl+End":
+      description: "Move cursor to end of document"
+    "Ctrl+Right":
+      description: "Move cursor to the beginning of the next word"
+    "Ctrl+Left":
+      description: "Move cursor to the beginning of the previous word"
+  "File Explorer":
+    "Ctrl+Shift+N":
+      description: "Create new folder"
+    "Delete":
+      description: "Move selected item to Recycle Bin"
+    "Shift+Delete":
+      description: "Permanently delete selected item"
+    "F2":
+      description: "Rename selected item"
+    "Alt+Enter":
+      description: "View properties of selected item"
+  "Web Browsing":
+    "Ctrl+T":
+      description: "Open new tab"
+    "Ctrl+Shift+T":
+      description: "Reopen last closed tab"
+    "Ctrl+L":
+      description: "Select address bar"
+    "F5":
+      description: "Reload current page"
+    "Alt+Left":
+      description: "Go back to previous page"
+    "Alt+Right":
+      description: "Go forward to next page"
+  "Windows Specific":
+    "Windows+E":
+      description: "Open File Explorer"
+    "Windows+I":
+      description: "Open Settings"
+    "Windows+L":
+      description: "Lock your PC"
+    "Windows+R":
+      description: "Open Run dialog"
+    "Windows+X":
+      description: "Open Quick Access Menu"
+    "Windows+Tab":
+      description: "Open Task View"
+    "Windows+Up":
+      description: "Maximize the current window"
+    "Windows+Down":
+      description: "Minimize the current window or restore a maximized window"
+    "Windows+Left":
+      description: "Snap current window to the left half of the screen"
+    "Windows+Right":
+      description: "Snap current window to the right half of the screen"

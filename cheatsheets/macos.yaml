@@ -23,73 +23,73 @@ shortcuts:
     "CMD+SHIFT+G":
       description: "Find previous occurrence of searched item"
   "File and App Management":
-    "cmd+N":
+    "CMD+N":
       description: "Open new window or document"
-    "cmd+O":
+    "CMD+O":
       description: "Open selected item or display dialog to choose file to open"
-    "cmd+S":
+    "CMD+S":
       description: "Save current document"
-    "cmd+W":
+    "CMD+W":
       description: "Close current window"
-    "cmd+Q":
+    "CMD+Q":
       description: "Quit current application"
-    "cmd+Tab":
+    "CMD+Tab":
       description: "Switch to next most recently used app"
-    "cmd+shift+Tab":
+    "CMD+SHIFT+Tab":
       description: "Switch to previous most recently used app"
   System:
-    "cmd+Space":
+    "CMD+Space":
       description: "Show or hide Spotlight search"
-    "ctrl+cmd+Space":
+    "CTRL+CMD+Space":
       description: "Show Character Viewer for emoji and special characters"
-    "cmd+,":
+    "CMD+,":
       description: "Open preferences for current app"
     "Fn+F11":
       description: "Show desktop"
-    "cmd+shift+3":
+    "CMD+SHIFT+3":
       description: "Take a screenshot of the entire screen"
-    "cmd+shift+4":
+    "CMD+SHIFT+4":
       description: "Take a screenshot of selected area"
   "Text Editing":
-    "cmd+B":
+    "CMD+B":
       description: "Bold selected text"
-    "cmd+I":
+    "CMD+I":
       description: "Italicize selected text"
-    "cmd+U":
+    "CMD+U":
       description: "Underline selected text"
-    "cmd+→":
+    "CMD+→":
       description: "Move cursor to end of current line"
-    "cmd+←":
+    "CMD+←":
       description: "Move cursor to beginning of current line"
-    "cmd+↑":
+    "CMD+↑":
       description: "Move cursor to beginning of document"
-    "cmd+↓":
+    "CMD+↓":
       description: "Move cursor to end of document"
   Finder:
-    "cmd+shift+N":
+    "CMD+SHIFT+N":
       description: "Create new folder"
-    "cmd+Delete":
+    "CMD+Delete":
       description: "Move selected item to Trash"
-    "cmd+shift+Delete":
+    "CMD+SHIFT+Delete":
       description: "Empty Trash"
-    "cmd+1":
+    "CMD+1":
       description: "View items as icons"
-    "cmd+2":
+    "CMD+2":
       description: "View items as list"
-    "cmd+3":
+    "CMD+3":
       description: "View items in columns"
-    "cmd+4":
+    "CMD+4":
       description: "View items in gallery"
   "Web Browsing":
-    "cmd+T":
+    "CMD+T":
       description: "Open new tab"
-    "cmd+shift+T":
+    "CMD+SHIFT+T":
       description: "Reopen last closed tab"
-    "cmd+L":
+    "CMD+L":
       description: "Select address bar"
-    "cmd+R":
+    "CMD+R":
       description: "Reload current page"
-    "cmd+[":
+    "CMD+[":
       description: "Go back to previous page"
-    "cmd+]":
+    "CMD+]":
       description: "Go forward to next page"
