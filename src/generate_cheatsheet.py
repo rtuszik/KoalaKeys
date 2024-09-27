@@ -4,7 +4,41 @@ import sys
 import os
 import glob
 from validate_yaml import validate_yaml, lint_yaml
+from dotenv import load_dotenv
+import logging
+import argparse
 
+def setup_logging(debug=False):
+    log_file = 'cheatsheet_generator.log'
+    log_level = logging.DEBUG if debug else logging.INFO
+    log_format = '%(asctime)s - %(levelname)s - %(message)s'
+
+    # Set up file handler
+    file_handler = logging.FileHandler(log_file)
+    file_handler.setLevel(log_level)
+    file_handler.setFormatter(logging.Formatter(log_format))
+
+    # Set up console handler
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(log_level)
+    console_handler.setFormatter(logging.Formatter(log_format))
+
+    # Set up root logger
+    logging.root.setLevel(log_level)
+    logging.root.addHandler(file_handler)
+    if debug:
+        logging.root.addHandler(console_handler)
+
+# Parse command-line arguments
+parser = argparse.ArgumentParser(description='Generate cheatsheets')
+parser.add_argument('-d', '--debug', action='store_true', help='Enable debug mode')
+args = parser.parse_args()
+
+# Set up logging
+setup_logging(args.debug)
+
+# Load environment variables
+load_dotenv()
 
 def load_yaml(file_path):
     try:
@@ -77,20 +111,20 @@ def main(yaml_file):
     warnings = lint_yaml(yaml_file)
 
     if errors:
-        print(f"Validation errors in {yaml_file}:")
+        logging.error(f"Validation errors in {yaml_file}:")
         for error in errors:
-            print(f"  - {error}")
+            logging.error(f"  - {error}")
         return None, None
 
     if warnings:
-        print(f"Linting warnings in {yaml_file}:")
+        logging.warning(f"Linting warnings in {yaml_file}:")
         for warning in warnings:
-            print(f"  - {warning}")
+            logging.warning(f"  - {warning}")
 
     data = load_yaml(yaml_file)
 
     if "title" not in data:
-        print("Error: 'title' field is missing in the YAML file.")
+        logging.error("Error: 'title' field is missing in the YAML file.")
         return None, None
 
     keyboard_layouts, system_mappings = load_configs()
