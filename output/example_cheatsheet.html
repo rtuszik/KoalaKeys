@@ -117,7 +117,7 @@
         color: var(--mocha-mauve);
       }
       .section {
-        background-color: var(--surface0);
+        background-color: var(--mantle);
         border-radius: 6px;
         padding: 8px;
         margin-bottom: 15px;
@@ -132,8 +132,8 @@
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
       }
       .section h2 {
-        color: var(--latte-blue);
-        border-bottom: 1px solid var(--latte-blue);
+        color: var(--latte-lavender);
+        border-bottom: 1px solid var(--latte-lavender);
         padding-bottom: 5px;
         margin-top: 0;
         margin-bottom: 10px;
@@ -141,8 +141,8 @@
         font-size: 1.3rem;
       }
       body.dark-mode .section h2 {
-        color: var(--mocha-blue);
-        border-bottom-color: var(--mocha-blue);
+        color: var(--mocha-lavender);
+        border-bottom-color: var(--mocha-lavender);
       }
       .shortcuts-container {
         display: grid;
@@ -165,7 +165,7 @@
         }
       }
       .shortcut {
-        background-color: var(--surface1);
+        background-color: var(--crust);
         border-radius: 5px;
         padding: 6px 8px;
         cursor: pointer;
@@ -185,7 +185,7 @@
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
       }
       .shortcut:hover {
-        background-color: var(--surface2);
+        background-color: var(--surface1);
         transform: translateY(-2px);
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
       }
@@ -199,7 +199,7 @@
       .shortcut-key {
         font-weight: 600;
         font-size: 0.95rem;
-        color: var(--latte-red);
+        color: var(--latte-mauve);
         font-family: "Iosevka Web", monospace;
         transition:
           color 0.3s,
@@ -258,7 +258,7 @@
       .key {
         width: 50px;
         height: 50px;
-        background: var(--surface0);
+        background: var(--crust);
         border: 1px solid var(--overlay0);
         border-radius: 4px;
         display: flex;
@@ -329,12 +329,25 @@
       .key__bottom-funct {
         width: 70px;
       }
+      .key__arrow {
+        width: 40px;
+        font-size: 18px;
+      }
+      .key-stack {
+        display: flex;
+        flex-direction: column;
+        width: 40px;
+      }
+      .key__arrow-half {
+        height: 25px;
+        font-size: 14px;
+      }
       #dark-mode-toggle {
         position: fixed;
         top: 20px;
         right: 20px;
         padding: 10px 15px;
-        background-color: var(--latte-blue);
+        background-color: var(--latte-lavender);
         color: var(--latte-base);
         border: none;
         border-radius: 8px;
@@ -430,13 +443,13 @@
 
       #shortcut-search:focus {
         outline: none;
-        border-color: var(--latte-blue);
-        box-shadow: 0 0 5px var(--latte-blue);
+        border-color: var(--latte-lavender);
+        box-shadow: 0 0 5px var(--latte-lavender);
       }
 
       body.dark-mode #shortcut-search:focus {
-        border-color: var(--mocha-blue);
-        box-shadow: 0 0 5px var(--mocha-blue);
+        border-color: var(--mocha-lavender);
+        box-shadow: 0 0 5px var(--mocha-lavender);
       }
 
       #content-wrapper {
@@ -527,7 +540,7 @@
         left: -200px;
         width: 200px;
         height: 100vh;
-        background: var(--latte-surface0);
+        background: var(--surface0);
         overflow-y: auto;
         transition: left 0.3s ease;
         z-index: 998;
@@ -574,10 +587,10 @@
         color: var(--mocha-text);
       }
       #category-nav a:hover {
-        color: var(--latte-blue);
+        color: var(--latte-lavender);
       }
       body.dark-mode #category-nav a:hover {
-        color: var(--mocha-blue);
+        color: var(--mocha-lavender);
       }
     </style>
   </head>
@@ -641,6 +654,7 @@
           data-layout="US"
           data-system="Darwin"
         >
+          <!-- Keyboard rows will be dynamically generated -->
           <div class="row">
             <div class="key" data-key="Esc">Esc</div>
             <div class="key" data-key="F1">F1</div>
@@ -718,13 +732,17 @@
             <div class="key key__right-shift" data-key="Shift">Shift</div>
           </div>
           <div class="row">
-            <div class="key key__bottom-funct" data-key="Ctrl">Ctrl</div>
-            <div class="key key__bottom-funct" data-key="Alt">Alt</div>
-            <div class="key key__bottom-funct" data-key="Cmd">Cmd</div>
-            <div class="key key__spacebar" data-key="Space">Space</div>
-            <div class="key key__bottom-funct" data-key="Cmd">Cmd</div>
-            <div class="key key__bottom-funct" data-key="Alt">Alt</div>
-            <div class="key key__bottom-funct" data-key="Ctrl">Ctrl</div>
+            <div class="key key__bottom-funct" data-key="Ctrl">CTRL</div>
+            <div class="key key__bottom-funct" data-key="Alt">ALT</div>
+            <div class="key key__bottom-funct" data-key="Cmd">CMD</div>
+            <div class="key key__spacebar" data-key="Space">SPACE</div>
+            <div class="key key__bottom-funct" data-key="Cmd">CMD</div>
+            <div class="key key__bottom-funct" data-key="Alt">ALT</div>
+            <div class="key key__bottom-funct" data-key="Ctrl">CTRL</div>
+            <div class="key key__arrow" data-key="Left">←</div>
+            <div class="key key__arrow" data-key="Up">↑</div>
+            <div class="key key__arrow" data-key="Down">↓</div>
+            <div class="key key__arrow" data-key="Right">→</div>
           </div>
         </div>
       </div>
@@ -735,17 +753,17 @@
         <div class="shortcuts-container">
           
           <div class="shortcut" title="Click to highlight on keyboard">
-            <div class="shortcut-key">⌘+C</div>
+            <div class="shortcut-key">Cmd+C</div>
             <div class="shortcut-description">Copy</div>
           </div>
           
           <div class="shortcut" title="Click to highlight on keyboard">
-            <div class="shortcut-key">⌘+V</div>
+            <div class="shortcut-key">Cmd+V</div>
             <div class="shortcut-description">Paste</div>
           </div>
           
           <div class="shortcut" title="Click to highlight on keyboard">
-            <div class="shortcut-key">⌘+S</div>
+            <div class="shortcut-key">Cmd+S</div>
             <div class="shortcut-description">Save</div>
           </div>
           
@@ -757,7 +775,7 @@
         <div class="shortcuts-container">
           
           <div class="shortcut" title="Click to highlight on keyboard">
-            <div class="shortcut-key">⌘+H</div>
+            <div class="shortcut-key">CMD+H</div>
             <div class="shortcut-description">Hide Current Window</div>
           </div>
           
@@ -767,6 +785,118 @@
     </div>
 
     <script>
+      // Key label mappings
+      const keyLabelMappings = {
+        Darwin: {
+          Cmd: "⌘",
+          Alt: "Option",
+          Ctrl: "Control",
+          Shift: "Shift",
+          CapsLock: "Caps",
+          Tab: "Tab",
+          Enter: "↩",
+          Backspace: "⌫",
+          Space: "",
+          Esc: "Esc",
+          "Left": "←",
+          "Down": "↓",
+          "Up": "↑",
+          "Right": "→",
+        },
+        Windows: {
+          Cmd: "Win",
+          Alt: "Alt",
+          Ctrl: "Ctrl",
+          Shift: "Shift",
+          CapsLock: "Caps",
+          Tab: "Tab",
+          Enter: "Enter",
+          Backspace: "Backspace",
+          Space: "Space",
+          Esc: "Esc",
+          "←": "←",
+          "↓": "↓",
+          "↑": "↑",
+          "→": "→",
+        },
+        Linux: {
+          Cmd: "Super",
+          Alt: "Alt",
+          Ctrl: "Ctrl",
+          Shift: "Shift",
+          CapsLock: "Caps",
+          Tab: "Tab",
+          Enter: "Enter",
+          Backspace: "Backspace",
+          Space: "Space",
+          Esc: "Esc",
+          "←": "←",
+          "↓": "↓",
+          "↑": "↑",
+          "→": "→",
+        },
+      };
+
+      function getKeyLabel(key, system) {
+        return keyLabelMappings[system][key] || key;
+      }
+
+      function generateKeyboard() {
+        const keyboard = document.getElementById("keyboard");
+        const layout = keyboard.getAttribute("data-layout");
+        const system = keyboard.getAttribute("data-system");
+        const keyboardLayout = [["Esc", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12"], ["`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "=", "Backspace"], ["Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\"], ["CapsLock", "A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "\u0027", "Enter"], ["Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Shift"], ["Ctrl", "Alt", "Cmd", "Space", "Cmd", "Alt", "Ctrl", "Left", "Up", "Down", "Right"]];
+
+        keyboard.innerHTML = "";
+
+        keyboardLayout.forEach((row) => {
+          const rowDiv = document.createElement("div");
+          rowDiv.className = "row";
+
+          row.forEach((key) => {
+            if (key === "↑↓") {
+              const stackDiv = document.createElement("div");
+              stackDiv.className = "key-stack";
+              
+              const upKeyDiv = document.createElement("div");
+              upKeyDiv.className = "key key__arrow key__arrow-half";
+              upKeyDiv.setAttribute("data-key", "↑");
+              upKeyDiv.textContent = getKeyLabel("↑", system);
+              
+              const downKeyDiv = document.createElement("div");
+              downKeyDiv.className = "key key__arrow key__arrow-half";
+              downKeyDiv.setAttribute("data-key", "↓");
+              downKeyDiv.textContent = getKeyLabel("↓", system);
+              
+              stackDiv.appendChild(upKeyDiv);
+              stackDiv.appendChild(downKeyDiv);
+              rowDiv.appendChild(stackDiv);
+            } else {
+              const keyDiv = document.createElement("div");
+              keyDiv.className = "key";
+              keyDiv.setAttribute("data-key", key);
+              keyDiv.textContent = getKeyLabel(key, system);
+
+              // Add specific classes for special keys
+              if (["Backspace", "Tab", "CapsLock", "Enter", "Shift"].includes(key)) {
+                keyDiv.classList.add(`key__${key.toLowerCase()}`);
+              } else if (key === "Space") {
+                keyDiv.classList.add("key__spacebar");
+              } else if (["←", "→"].includes(key)) {
+                keyDiv.classList.add("key__arrow");
+              }
+
+              rowDiv.appendChild(keyDiv);
+            }
+          });
+
+          keyboard.appendChild(rowDiv);
+        });
+      }
+
+      // Call generateKeyboard on page load
+      document.addEventListener("DOMContentLoaded", generateKeyboard);
+
       // Theme toggle functionality
       const themeToggle = document.getElementById("theme-toggle");
       const themeIcon = document.getElementById("theme-icon");
@@ -820,16 +950,24 @@
           .forEach((key) => key.classList.remove("active"));
 
         const keys = shortcut.split("+");
+        const system = document.getElementById("keyboard").getAttribute("data-system");
 
         keys.forEach((key) => {
           let keyToFind = key.trim().toLowerCase();
-          if (keyToFind === "⌃") keyToFind = "ctrl";
-          const keyElement = document.querySelector(
-            `.key[data-key="${keyToFind}"]`,
-          );
-          if (keyElement) {
-            keyElement.classList.add("active");
-          }
+          const keyElements = document.querySelectorAll(".key");
+
+          keyElements.forEach((element) => {
+            const dataKey = element.getAttribute("data-key").toLowerCase();
+            const keyLabel = element.textContent.toLowerCase();
+
+            if (
+              dataKey === keyToFind ||
+              keyLabel === keyToFind ||
+              (keyToFind === "cmd" && (dataKey === "cmd" || dataKey === "win" || dataKey === "super"))
+            ) {
+              element.classList.add("active");
+            }
+          });
         });
       }
 
@@ -840,10 +978,10 @@
         });
       });
 
-      // Normalize all key data-attributes to lowercase
+      // Keep original case for key data-attributes
       document.querySelectorAll(".key").forEach((key) => {
         const dataKey = key.getAttribute("data-key");
-        key.setAttribute("data-key", dataKey.toLowerCase());
+        key.setAttribute("data-key", dataKey);
       });
 
       // Category navigation
