@@ -57,13 +57,13 @@ shortcuts:
       description: "Italicize selected text"
     "CMD+U":
       description: "Underline selected text"
-    "CMD+→":
+    "CMD+Right":
       description: "Move cursor to end of current line"
-    "CMD+←":
+    "CMD+Left":
       description: "Move cursor to beginning of current line"
-    "CMD+↑":
+    "CMD+Up":
       description: "Move cursor to beginning of document"
-    "CMD+↓":
+    "CMD+Down":
       description: "Move cursor to end of document"
   Finder:
     "CMD+SHIFT+N":

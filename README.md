@@ -1,103 +1,88 @@
 # Easy Cheatsheets
 
-Create and manage your collection of interactive keyboard shortcut cheatsheets with ease!
+A simple tool to create and manage interactive keyboard shortcut cheatsheets.
+
+> **Quick Start**: To create a cheatsheet, add a YAML file to the `cheatsheets` directory and run `python src/generate_cheatsheet.py`. For detailed YAML formatting instructions, see the [YAML Cheatsheet Specification Guide](yaml_cheatsheet_specification.md).
 
 ## Overview
 
-Easy Cheatsheets is a powerful tool designed to help you create, organize, and view a collection of interactive HTML cheatsheets for keyboard shortcuts. Whether you're a developer, designer, or power user, this tool will help you keep all your essential shortcuts at your fingertips.
+Easy Cheatsheets helps you generate and organize interactive HTML cheatsheets for keyboard shortcuts. It's designed for developers, designers, and power users who want to keep their essential shortcuts easily accessible.
 
 ## Features
 
-- Generate beautiful, interactive HTML cheatsheets from simple YAML files
-- Create a collection of cheatsheets for different applications or workflows
+- Generate HTML cheatsheets from YAML files
 - Interactive keyboard layout with real-time highlighting
-- Categorized shortcuts with descriptions for easy reference
-- Clickable shortcuts that highlight corresponding keys on the keyboard
-- Index page for quick access to all your cheatsheets
-- Search functionality to find shortcuts quickly
-- Responsive design for both cheatsheets and index page
+- Categorized shortcuts with descriptions
+- Index page for quick access to all cheatsheets
+- Search functionality
 - Support for different keyboard layouts and system mappings
-- Dark mode toggle for comfortable viewing in any environment
+
+## Available Systems and Keyboards
+
+### Systems
+
+- Darwin (macOS)
+- Linux
+- Windows
+
+### Keyboard Layouts
+
+- US
+- UK
+- DE (German)
+- FR (French)
+- ES (Spanish)
 
 ## Requirements
 
-- Python 3.7+
+- Python 3.8+
 
 ## Installation
 
-1. Clone this repository:
+1. Clone the repository:
+
    ```
    git clone https://github.com/yourusername/easy-cheatsheets.git
    cd easy-cheatsheets
    ```
 
-2. Create a virtual environment (optional but recommended):
+2. Create and activate a virtual environment (optional):
+
    ```
    python -m venv venv
+   source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
    ```
 
-3. Activate the virtual environment:
-   - On Unix or MacOS:
-     ```
-     source venv/bin/activate
-     ```
-   - On Windows:
-     ```
-     venv\Scripts\activate
-     ```
+3. Install dependencies:
 
-4. Install the required dependencies:
    ```
    pip install -r requirements.txt
    ```
 
-5. Set up environment variables:
-   Create a `.env` file in the project root and add the following:
+4. Set up the output directory:
+   Create a `.env` file in the project root with:
    ```
    CHEATSHEET_OUTPUT_DIR=path/to/your/output/directory
    ```
-   Replace `path/to/your/output/directory` with the desired output location for generated cheatsheets.
 
 ## Usage
 
-1. Create YAML files for your cheatsheets in the `cheatsheets` directory. Use the following format:
+1. Create YAML files for your cheatsheets in the `cheatsheets` directory. For detailed instructions on how to format your YAML files, please refer to the [YAML Cheatsheet Specification Guide](yaml_cheatsheet_spec.md).
 
-   ```yaml
-   title: Your Cheatsheet Title
-   layout:
-     keyboard: US
-     system: Darwin
-   shortcuts:
-     Category Name:
-       "Shortcut Keys":
-         description: "Shortcut Description"
-   ```
-
-2. Run the script to generate your cheatsheet collection:
+2. Generate cheatsheets:
 
    ```
    python src/generate_cheatsheet.py
    ```
 
-3. Find your generated HTML cheatsheets in the directory specified by the `CHEATSHEET_OUTPUT_DIR` environment variable (or in the `output` directory if not set).
+3. Find your HTML cheatsheets in the specified output directory.
 
-4. Open the `index.html` file in your browser to view and navigate your cheatsheet collection.
-
-## Customization
-
-Customize the look and feel of your cheatsheets by modifying:
-
-- `src/cheatsheet_template.html`: Individual cheatsheet template
-- `src/index_template.html`: Index page template
+4. Open `index.html` to view your cheatsheet collection.
 
 ## Contributing
 
-We welcome contributions! Please feel free to submit issues, feature requests, or pull requests.
+Contributions are welcome! Feel free to submit issues, feature requests, or pull requests.
 
 ## License
 
-This project is open source and available under the [MIT License](LICENSE).
-
-## Get Started
-
-Start building your ultimate cheatsheet collection today with Easy Cheatsheets!
+This project is licensed under the terms of the [GPLv3](LICENSE).
