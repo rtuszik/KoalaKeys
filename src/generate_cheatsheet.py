@@ -45,14 +45,25 @@ def load_yaml(file_path):
         with open(file_path, "r") as file:
             return yaml.safe_load(file)
     except FileNotFoundError:
-        print(f"Error: YAML file '{file_path}' not found.")
-        sys.exit(1)
+        logging.error(f"Error: YAML file '{file_path}' not found.")
+        return None
+    except yaml.YAMLError as e:
+        logging.error(f"Error parsing YAML file '{file_path}': {e}")
+        return None
+    except Exception as e:
+        logging.error(f"Unexpected error reading file '{file_path}': {e}")
+        return None
 
 
 def load_configs():
     config_dir = os.path.join(os.path.dirname(__file__), "configs")
     keyboard_layouts = load_yaml(os.path.join(config_dir, "keyboard_layouts.yaml"))
     system_mappings = load_yaml(os.path.join(config_dir, "system_mappings.yaml"))
+    
+    if keyboard_layouts is None or system_mappings is None:
+        logging.error("Failed to load configuration files.")
+        return None, None
+    
     return keyboard_layouts, system_mappings
 
 
@@ -63,19 +74,26 @@ def replace_shortcut_names(shortcut, system_mappings):
         "Left": "←",
         "Right": "→"
     }
-    return "+".join(
-        arrow_key_mappings.get(key.strip(), system_mappings.get(key.strip(), key.strip()))
-        for key in shortcut.split("+")
-    )
+    try:
+        return "+".join(
+            arrow_key_mappings.get(key.strip(), system_mappings.get(key.strip(), key.strip()))
+            for key in shortcut.split("+")
+        )
+    except Exception as e:
+        logging.error(f"Error replacing shortcut names: {e}")
+        return shortcut
 
 
 def normalize_shortcuts(data, system_mappings):
     normalized = {}
-    for section, shortcuts in data.get("shortcuts", {}).items():
-        normalized[section] = {}
-        for shortcut, details in shortcuts.items():
-            normalized_shortcut = replace_shortcut_names(shortcut, system_mappings)
-            normalized[section][normalized_shortcut] = details
+    try:
+        for section, shortcuts in data.get("shortcuts", {}).items():
+            normalized[section] = {}
+            for shortcut, details in shortcuts.items():
+                normalized_shortcut = replace_shortcut_names(shortcut, system_mappings)
+                normalized[section][normalized_shortcut] = details
+    except Exception as e:
+        logging.error(f"Error normalizing shortcuts: {e}")
     return normalized
 
 
@@ -93,16 +111,24 @@ def generate_html(data, keyboard_layouts, system_mappings):
         with open(template_path, "r") as file:
             template = Template(file.read())
     except FileNotFoundError:
-        print(f"Error: Template file '{template_path}' not found.")
-        sys.exit(1)
+        logging.error(f"Error: Template file '{template_path}' not found.")
+        return None
+    except Exception as e:
+        logging.error(f"Error reading template file: {e}")
+        return None
 
     layout_info = get_layout_info(data)
     data["shortcuts"] = normalize_shortcuts(
-        data, system_mappings[layout_info["system"]]
+        data, system_mappings.get(layout_info["system"], {})
     )
     data["layout"] = layout_info
-    data["keyboard_layout"] = keyboard_layouts[layout_info["keyboard"]]["layout"]
-    return template.render(**data)
+    data["keyboard_layout"] = keyboard_layouts.get(layout_info["keyboard"], {}).get("layout")
+    
+    try:
+        return template.render(**data)
+    except Exception as e:
+        logging.error(f"Error rendering template: {e}")
+        return None
 
 
 def main(yaml_file):
@@ -122,13 +148,20 @@ def main(yaml_file):
             logging.warning(f"  - {warning}")
 
     data = load_yaml(yaml_file)
+    if data is None:
+        return None, None
 
     if "title" not in data:
         logging.error("Error: 'title' field is missing in the YAML file.")
         return None, None
 
     keyboard_layouts, system_mappings = load_configs()
+    if keyboard_layouts is None or system_mappings is None:
+        return None, None
+
     html_content = generate_html(data, keyboard_layouts, system_mappings)
+    if html_content is None:
+        return None, None
 
     # Use the output directory from .env if specified, otherwise use the default
     output_dir = os.getenv('CHEATSHEET_OUTPUT_DIR')
