@@ -131,8 +131,7 @@ def generate_html(data, keyboard_layouts, system_mappings):
         return None
 
 
-def main(yaml_file):
-    # Validate and lint the YAML file
+def validate_and_lint(yaml_file):
     errors = validate_yaml(yaml_file)
     warnings = lint_yaml(yaml_file)
 
@@ -140,19 +139,48 @@ def main(yaml_file):
         logging.error(f"Validation errors in {yaml_file}:")
         for error in errors:
             logging.error(f"  - {error}")
-        return None, None
+        return False
 
     if warnings:
         logging.warning(f"Linting warnings in {yaml_file}:")
         for warning in warnings:
             logging.warning(f"  - {warning}")
 
-    data = load_yaml(yaml_file)
-    if data is None:
+    return True
+
+def get_output_directory():
+    output_dir = os.getenv('CHEATSHEET_OUTPUT_DIR')
+    if not output_dir:
+        output_dir = os.path.join(os.path.dirname(__file__), "..", "output")
+        logging.info(f"Using default output directory: {output_dir}")
+    else:
+        logging.info(f"Using custom output directory from .env: {output_dir}")
+    return output_dir
+
+def create_output_directory(output_dir):
+    try:
+        os.makedirs(output_dir, exist_ok=True)
+    except OSError as e:
+        logging.error(f"Error creating output directory: {e}")
+        return False
+    return True
+
+def write_html_content(html_output, html_content):
+    try:
+        with open(html_output, "w") as file:
+            file.write(html_content)
+    except IOError as e:
+        logging.error(f"Error writing to output file: {e}")
+        return False
+    return True
+
+def main(yaml_file):
+    if not validate_and_lint(yaml_file):
         return None, None
 
-    if "title" not in data:
-        logging.error("Error: 'title' field is missing in the YAML file.")
+    data = load_yaml(yaml_file)
+    if data is None or "title" not in data:
+        logging.error("Error: Invalid YAML file or missing 'title' field.")
         return None, None
 
     keyboard_layouts, system_mappings = load_configs()
@@ -163,28 +191,14 @@ def main(yaml_file):
     if html_content is None:
         return None, None
 
-    # Use the output directory from .env if specified, otherwise use the default
-    output_dir = os.getenv('CHEATSHEET_OUTPUT_DIR')
-    if not output_dir:
-        output_dir = os.path.join(os.path.dirname(__file__), "..", "output")
-        logging.info(f"Using default output directory: {output_dir}")
-    else:
-        logging.info(f"Using custom output directory from .env: {output_dir}")
-
-    try:
-        os.makedirs(output_dir, exist_ok=True)
-    except OSError as e:
-        logging.error(f"Error creating output directory: {e}")
+    output_dir = get_output_directory()
+    if not create_output_directory(output_dir):
         return None, None
 
     base_filename = f"{data['title'].lower().replace(' ', '_')}_cheatsheet"
     html_output = os.path.join(output_dir, f"{base_filename}.html")
 
-    try:
-        with open(html_output, "w") as file:
-            file.write(html_content)
-    except IOError as e:
-        logging.error(f"Error writing to output file: {e}")
+    if not write_html_content(html_output, html_content):
         return None, None
 
     logging.info(f"Cheatsheet generated: {html_output}")
