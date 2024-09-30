@@ -1,5 +1,5 @@
 import yaml
-from jinja2 import Template, Environment, FileSystemLoader
+from jinja2 import Environment, FileSystemLoader
 import sys
 import os
 import glob
@@ -7,6 +7,7 @@ from validate_yaml import validate_yaml, lint_yaml
 from dotenv import load_dotenv
 import logging
 import argparse
+from template_renderer import render_template
 
 def setup_logging(debug=False):
     log_file = 'cheatsheet_generator.log'
@@ -107,15 +108,6 @@ def get_layout_info(data):
 
 def generate_html(data, keyboard_layouts, system_mappings):
     template_path = os.path.join(os.path.dirname(__file__), "cheatsheet_template.html")
-    try:
-        with open(template_path, "r") as file:
-            template = Template(file.read())
-    except FileNotFoundError:
-        logging.error(f"Error: Template file '{template_path}' not found.")
-        return None
-    except Exception as e:
-        logging.error(f"Error reading template file: {e}")
-        return None
 
     layout_info = get_layout_info(data)
     data["shortcuts"] = normalize_shortcuts(
@@ -124,11 +116,7 @@ def generate_html(data, keyboard_layouts, system_mappings):
     data["layout"] = layout_info
     data["keyboard_layout"] = keyboard_layouts.get(layout_info["keyboard"], {}).get("layout")
     
-    try:
-        return template.render(**data)
-    except Exception as e:
-        logging.error(f"Error rendering template: {e}")
-        return None
+    return render_template(template_path, data)
 
 
 def validate_and_lint(yaml_file):
