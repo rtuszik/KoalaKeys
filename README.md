@@ -1,4 +1,4 @@
-<img src="assets/icons/KoalaKeys.png" width="48">
+<img src="assets/icons/KoalaKeys.png" width="128">
 
 # KoalaKeys
 
