@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/x-icon" href="/assets/icons/favicon.ico" />
     <title>{{ title }} Cheatsheet</title>
     <link
       href="https://iosevka-webfonts.github.io/iosevka/Iosevka.css"
@@ -831,17 +832,17 @@
             if (key === "↑↓") {
               const stackDiv = document.createElement("div");
               stackDiv.className = "key-stack";
-              
+
               const upKeyDiv = document.createElement("div");
               upKeyDiv.className = "key key__arrow key__arrow-half";
               upKeyDiv.setAttribute("data-key", "↑");
               upKeyDiv.textContent = getKeyLabel("↑", system);
-              
+
               const downKeyDiv = document.createElement("div");
               downKeyDiv.className = "key key__arrow key__arrow-half";
               downKeyDiv.setAttribute("data-key", "↓");
               downKeyDiv.textContent = getKeyLabel("↓", system);
-              
+
               stackDiv.appendChild(upKeyDiv);
               stackDiv.appendChild(downKeyDiv);
               rowDiv.appendChild(stackDiv);
