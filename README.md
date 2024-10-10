@@ -1,4 +1,4 @@
-![KoalaKeys](assets/icons/KoalaKeys.png)
+![KoalaKeys](assets/icons/KoalaKeys.png =128x128)
 
 # KoalaKeys
 
