@@ -1,12 +1,15 @@
-title: Example
+title: "Default macOS Keyboard Shortcuts"
+layout:
+  keyboard: US
+  system: Darwin
 shortcuts:
-  File Operations:
-    "Cmd+C":
-      description: "Copy"
-    "Cmd+V":
-      description: "Paste"
-    "Cmd+S":
-      description: "Save"
-  Window Management:
-    "CMD+H":
-      description: "Hide Current Window"
+  General:
+    "CMD+C":
+      description: "Copy selected item"
+    "CMD+X":
+      description: "Cut selected item"
+  File and App Management:
+    "CMD+N":
+      description: "Open new window or document"
+    "CMD+O":
+      description: "Open selected item or display dialog to choose file to open"
