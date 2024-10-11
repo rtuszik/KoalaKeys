@@ -6,13 +6,13 @@
 
 A simple tool to create and manage interactive keyboard shortcut cheatsheets.
 
-> **Demo**: Check out the [live demo](https://rtuszik.github.io/KoalaKeys-collection/) to see a small collection of cheatsheets created with this project.
+> **Demo**: Check out the [live demo](https://rtuszik.github.io/KoalaKeys-Collection/) to see a small collection of cheatsheets created with this project.
 
 ## Overview
 
 KoalaKeys helps generate and organize interactive HTML cheatsheets for keyboard shortcuts. It's designed for developers, designers, and power users who want to keep their essential shortcuts easily accessible.
 
-> **Quick Start**: To create a cheatsheet, add a YAML file to the `cheatsheets` directory and run `python src/generate_cheatsheet.py`. For detailed YAML formatting instructions, see the [YAML Cheatsheet Specification Guide](https://github.com/rtuszik/KoalaKeys/blob/cc427d1ee6fcc8a6f671954848b161c8f1bff599/yaml_cheatsheet_spec.md).
+> **Quick Start**: To create a cheatsheet, add a YAML file to the `cheatsheets` directory and run `python src/generate_cheatsheet.py`. For detailed YAML formatting instructions, see the [YAML Cheatsheet Specification Guide](yaml_cheatsheet_spec.md).
 
 ## Screenshots
 
@@ -33,8 +33,8 @@ KoalaKeys helps generate and organize interactive HTML cheatsheets for keyboard 
 
 A live demo instance is available, showcasing a selection of cheatsheets:
 
-- **Demo Site**: [https://rtuszik.github.io/KoalaKeys-collection/](https://rtuszik.github.io/KoalaKeys-collection/)
-- **Demo Repository**: [https://github.com/rtuszik/KoalaKeys-collection](https://github.com/rtuszik/KoalaKeys-collection)
+- **Demo Site**: [https://rtuszik.github.io/KoalaKeys-Collection/](https://rtuszik.github.io/KoalaKeys-Collection/)
+- **Demo Repository**: [https://github.com/rtuszik/KoalaKeys-Collection](https://github.com/rtuszik/KoalaKeys-Collection)
 
 Explore the demo to see how KoalaKeys works and to get ideas for creating custom cheatsheets. The demo repository also contains example YAML files that can be used as templates for new cheatsheets.
 
@@ -70,8 +70,8 @@ Explore the demo to see how KoalaKeys works and to get ideas for creating custom
 2. Create and activate a virtual environment (optional):
 
    ```
-   python -m venv venv
-   source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
+   python -m venv .venv
+   source .venv/bin/activate  # On Windows, use `venv\Scripts\activate`
    ```
 
 3. Install dependencies:
@@ -88,7 +88,7 @@ Explore the demo to see how KoalaKeys works and to get ideas for creating custom
 
 ## Usage
 
-1. Create YAML files for your cheatsheets in the `cheatsheets` directory. For detailed instructions on how to format YAML files, please refer to the [YAML Cheatsheet Specification Guide](https://github.com/rtuszik/KoalaKeys/blob/cc427d1ee6fcc8a6f671954848b161c8f1bff599/yaml_cheatsheet_spec.md).
+1. Create YAML files for your cheatsheets in the `cheatsheets` directory. For detailed instructions on how to format YAML files, please refer to the [YAML Cheatsheet Specification Guide](yaml_cheatsheet_spec.md).
 
 2. Generate cheatsheets:
 
