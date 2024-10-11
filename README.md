@@ -12,7 +12,7 @@ A simple tool to create and manage interactive keyboard shortcut cheatsheets.
 
 KoalaKeys helps generate and organize interactive HTML cheatsheets for keyboard shortcuts. It's designed for developers, designers, and power users who want to keep their essential shortcuts easily accessible.
 
-> **Quick Start**: To create a cheatsheet, add a YAML file to the `cheatsheets` directory and run `python src/generate_cheatsheet.py`. For detailed YAML formatting instructions, see the [YAML Cheatsheet Specification Guide](yaml_cheatsheet_specification.md).
+> **Quick Start**: To create a cheatsheet, add a YAML file to the `cheatsheets` directory and run `python src/generate_cheatsheet.py`. For detailed YAML formatting instructions, see the [YAML Cheatsheet Specification Guide](https://github.com/rtuszik/KoalaKeys/blob/cc427d1ee6fcc8a6f671954848b161c8f1bff599/yaml_cheatsheet_spec.md).
 
 ## Features
 
@@ -82,7 +82,7 @@ Explore the demo to see how KoalaKeys works and to get ideas for creating custom
 
 ## Usage
 
-1. Create YAML files for your cheatsheets in the `cheatsheets` directory. For detailed instructions on how to format YAML files, please refer to the [YAML Cheatsheet Specification Guide](yaml_cheatsheet_spec.md).
+1. Create YAML files for your cheatsheets in the `cheatsheets` directory. For detailed instructions on how to format YAML files, please refer to the [YAML Cheatsheet Specification Guide](https://github.com/rtuszik/KoalaKeys/blob/cc427d1ee6fcc8a6f671954848b161c8f1bff599/yaml_cheatsheet_spec.md).
 
 2. Generate cheatsheets:
 
