@@ -1,7 +1,8 @@
 .aider*
 output/*
-# Created by https://www.toptal.com/developers/gitignore/api/Vim,macOS,Python,venv
-# Edit at https://www.toptal.com/developers/gitignore?templates=Vim,macOS,Python,venv
+
+cheatsheets/*
+!cheatsheets/example.yaml
 
 ### macOS ###
 # General
