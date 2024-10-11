@@ -347,34 +347,6 @@
         height: 25px;
         font-size: 14px;
       }
-      #dark-mode-toggle {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 10px 15px;
-        background-color: var(--latte-lavender);
-        color: var(--latte-base);
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        transition:
-          background-color 0.3s,
-          transform 0.2s;
-        font-weight: 600;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      }
-      #dark-mode-toggle:hover {
-        background-color: var(--latte-sapphire);
-        transform: translateY(-2px);
-      }
-      body.dark-mode #dark-mode-toggle {
-        background-color: var(--mocha-peach);
-        color: var(--mocha-base);
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-      }
-      body.dark-mode #dark-mode-toggle:hover {
-        background-color: var(--mocha-maroon);
-      }
       .wide {
         width: 65px;
       }
@@ -485,7 +457,7 @@
         transform: translateX(-50%);
       }
 
-      #theme-toggle {
+      #dark-mode-toggle {
         flex: 0 0 auto;
         position: relative;
         z-index: 1002;
@@ -497,7 +469,7 @@
         transition: color 0.3s;
       }
 
-      body.dark-mode #theme-toggle {
+      body.dark-mode #dark-mode-toggle {
         color: var(--mocha-text);
       }
 
@@ -627,8 +599,8 @@
         />
       </div>
       <button
-        id="theme-toggle"
-        class="theme-toggle"
+        id="dark-mode-toggle"
+        class="dark-mode-toggle"
         aria-label="Toggle dark mode"
       >
         <span id="theme-icon">◐</span>
@@ -876,21 +848,21 @@
       // Call generateKeyboard on page load
       document.addEventListener("DOMContentLoaded", generateKeyboard);
 
-      // Theme toggle functionality
-      const themeToggle = document.getElementById("theme-toggle");
+      // Dark-Mode toggle functionality
+      const darkModeToggle = document.getElementById('dark-mode-toggle');
       const themeIcon = document.getElementById("theme-icon");
       const body = document.body;
 
-      function updateThemeToggle() {
+      function updateDarkModeToggle() {
         themeIcon.textContent = body.classList.contains("dark-mode")
           ? "☀️"
           : "🌙";
       }
 
-      themeToggle.addEventListener("click", () => {
+      darkModeToggle.addEventListener("click", () => {
         body.classList.toggle("dark-mode");
         localStorage.setItem("darkMode", body.classList.contains("dark-mode"));
-        updateThemeToggle();
+        updateDarkModeToggle();
         adjustLayout();
       });
 
@@ -920,7 +892,7 @@
         body.classList.remove("dark-mode");
       }
 
-      updateThemeToggle();
+      updateDarkModeToggle();
       adjustLayout();
 
       function highlightKeys(shortcut) {

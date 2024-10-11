@@ -106,35 +106,19 @@
       }
 
       #dark-mode-toggle {
-        position: fixed;
+        position: absolute;
         top: 20px;
         right: 20px;
-        padding: 10px 15px;
-        background-color: var(--latte-blue);
-        color: var(--latte-base);
+        background: none;
         border: none;
-        border-radius: 8px;
         cursor: pointer;
-        transition:
-          background-color 0.3s,
-          transform 0.2s;
-        font-weight: 600;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      }
-
-      #dark-mode-toggle:hover {
-        background-color: var(--latte-sapphire);
-        transform: translateY(-2px);
+        font-size: 24px;
+        color: var(--text);
+        transition: color 0.3s;
       }
 
       body.dark-mode #dark-mode-toggle {
-        background-color: var(--mocha-peach);
-        color: var(--mocha-base);
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-      }
-
-      body.dark-mode #dark-mode-toggle:hover {
-        background-color: var(--mocha-maroon);
+        color: var(--mocha-text);
       }
 
       .controls {
@@ -430,7 +414,13 @@
       width="128"
     />
     <h1>Cheatsheet Index</h1>
-    <button id="dark-mode-toggle">Toggle Light Mode</button>
+    <button
+      id="dark-mode-toggle"
+      class="dark-mode-toggle"
+      aria-label="Toggle dark mode"
+    >
+      <span id="theme-icon">◐</span>
+    </button>
     <div class="controls">
       <div class="search-bar">
         <input type="text" id="search" placeholder="Search cheatsheets..." />
@@ -467,8 +457,12 @@
       const nextPageButton = document.getElementById('next-page');
       const body = document.body;
 
+      const themeIcon = document.getElementById("theme-icon");
+
       function updateDarkModeToggle() {
-          darkModeToggle.textContent = body.classList.contains('dark-mode') ? 'Toggle Light Mode' : 'Toggle Dark Mode';
+        themeIcon.textContent = body.classList.contains("dark-mode")
+          ? "☀️"
+          : "🌙";
       }
 
       darkModeToggle.addEventListener('click', () => {
