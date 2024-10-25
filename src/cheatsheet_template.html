@@ -923,36 +923,37 @@
       adjustLayout();
 
       function highlightKeys(shortcut) {
-        document
-          .querySelectorAll(".key")
-          .forEach((key) => key.classList.remove("active"));
+        // Clear any previously highlighted keys
+        document.querySelectorAll(".key").forEach((key) => key.classList.remove("active"));
 
-        const keys = shortcut.querySelectorAll('.key-part');
+        // Get the shortcut key parts
+        const shortcutParts = shortcut.split('+').map(part => part.trim());
         const system = document.getElementById("keyboard").getAttribute("data-system");
 
-        keys.forEach((key) => {
-          let keyToFind = key.trim().toLowerCase();
-          const keyElements = document.querySelectorAll(".key");
+        shortcutParts.forEach((keyToFind) => {
+            keyToFind = keyToFind.toLowerCase();
+            const keyElements = document.querySelectorAll(".key");
 
-          keyElements.forEach((element) => {
-            const dataKey = element.getAttribute("data-key").toLowerCase();
-            const keyLabel = element.textContent.toLowerCase();
+            keyElements.forEach((element) => {
+                const dataKey = element.getAttribute("data-key").toLowerCase();
+                const keyLabel = element.textContent.toLowerCase();
 
-            if (
-              dataKey === keyToFind ||
-              keyLabel === keyToFind ||
-              (keyToFind === "cmd" && (dataKey === "cmd" || dataKey === "win" || dataKey === "super"))
-            ) {
-              element.classList.add("active");
-            }
-          });
+                if (
+                    dataKey === keyToFind ||
+                    keyLabel === keyToFind ||
+                    (keyToFind === "cmd" && (dataKey === "cmd" || dataKey === "win" || dataKey === "super"))
+                ) {
+                    element.classList.add("active");
+                }
+            });
         });
       }
 
       document.querySelectorAll(".shortcut").forEach((shortcut) => {
-        shortcut.addEventListener("click", function () {
-          const shortcutKey = this.querySelector(".shortcut-key").textContent;
-          highlightKeys(shortcutKey);
+        shortcut.addEventListener("click", function() {
+            // Get the text content and replace <sep> with +
+            const shortcutKey = this.querySelector(".shortcut-key").textContent.replace(/\s*\+\s*/g, '+');
+            highlightKeys(shortcutKey);
         });
       });
 
