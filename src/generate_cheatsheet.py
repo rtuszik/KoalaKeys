@@ -2,46 +2,31 @@ import yaml
 from jinja2 import Environment, FileSystemLoader
 import sys
 import os
-import glob
 from validate_yaml import validate_yaml, lint_yaml
 from dotenv import load_dotenv
-import logging
-import argparse
 from template_renderer import render_template
+from logger import get_logger
+from pathlib import Path
 
-def setup_logging(debug=False):
-    log_file = 'cheatsheet_generator.log'
-    log_level = logging.DEBUG if debug else logging.INFO
-    log_format = '%(asctime)s - %(levelname)s - %(message)s'
+# Define base paths
+BASE_DIR = Path(__file__).parent
+PROJECT_ROOT = BASE_DIR.parent
 
-    # Set up file handler
-    file_handler = logging.FileHandler(log_file)
-    file_handler.setLevel(log_level)
-    file_handler.setFormatter(logging.Formatter(log_format))
+# Define directory paths
+OUTPUT_DIR = Path(os.getenv('CHEATSHEET_OUTPUT_DIR') or PROJECT_ROOT / "output")
+TEMPLATES_DIR = BASE_DIR / "templates"
+LAYOUTS_DIR = BASE_DIR / "layouts"
+CHEATSHEETS_DIR = PROJECT_ROOT / "cheatsheets"
 
-    # Set up console handler
-    console_handler = logging.StreamHandler()
-    console_handler.setLevel(log_level)
-    console_handler.setFormatter(logging.Formatter(log_format))
+# Ensure output directory exists
+OUTPUT_DIR.mkdir(exist_ok=True, parents=True)
 
-    # Set up root logger
-    logging.root.setLevel(log_level)
-    logging.root.addHandler(file_handler)
-    if debug:
-        logging.root.addHandler(console_handler)
-
-# Parse command-line arguments
-parser = argparse.ArgumentParser(description='Generate cheatsheets')
-parser.add_argument('-d', '--debug', action='store_true', help='Enable debug mode')
-args = parser.parse_args()
-
-# Set up logging
-setup_logging(args.debug)
+logging = get_logger()
 
 # Load environment variables
 load_dotenv()
 
-def load_yaml(file_path):
+def load_yaml(file_path: Path) -> dict | None:
     try:
         with open(file_path, "r") as file:
             return yaml.safe_load(file)
@@ -56,17 +41,15 @@ def load_yaml(file_path):
         return None
 
 
-def load_configs():
-    config_dir = os.path.join(os.path.dirname(__file__), "configs")
-    keyboard_layouts = load_yaml(os.path.join(config_dir, "keyboard_layouts.yaml"))
-    system_mappings = load_yaml(os.path.join(config_dir, "system_mappings.yaml"))
+def load_layout():
+    keyboard_layouts = load_yaml(LAYOUTS_DIR / "keyboard_layouts.yaml")
+    system_mappings = load_yaml(LAYOUTS_DIR / "system_mappings.yaml")
     
     if keyboard_layouts is None or system_mappings is None:
         logging.error("Failed to load configuration files.")
         return None, None
     
     return keyboard_layouts, system_mappings
-
 
 def replace_shortcut_names(shortcut, system_mappings):
     arrow_key_mappings = {
@@ -76,36 +59,38 @@ def replace_shortcut_names(shortcut, system_mappings):
         "Right": "→"
     }
     try:
-        # Split by plus sign
-        parts = shortcut.split('+')
         processed_parts = []
+        i = 0
+        while i < len(shortcut):
+            if shortcut[i] == '+':
+                # If next character is also +, it's a key
+                if i + 1 < len(shortcut) and shortcut[i + 1] == '+':
+                    processed_parts.append('+')
+                    i += 2  # Skip both plus signs
+                    # Otherwise it's a separator
+                else:
+                    processed_parts.append('<sep>')
+                    i += 1
+            else:
+                # Collect non-plus characters
+                current_part = ''
+                while i < len(shortcut) and shortcut[i] != '+':
+                    current_part += shortcut[i]
+                    i += 1
+                if current_part.strip():  # Only add non-empty parts
+                    part = current_part.strip()
+                    part = system_mappings.get(part.lower(), part)
+                    if part in ['⌘', '⌥', '⌃', '⇧']:
+                        part = f'<span class="modifier-symbol">{part}</span>'
 
-            # First part is always a key
-        if parts:
-            first_part = parts[0].strip()
-            processed_parts.append(
-            arrow_key_mappings.get(first_part, system_mappings.get(first_part, first_part)))
+                    part = arrow_key_mappings.get(part, part)
+                    processed_parts.append(part)
 
-            # Process remaining parts, starting with index 1
-            # Odd indices (1, 3, 5...) will be plus keys if not empty
-            # Even indices (2, 4, 6...) will be regular keys
-            for i in range(1, len(parts)):
-                part = parts[i].strip()
-                if i % 2 == 1:  # Odd indices after split are plus keys if not empty
-                    if part:  # If there's content, it's a plus key
-                        processed_parts.append(
-                            arrow_key_mappings.get(part, system_mappings.get(part, part))
-                        )
-                else:  # Even indices after split are always regular keys
-                    processed_parts.append(
-                        arrow_key_mappings.get(part, system_mappings.get(part, part))
-                    )
 
-        return "<sep>".join(processed_parts)
+        return ''.join(processed_parts)
     except Exception as e:
          logging.error(f"Error replacing shortcut names: {e}")
          return shortcut
-
 
 def normalize_shortcuts(data, system_mappings):
     normalized = {}
@@ -129,8 +114,7 @@ def get_layout_info(data):
 
 
 def generate_html(data, keyboard_layouts, system_mappings):
-    template_path = os.path.join(os.path.dirname(__file__), "cheatsheet_template.html")
-
+    template_path = TEMPLATES_DIR / "cheatsheet_template.html"
     layout_info = get_layout_info(data)
     data["shortcuts"] = normalize_shortcuts(
         data, system_mappings.get(layout_info["system"], {})
@@ -158,23 +142,6 @@ def validate_and_lint(yaml_file):
 
     return True
 
-def get_output_directory():
-    output_dir = os.getenv('CHEATSHEET_OUTPUT_DIR')
-    if not output_dir:
-        output_dir = os.path.join(os.path.dirname(__file__), "..", "output")
-        logging.info(f"Using default output directory: {output_dir}")
-    else:
-        logging.info(f"Using custom output directory from .env: {output_dir}")
-    return output_dir
-
-def create_output_directory(output_dir):
-    try:
-        os.makedirs(output_dir, exist_ok=True)
-    except OSError as e:
-        logging.error(f"Error creating output directory: {e}")
-        return False
-    return True
-
 def write_html_content(html_output, html_content):
     try:
         with open(html_output, "w") as file:
@@ -193,7 +160,7 @@ def main(yaml_file):
         logging.error("Error: Invalid YAML file or missing 'title' field.")
         return None, None
 
-    keyboard_layouts, system_mappings = load_configs()
+    keyboard_layouts, system_mappings = load_layout()
     if keyboard_layouts is None or system_mappings is None:
         return None, None
 
@@ -201,12 +168,8 @@ def main(yaml_file):
     if html_content is None:
         return None, None
 
-    output_dir = get_output_directory()
-    if not create_output_directory(output_dir):
-        return None, None
-
     base_filename = f"{data['title'].lower().replace(' ', '_')}_cheatsheet"
-    html_output = os.path.join(output_dir, f"{base_filename}.html")
+    html_output = os.path.join(OUTPUT_DIR, f"{base_filename}.html")
 
     if not write_html_content(html_output, html_content):
         return None, None
@@ -217,20 +180,13 @@ def main(yaml_file):
 
 
 def generate_index(cheatsheets):
-    template_path = os.path.join(os.path.dirname(__file__), "index_template.html")
+    template_path = TEMPLATES_DIR / "index_template.html"
     env = Environment(loader=FileSystemLoader(os.path.dirname(template_path)))
     template = env.get_template(os.path.basename(template_path))
 
     html_content = template.render(cheatsheets=cheatsheets)
 
-    output_dir = os.getenv('CHEATSHEET_OUTPUT_DIR')
-    if not output_dir:
-        output_dir = os.path.join(os.path.dirname(__file__), "..", "output")
-        logging.info(f"Using default output directory for index: {output_dir}")
-    else:
-        logging.info(f"Using custom output directory from .env for index: {output_dir}")
-
-    index_output = os.path.join(output_dir, "index.html")
+    index_output = os.path.join(OUTPUT_DIR, "index.html")
 
     with open(index_output, "w") as file:
         file.write(html_content)
@@ -239,8 +195,7 @@ def generate_index(cheatsheets):
 
 
 if __name__ == "__main__":
-    cheatsheet_dir = os.path.join(os.path.dirname(__file__), "..", "cheatsheets")
-    yaml_files = glob.glob(os.path.join(cheatsheet_dir, "*.yaml"))
+    yaml_files = yaml_files = list(CHEATSHEETS_DIR.glob("*.yaml"))
 
     if not yaml_files:
         print("No YAML files found in the cheatsheets directory.")

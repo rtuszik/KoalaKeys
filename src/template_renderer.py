@@ -1,5 +1,7 @@
 from jinja2 import Template
-import logging
+from logger import get_logger
+
+logging = get_logger()
 
 def render_template(template_path, data):
     try:
