@@ -38,17 +38,17 @@ shortcuts:
     "Alt+Shift+Tab":
       description: "Switch to previous app in Alt+Tab order"
   System:
-    "Windows+S":
+    "Win+S":
       description: "Open Search"
-    "Windows+.":
+    "Win+.":
       description: "Open emoji panel"
     "Ctrl+Shift+Esc":
       description: "Open Task Manager"
-    "Windows+D":
+    "Win+D":
       description: "Show desktop"
-    "Windows+PrtScn":
+    "Win+PrtScn":
       description: "Take a screenshot of the entire screen and save it"
-    "Windows+Shift+S":
+    "Win+Shift+S":
       description: "Take a screenshot of selected area"
   "Text Editing":
     "Ctrl+B":
@@ -93,24 +93,24 @@ shortcuts:
       description: "Go back to previous page"
     "Alt+Right":
       description: "Go forward to next page"
-  "Windows Specific":
-    "Windows+E":
+  "Win Specific":
+    "Win+E":
       description: "Open File Explorer"
-    "Windows+I":
+    "Win+I":
       description: "Open Settings"
-    "Windows+L":
+    "Win+L":
       description: "Lock your PC"
-    "Windows+R":
+    "Win+R":
       description: "Open Run dialog"
-    "Windows+X":
+    "Win+X":
       description: "Open Quick Access Menu"
-    "Windows+Tab":
+    "Win+Tab":
       description: "Open Task View"
-    "Windows+Up":
+    "Win+Up":
       description: "Maximize the current window"
-    "Windows+Down":
+    "Win+Down":
       description: "Minimize the current window or restore a maximized window"
-    "Windows+Left":
+    "Win+Left":
       description: "Snap current window to the left half of the screen"
-    "Windows+Right":
+    "Win+Right":
       description: "Snap current window to the right half of the screen"
