@@ -1,0 +1,597 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="https://github.com/rtuszik/KoalaKeys/blob/cc427d1ee6fcc8a6f671954848b161c8f1bff599/assets/icons/favicon.ico"
+    />
+    <title>Cheatsheet Index</title>
+    <link
+      href="https://iosevka-webfonts.github.io/iosevka/Iosevka.css"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --latte-rosewater: #dc8a78;
+        --latte-flamingo: #dd7878;
+        --latte-pink: #ea76cb;
+        --latte-mauve: #8839ef;
+        --latte-red: #d20f39;
+        --latte-maroon: #e64553;
+        --latte-peach: #fe640b;
+        --latte-yellow: #df8e1d;
+        --latte-green: #40a02b;
+        --latte-teal: #179299;
+        --latte-sky: #04a5e5;
+        --latte-sapphire: #209fb5;
+        --latte-blue: #1e66f5;
+        --latte-lavender: #7287fd;
+        --latte-text: #4c4f69;
+        --latte-subtext1: #5c5f77;
+        --latte-subtext0: #6c6f85;
+        --latte-overlay2: #7c7f93;
+        --latte-overlay1: #8c8fa1;
+        --latte-overlay0: #9ca0b0;
+        --latte-surface2: #acb0be;
+        --latte-surface1: #bcc0cc;
+        --latte-surface0: #ccd0da;
+        --latte-base: #eff1f5;
+        --latte-mantle: #e6e9ef;
+        --latte-crust: #dce0e8;
+
+        --mocha-rosewater: #f5e0dc;
+        --mocha-flamingo: #f2cdcd;
+        --mocha-pink: #f5c2e7;
+        --mocha-mauve: #cba6f7;
+        --mocha-red: #f38ba8;
+        --mocha-maroon: #eba0ac;
+        --mocha-peach: #fab387;
+        --mocha-yellow: #f9e2af;
+        --mocha-green: #a6e3a1;
+        --mocha-teal: #94e2d5;
+        --mocha-sky: #89dceb;
+        --mocha-sapphire: #74c7ec;
+        --mocha-blue: #89b4fa;
+        --mocha-lavender: #b4befe;
+        --mocha-text: #cdd6f4;
+        --mocha-subtext1: #bac2de;
+        --mocha-subtext0: #a6adc8;
+        --mocha-overlay2: #9399b2;
+        --mocha-overlay1: #7f849c;
+        --mocha-overlay0: #6c7086;
+        --mocha-surface2: #585b70;
+        --mocha-surface1: #45475a;
+        --mocha-surface0: #313244;
+        --mocha-base: #1e1e2e;
+        --mocha-mantle: #181825;
+        --mocha-crust: #11111b;
+      }
+
+      body {
+        font-family: "Iosevka Web", monospace;
+        line-height: 1.6;
+        color: var(--latte-text);
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 40px 20px;
+        background-color: var(--latte-base);
+        transition:
+          background-color 0.3s,
+          color 0.3s;
+      }
+
+      body.dark-mode {
+        color: var(--mocha-text);
+        background-color: var(--mocha-base);
+      }
+
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      #logo_img {
+        top: 10px;
+        left: 10px;
+      }
+
+      h1 {
+        flex-grow: 2;
+        color: var(--latte-mauve);
+        text-align: center;
+        font-size: 2.5rem;
+        margin-bottom: 2rem;
+        margin-right: 8rem;
+      }
+
+      body.dark-mode h1 {
+        color: var(--mocha-mauve);
+      }
+
+      #dark-mode-toggle {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 24px;
+        color: var(--text);
+        transition: color 0.3s;
+      }
+
+      body.dark-mode #dark-mode-toggle {
+        color: var(--mocha-text);
+      }
+
+      .controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+      }
+
+      .search-bar {
+        flex-grow: 1;
+        margin-right: 1rem;
+      }
+
+      .search-bar input {
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        border: 2px solid var(--latte-surface2);
+        border-radius: 5px;
+        background-color: var(--latte-base);
+        color: var(--latte-text);
+        transition:
+          border-color 0.3s,
+          background-color 0.3s,
+          color 0.3s,
+          box-shadow 0.3s;
+      }
+
+      .search-bar input:focus {
+        outline: none;
+        border-color: var(--latte-lavender);
+        box-shadow: 0 0 5px var(--latte-lavender);
+      }
+
+      body.dark-mode .search-bar input {
+        border-color: var(--mocha-surface2);
+        background-color: var(--mocha-base);
+        color: var(--mocha-text);
+      }
+
+      body.dark-mode .search-bar input:focus {
+        border-color: var(--mocha-lavender);
+        box-shadow: 0 0 5px var(--mocha-lavender);
+      }
+
+      .sort-select,
+      .layout-select,
+      .items-per-page-select {
+        padding: 10px;
+        font-size: 16px;
+        border: 2px solid var(--latte-surface2);
+        border-radius: 5px;
+        background-color: var(--latte-base);
+        color: var(--latte-text);
+        margin-left: 1rem;
+        transition:
+          border-color 0.3s,
+          background-color 0.3s,
+          color 0.3s,
+          box-shadow 0.3s;
+      }
+
+      .sort-select:focus,
+      .layout-select:focus,
+      .items-per-page-select:focus {
+        outline: none;
+        border-color: var(--latte-lavender);
+        box-shadow: 0 0 5px var(--latte-lavender);
+      }
+
+      body.dark-mode .sort-select,
+      body.dark-mode .layout-select,
+      body.dark-mode .items-per-page-select {
+        border-color: var(--mocha-surface2);
+        background-color: var(--mocha-base);
+        color: var(--mocha-text);
+      }
+
+      body.dark-mode .sort-select:focus,
+      body.dark-mode .layout-select:focus,
+      body.dark-mode .items-per-page-select:focus {
+        border-color: var(--mocha-lavender);
+        box-shadow: 0 0 5px var(--mocha-lavender);
+      }
+
+      .cheatsheet-list {
+        list-style-type: none;
+        padding: 0;
+        display: grid;
+        gap: 20px;
+      }
+
+      .cheatsheet-item {
+        background-color: var(--latte-surface0);
+        border-radius: 12px;
+        overflow: hidden;
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        min-height: 180px;
+        border: 1px solid var(--latte-overlay0);
+      }
+
+      .cheatsheet-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+      }
+
+      .cheatsheet-link {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        color: var(--latte-blue);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 1.2rem;
+      }
+
+      .cheatsheet-title {
+        padding: 25px;
+        flex-grow: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+      }
+
+      body.dark-mode .cheatsheet-item {
+        background-color: var(--mocha-surface0);
+      }
+
+      body.dark-mode .cheatsheet-link {
+        color: var(--mocha-blue);
+      }
+
+      .no-results {
+        text-align: center;
+        font-size: 1.2rem;
+        color: var(--latte-subtext0);
+        margin-top: 2rem;
+      }
+
+      body.dark-mode .no-results {
+        color: var(--mocha-subtext0);
+      }
+
+      .pagination {
+        display: flex;
+        justify-content: center;
+        margin-top: 2rem;
+      }
+
+      .pagination button {
+        padding: 0.5rem 1rem;
+        margin: 0 0.5rem;
+        background-color: var(--latte-surface1);
+        color: var(--latte-text);
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+
+      .pagination button:hover {
+        background-color: var(--latte-surface2);
+      }
+
+      body.dark-mode .pagination button {
+        background-color: var(--mocha-surface1);
+        color: var(--mocha-text);
+      }
+
+      body.dark-mode .pagination button:hover {
+        background-color: var(--mocha-surface2);
+      }
+
+      .pagination button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      footer {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        width: 40%;
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 8px;
+        padding: 10px;
+        font-family: "Iosevka Web", monospace;
+        line-height: 1.6;
+        transition:
+          background-color 0.3s,
+          color 0.3s;
+      }
+
+      .center {
+        margin: auto;
+        text-align: center;
+        padding: 10px;
+      }
+
+      #icon-footer {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        width: 40%;
+      }
+
+      .GitHub_Button {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 10px 15px;
+        gap: 15px;
+        background-color: var(--latte-blue);
+        color: var(--latte-base);
+        outline-offset: -3px;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+        transition: 400ms;
+        height: auto;
+      }
+
+      .dark-mode .GitHub_Button {
+        background-color: var(--mocha-maroon);
+      }
+
+      .GitHub_Button .text {
+        color: black;
+        font-weight: 700;
+        font-size: 1.2em;
+        transition: 400ms;
+      }
+
+      .dark-mode .GitHub_Button .text {
+        color: black;
+      }
+
+      .GitHub_Button svg path {
+        transition: 400ms;
+      }
+
+      .GitHub_Button svg path {
+        fill: white;
+      }
+
+      .dark-mode .GitHub_Button svg path {
+        fill: #181717;
+      }
+
+      .GitHub_Button:hover {
+        background-color: var(--latte-sapphire);
+      }
+
+      .GitHub_Button:hover .text {
+        color: white;
+      }
+
+      .dark-mode .GitHub_Button:hover {
+        background-color: var(--mocha-maroon);
+      }
+
+      .dark-mode .GitHub_Button:hover .text {
+        color: black;
+      }
+
+      a:link {
+        text-decoration: none;
+      }
+      a:visited {
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: none;
+      }
+      a:active {
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body class="dark-mode">
+    <div class="header">
+      <img
+        src="https://github.com/rtuszik/KoalaKeys/raw/main/assets/icons/KoalaKeys.png"
+        id="logo_img"
+        width="128"
+      />
+      <h1>Cheatsheet Index</h1>
+      <button id="dark-mode-toggle" aria-label="Toggle dark mode">
+        <span id="theme-icon">◐</span>
+      </button>
+    </div>
+    <div class="controls">
+      <div class="search-bar">
+        <input type="text" id="search" placeholder="Search cheatsheets..." />
+      </div>
+      <select id="sort" class="sort-select">
+        <option value="name-asc">Name (A-Z)</option>
+        <option value="name-desc">Name (Z-A)</option>
+      </select>
+      <select id="items-per-page" class="items-per-page-select">
+        <option value="8">8 per page</option>
+        <option value="16">16 per page</option>
+        <option value="32">32 per page</option>
+        <option value="64">64 per page</option>
+        <option value="128">128 per page</option>
+      </select>
+    </div>
+    <ul id="cheatsheet-list" class="cheatsheet-list"></ul>
+    <div id="no-results" class="no-results" style="display: none">
+      No cheatsheets found matching your search.
+    </div>
+    <div class="pagination">
+      <button id="prev-page">Previous</button>
+      <button id="next-page">Next</button>
+    </div>
+
+    <script>
+      const cheatsheetList = document.getElementById('cheatsheet-list');
+      const searchInput = document.getElementById('search');
+      const sortSelect = document.getElementById('sort');
+      const itemsPerPageSelect = document.getElementById('items-per-page');
+      const noResults = document.getElementById('no-results');
+      const darkModeToggle = document.getElementById('dark-mode-toggle');
+      const prevPageButton = document.getElementById('prev-page');
+      const nextPageButton = document.getElementById('next-page');
+      const body = document.body;
+
+      const themeIcon = document.getElementById("theme-icon");
+
+      function updateDarkModeToggle() {
+        themeIcon.textContent = body.classList.contains("dark-mode")
+          ? "☀️"
+          : "🌙";
+      }
+
+      darkModeToggle.addEventListener('click', () => {
+          body.classList.toggle('dark-mode');
+          localStorage.setItem('darkMode', body.classList.contains('dark-mode'));
+          updateDarkModeToggle();
+      });
+
+      // Check for saved dark mode preference, default to dark mode
+      if (localStorage.getItem('darkMode') === null) {
+          localStorage.setItem('darkMode', 'true');
+      }
+
+      if (localStorage.getItem('darkMode') === 'true') {
+          body.classList.add('dark-mode');
+      } else {
+          body.classList.remove('dark-mode');
+      }
+
+      updateDarkModeToggle();
+
+      const cheatsheets = [
+          {% for cheatsheet in cheatsheets %}
+          { title: "{{ cheatsheet.title }}", filename: "{{ cheatsheet.filename }}" },
+          {% endfor %}
+      ];
+
+      let currentPage = 1;
+      let itemsPerPage = 9;
+
+      function updateCheatsheets() {
+          const searchTerm = searchInput.value.toLowerCase();
+          const sortOrder = sortSelect.value;
+
+          let filteredCheatsheets = cheatsheets.filter(cheatsheet =>
+              cheatsheet.title.toLowerCase().includes(searchTerm)
+          );
+
+          filteredCheatsheets.sort((a, b) => {
+              if (sortOrder === 'name-asc') {
+                  return a.title.localeCompare(b.title);
+              } else {
+                  return b.title.localeCompare(a.title);
+              }
+          });
+
+          const totalPages = Math.ceil(filteredCheatsheets.length / itemsPerPage);
+          currentPage = Math.min(currentPage, totalPages);
+
+          const startIndex = (currentPage - 1) * itemsPerPage;
+          const endIndex = startIndex + itemsPerPage;
+          const pageCheatsheets = filteredCheatsheets.slice(startIndex, endIndex);
+
+          cheatsheetList.innerHTML = pageCheatsheets.map(cheatsheet => `
+              <li class="cheatsheet-item">
+                  <a href="${cheatsheet.filename}" class="cheatsheet-link">
+                      <div class="cheatsheet-title">${cheatsheet.title}</div>
+                  </a>
+              </li>
+          `).join('');
+
+          noResults.style.display = filteredCheatsheets.length === 0 ? 'block' : 'none';
+
+          prevPageButton.disabled = currentPage === 1;
+          nextPageButton.disabled = currentPage === totalPages;
+
+          updateLayout();
+      }
+
+      function updateLayout() {
+          const containerWidth = cheatsheetList.offsetWidth;
+          const itemWidth = 250; // Approximate width of each item
+          const columns = Math.floor(containerWidth / itemWidth);
+          cheatsheetList.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
+      }
+
+      searchInput.addEventListener('input', () => {
+          currentPage = 1;
+          updateCheatsheets();
+      });
+      sortSelect.addEventListener('change', updateCheatsheets);
+      itemsPerPageSelect.addEventListener('change', (e) => {
+          itemsPerPage = parseInt(e.target.value);
+          currentPage = 1;
+          updateCheatsheets();
+      });
+
+      prevPageButton.addEventListener('click', () => {
+          if (currentPage > 1) {
+              currentPage--;
+              updateCheatsheets();
+          }
+      });
+
+      nextPageButton.addEventListener('click', () => {
+          currentPage++;
+          updateCheatsheets();
+      });
+
+      window.addEventListener('resize', updateLayout);
+
+      updateCheatsheets();
+    </script>
+  </body>
+  <footer>
+    <img
+      src="https://github.com/rtuszik/KoalaKeys/raw/main/assets/icons/KoalaKeys.png"
+      alt="KoalaKeys"
+      id="icon-footer"
+      width="128"
+    />
+    <a href="https://github.com/rtuszik/KoalaKeys">
+      <button class="GitHub_Button">
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M12 0.296997C5.37 0.296997 0 5.67 0 12.297C0 17.6 3.438 22.097 8.205 23.682C8.805 23.795 9.025 23.424 9.025 23.105C9.025 22.82 9.015 22.065 9.01 21.065C5.672 21.789 4.968 19.455 4.968 19.455C4.422 18.07 3.633 17.7 3.633 17.7C2.546 16.956 3.717 16.971 3.717 16.971C4.922 17.055 5.555 18.207 5.555 18.207C6.625 20.042 8.364 19.512 9.05 19.205C9.158 18.429 9.467 17.9 9.81 17.6C7.145 17.3 4.344 16.268 4.344 11.67C4.344 10.36 4.809 9.29 5.579 8.45C5.444 8.147 5.039 6.927 5.684 5.274C5.684 5.274 6.689 4.952 8.984 6.504C9.944 6.237 10.964 6.105 11.984 6.099C13.004 6.105 14.024 6.237 14.984 6.504C17.264 4.952 18.269 5.274 18.269 5.274C18.914 6.927 18.509 8.147 18.389 8.45C19.154 9.29 19.619 10.36 19.619 11.67C19.619 16.28 16.814 17.295 14.144 17.59C14.564 17.95 14.954 18.686 14.954 19.81C14.954 21.416 14.939 22.706 14.939 23.096C14.939 23.411 15.149 23.786 15.764 23.666C20.565 22.092 24 17.592 24 12.297C24 5.67 18.627 0.296997 12 0.296997Z"
+            fill="white"
+          ></path>
+        </svg>
+        <p class="text">KoalaKeys</p>
+      </button>
+    </a>
+  </footer>
+</html>
