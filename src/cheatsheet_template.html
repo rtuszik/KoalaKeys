@@ -218,6 +218,26 @@
       body.dark-mode .shortcut-key {
         color: var(--mocha-red);
       }
+      
+      .shortcut-key .key-part {
+          color: var(--latte-mauve);
+      }
+
+      body.dark-mode .shortcut-key .key-part {
+          color: var(--mocha-red);
+      }
+
+      .shortcut-key .separator {
+          color: var(--latte-subtext0);
+          margin: 0 0.3em;
+          font-weight: normal;
+      }
+
+      body.dark-mode .shortcut-key .separator {
+          color: var(--mocha-subtext0);
+      }
+
+
       .shortcut-description {
         font-size: 0.85rem;
         text-align: right;
@@ -727,6 +747,13 @@
           {% for shortcut, details in shortcuts.items() %}
           <div class="shortcut" title="Click to highlight on keyboard">
             <div class="shortcut-key">{{ shortcut }}</div>
+                {% for key in shortcut.split('<sep>') %}
+                    <span class="key-part">{{ key }}</span>
+                    {% if not loop.last %}
+                        <span class="separator">+</span>
+                    {% endif %}
+                {% endfor %}
+
             <div class="shortcut-description">{{ details.description }}</div>
           </div>
           {% endfor %}
@@ -900,7 +927,7 @@
           .querySelectorAll(".key")
           .forEach((key) => key.classList.remove("active"));
 
-        const keys = shortcut.split("+");
+        const keys = shortcut.querySelectorAll('.key-part');
         const system = document.getElementById("keyboard").getAttribute("data-system");
 
         keys.forEach((key) => {

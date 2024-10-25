@@ -76,13 +76,35 @@ def replace_shortcut_names(shortcut, system_mappings):
         "Right": "→"
     }
     try:
-        return "+".join(
-            arrow_key_mappings.get(key.strip(), system_mappings.get(key.strip(), key.strip()))
-            for key in shortcut.split("+")
-        )
+        # Split by plus sign
+        parts = shortcut.split('+')
+        processed_parts = []
+
+            # First part is always a key
+        if parts:
+            first_part = parts[0].strip()
+            processed_parts.append(
+            arrow_key_mappings.get(first_part, system_mappings.get(first_part, first_part)))
+
+            # Process remaining parts, starting with index 1
+            # Odd indices (1, 3, 5...) will be plus keys if not empty
+            # Even indices (2, 4, 6...) will be regular keys
+            for i in range(1, len(parts)):
+                part = parts[i].strip()
+                if i % 2 == 1:  # Odd indices after split are plus keys if not empty
+                    if part:  # If there's content, it's a plus key
+                        processed_parts.append(
+                            arrow_key_mappings.get(part, system_mappings.get(part, part))
+                        )
+            else:  # Even indices after split are always regular keys
+                processed_parts.append(
+                    arrow_key_mappings.get(part, system_mappings.get(part, part))
+            )
+
+        return "<sep>".join(processed_parts)
     except Exception as e:
-        logging.error(f"Error replacing shortcut names: {e}")
-        return shortcut
+         logging.error(f"Error replacing shortcut names: {e}")
+         return shortcut
 
 
 def normalize_shortcuts(data, system_mappings):
