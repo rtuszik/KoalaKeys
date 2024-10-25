@@ -237,6 +237,16 @@
       }
 
 
+      .shortcut-key .modifier-symbol {
+          font-size: 1.5em;
+          display: inline-block;
+          vertical-align: middle;
+      }
+
+      .shortcut-key span:has(> span.modifier-symbol) {
+          line-height: 1;
+      }
+
       .shortcut-description {
         font-size: 0.85rem;
         text-align: right;
@@ -747,7 +757,7 @@
           <div class="shortcut" title="Click to highlight on keyboard">
             <div class="shortcut-key">
                 {% for key in shortcut.split('<sep>') %}
-                    <span class="key-part">{{ key }}</span>
+                    <span class="key-part">{{ key | safe }}</span>
                     {% if not loop.last %}
                         <span class="separator">+</span>
                     {% endif %}
@@ -766,8 +776,8 @@
       const keyLabelMappings = {
         Darwin: {
           Cmd: "⌘",
-          Alt: "Option",
-          Ctrl: "Control",
+          Alt: "⌥",
+          Ctrl: "⌃",
           Shift: "Shift",
           CapsLock: "Caps",
           Tab: "Tab",
@@ -818,6 +828,20 @@
         return keyLabelMappings[system][key] || key;
       }
 
+    function wrapModifierSymbols(text) {
+        // Define the symbols we want to make larger
+        const modifierSymbols = ['⌘', '⌥', '⌃', '⇧'];
+
+        // Replace each modifier symbol with a wrapped version
+        modifierSymbols.forEach(symbol => {
+            text = text.replace(
+                new RegExp(symbol, 'g'),
+                `<span class="modifier-symbol">${symbol}</span>`
+            );
+        });
+
+        return text;
+    }
       function generateKeyboard() {
         const keyboard = document.getElementById("keyboard");
         const layout = keyboard.getAttribute("data-layout");
