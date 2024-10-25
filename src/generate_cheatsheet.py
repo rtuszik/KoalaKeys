@@ -102,12 +102,6 @@ def replace_shortcut_names(shortcut, system_mappings):
                     )
 
         return "<sep>".join(processed_parts)
-            else:  # Even indices after split are always regular keys
-                processed_parts.append(
-                    arrow_key_mappings.get(part, system_mappings.get(part, part))
-            )
-
-        return "<sep>".join(processed_parts)
     except Exception as e:
          logging.error(f"Error replacing shortcut names: {e}")
          return shortcut
