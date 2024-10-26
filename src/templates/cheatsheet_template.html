@@ -172,7 +172,6 @@
       .shortcut {
         background-color: var(--crust);
         border-radius: 5px;
-        padding: 6px 8px;
         cursor: pointer;
         transition:
           background-color 0.3s,
@@ -182,7 +181,7 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        height: 40px;
+        min-height: 40px;
         overflow: hidden;
       }
       body.dark-mode .shortcut {
@@ -209,11 +208,12 @@
         transition:
           color 0.3s,
           font-size 0.3s;
-        flex-shrink: 0;
-        margin-right: 8px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        flex: 1 1 50%;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        display: flex;
+        align-items: center;
+        height: 100%;
       }
 
       .text-shortcut {
@@ -239,6 +239,8 @@
       .shortcut-key .separator {
           color: var(--latte-subtext0);
           font-weight: normal;
+          margin-right: 0.3em;
+          margin-left: 0.3em;
       }
 
       body.dark-mode .shortcut-key .separator {
@@ -259,11 +261,15 @@
       .shortcut-description {
         font-size: 0.85rem;
         text-align: right;
-        flex-grow: 1;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        flex: 1 1 50%;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
         transition: font-size 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        height: 100%;
+
       }
       @media (max-width: 600px) {
         .shortcuts-container {
@@ -1017,16 +1023,15 @@
       function adjustLayout() {
         const isNavActive = document.body.classList.contains("nav-active");
         const shortcutKeys = document.querySelectorAll(".shortcut-key");
-        const shortcutDescriptions = document.querySelectorAll(
-          ".shortcut-description",
-        );
+        const shortcutDescriptions = document.querySelectorAll(".shortcut-description");
         const shortcuts = document.querySelectorAll(".shortcut");
 
         shortcuts.forEach((shortcut) => {
           shortcut.style.flexDirection = "row";
-          shortcut.style.alignItems = "center";
-          shortcut.style.height = "40px";
-          shortcut.style.padding = "6px 8px";
+          shortcut.style.alignItems = "flex-start";
+          shortcut.style.minHeight = "40px";
+          shortcut.style.height = "auto";
+          shortcut.style.padding = "8px";
         });
 
         shortcutKeys.forEach((key) => {
@@ -1034,18 +1039,16 @@
           key.style.marginRight = "8px";
           key.style.marginBottom = "0";
           key.style.width = isNavActive ? "40%" : "50%";
-          key.style.whiteSpace = "nowrap";
-          key.style.overflow = "hidden";
-          key.style.textOverflow = "ellipsis";
+          key.style.wordWrap = "break-word";
+          key.style.overflowWrap = "break-word";
         });
 
         shortcutDescriptions.forEach((desc) => {
           desc.style.fontSize = isNavActive ? "0.75rem" : "0.85rem";
           desc.style.textAlign = "right";
           desc.style.width = isNavActive ? "60%" : "50%";
-          desc.style.whiteSpace = "nowrap";
-          desc.style.overflow = "hidden";
-          desc.style.textOverflow = "ellipsis";
+          desc.style.wordWrap = "break-word";
+          desc.style.overflowWrap = "break-word";
         });
       }
 
