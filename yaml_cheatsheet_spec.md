@@ -34,7 +34,7 @@ Optionally, the following keys are also supported:
 ```yaml
 title: ""
 RenderKeys: true # defaults to true
-AllowText: true # defaults to false - requires RenderKeys: false
+AllowText: false # defaults to false - requires RenderKeys: false
 layout:
   keyboard: US
   system: Darwin
@@ -158,24 +158,21 @@ The system will attempt to automatically fix some issues:
 Here's a minimal example of a correctly formatted YAML cheatsheet:
 
 ```yaml
-title: "Example Application Shortcuts"
+title: "KoalaKeys"
+RenderKeys: true # defaults to true
+AllowText: false # defaults to false - requires RenderKeys: false
 layout:
   keyboard: US
   system: Darwin
 shortcuts:
-  "File Operations":
-    "CMD+S":
-      description: "Save current document"
-    "CMD+O":
-      description: "Open a document"
-  "Editing":
+  General:
+    "CMD+C":
+      description: "Copy selected item"
     "CMD+X":
-      description: "Cut selected text"
-    "CMD+V":
-      description: "Paste text from clipboard"
-  "Navigation":
-    "CMD+Left":
-      description: "Go to beginning of line"
-    "CMD+Right":
-      description: "Go to end of line"
+      description: "Cut selected item"
+  File and App Management:
+    "CMD+N":
+      description: "Open new window or document"
+    "CMD+O":
+      description: "Open selected item or display dialog to choose file to open"
 ```
