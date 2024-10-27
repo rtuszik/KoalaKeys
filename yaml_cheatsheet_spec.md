@@ -1,10 +1,11 @@
-# YAML Cheatsheet Specification Guide
+# YAML cheat sheet Specification Guide
 
 ## TLDR
 
 - Use `.yaml` extension
 - Required top-level keys: `title`, `layout`, `shortcuts`
-- `layout` specifies `keyboard` (US, UK, DE, FR, ES) and `system` (Darwin, Windows, Linux)
+- Optional top-level keys: `RenderKeys`,`AllowText`
+- `layout` specifies `keyboard` (US, UK, ...) and `system` (Darwin, Windows, Linux)
 - `shortcuts` organized by categories
 - Use all caps for key names (CMD, CTRL, SHIFT, ALT)
 - Use `+` to combine keys
@@ -13,31 +14,36 @@
 
 ## File Structure
 
-Each cheatsheet should be a single YAML file with the `.yaml` extension, located in the `cheatsheets` directory of the project.
+Each cheat sheet should be a single YAML file with the `.yaml` extension, located in the `cheatsheets` directory of the project.
 
 ## Top-Level Keys
 
 The YAML file must contain the following top-level keys:
 
-1. `title`: A string representing the title of the cheatsheet.
+1. `title`: A string representing the title of the cheat sheet.
 2. `layout`: An object containing keyboard and system information.
 3. `shortcuts`: An object containing categories and their associated shortcuts.
+
+Optionally, the following keys are also supported:
+
+1. `RenderKeys`: `true`/`false` (default: true)
+2. `AllowText`: `true`/`false` (default: false)
 
 ### Example:
 
 ```yaml
-title: "Default macOS Keyboard Shortcuts"
+title: ""
+RenderKeys: true # defaults to true
+AllowText: true # defaults to false - requires RenderKeys: false
 layout:
   keyboard: US
   system: Darwin
 shortcuts:
-  # Categories and shortcuts go here
 ```
 
 ## Title
 
 - The `title` should be a descriptive string enclosed in quotes.
-- Use title case for the cheatsheet name.
 
 ## Layout
 
@@ -173,5 +179,3 @@ shortcuts:
     "CMD+Right":
       description: "Go to end of line"
 ```
-
-By following this specification and understanding the validation and fixing processes, you can ensure that your YAML cheatsheets will be compatible with the Easy Cheatsheets project and will render correctly in the generated HTML output.
