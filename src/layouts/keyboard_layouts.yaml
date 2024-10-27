@@ -48,7 +48,19 @@ US:
         "Enter",
       ]
     - ["Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Shift"]
-    - ["Ctrl", "Alt", "Cmd", "Space", "Cmd", "Alt", "Ctrl", "Left", "Up", "Down", "Right"]
+    - [
+        "Ctrl",
+        "Alt",
+        "Cmd",
+        "Space",
+        "Cmd",
+        "Alt",
+        "Ctrl",
+        "Left",
+        "Up",
+        "Down",
+        "Right",
+      ]
 
 UK:
   layout:
@@ -259,3 +271,67 @@ ES:
       ]
     - ["Shift", "Ç", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "-", "Shift"]
     - ["Ctrl", "Alt", "Cmd", "Space", "Cmd", "Alt", "Ctrl"]
+
+DVORAK:
+  layout:
+    - [
+        "Esc",
+        "F1",
+        "F2",
+        "F3",
+        "F4",
+        "F5",
+        "F6",
+        "F7",
+        "F8",
+        "F9",
+        "F10",
+        "F11",
+        "F12",
+      ]
+    - [
+        "`",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "0",
+        "[",
+        "]",
+        "Backspace",
+      ]
+    - ["Tab", "'", ",", ".", "P", "Y", "F", "G", "C", "R", "L", "/", "=", "\\"]
+    - [
+        "CapsLock",
+        "A",
+        "O",
+        "E",
+        "U",
+        "I",
+        "D",
+        "H",
+        "T",
+        "N",
+        "S",
+        "-",
+        "Enter",
+      ]
+    - ["Shift", ";", "Q", "J", "K", "X", "B", "M", "W", "V", "Z", "Shift"]
+    - [
+        "Ctrl",
+        "Alt",
+        "Cmd",
+        "Space",
+        "Cmd",
+        "Alt",
+        "Ctrl",
+        "Left",
+        "Up",
+        "Down",
+        "Right",
+      ]
