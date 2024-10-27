@@ -1,4 +1,6 @@
-title: "Default macOS Keyboard Shortcuts"
+title: "KoalaKeys"
+RenderKeys: true # defaults to true
+AllowText: true # defaults to false - requires RenderKeys: false
 layout:
   keyboard: US
   system: Darwin
