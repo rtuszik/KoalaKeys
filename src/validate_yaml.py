@@ -23,6 +23,20 @@ def validate_yaml(file_path):
     if 'title' in data and not isinstance(data['title'], str):
         errors.append("Title must be a string")
 
+    # Validate RenderKeys and AllowText if present
+    render_keys = data.get('RenderKeys', True)
+    allow_text = data.get('AllowText', False)
+
+    if 'RenderKeys' in data and not isinstance(render_keys, bool):
+        errors.append("RenderKeys must be a boolean value (true/false)")
+
+    if 'AllowText' in data and not isinstance(allow_text, bool):
+        errors.append("AllowText must be a boolean value (true/false)")
+
+    # Check if AllowText is only enabled when RenderKeys is false
+    if allow_text and render_keys:
+        errors.append("AllowText can only be true when RenderKeys is false")
+
     # Validate layout (if present)
     if 'layout' in data:
         if not isinstance(data['layout'], dict):
@@ -52,9 +66,10 @@ def validate_yaml(file_path):
                         elif not isinstance(details['description'], str):
                             errors.append(f"Description for shortcut '{shortcut}' in category '{category}' must be a string")
                         
-                        # Validate shortcut format
-                        if not re.match(r'^[A-Za-z0-9+⌘⌥⌃⇧←→↑↓\s\-\|\[\],.:/`"?<>=\\⌃]+$', shortcut):
-                            errors.append(f"Invalid shortcut format: '{shortcut}' in category '{category}'")
+                        # Only validate shortcut format if AllowText is false
+                        if not allow_text:
+                            if not re.match(r'^[A-Za-z0-9+⌘⌥⌃⇧←→↑↓\s\-\|\[\],.:/`"?<>=\\⌃]+$', shortcut):
+                                errors.append(f"Invalid shortcut format: '{shortcut}' in category '{category}'")
 
     return errors
 

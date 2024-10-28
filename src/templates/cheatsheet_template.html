@@ -117,7 +117,18 @@
         margin-bottom: 10px;
         font-weight: 700;
         font-size: 2.2rem;
+        position: absolute;
+        left: 50%;
+        right: 0;
+        margin: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 100vw;
+        padding: 0;
+        transform: translateX(-50%);
       }
+
       body.dark-mode h1 {
         color: var(--mocha-mauve);
       }
@@ -172,7 +183,6 @@
       .shortcut {
         background-color: var(--crust);
         border-radius: 5px;
-        padding: 6px 8px;
         cursor: pointer;
         transition:
           background-color 0.3s,
@@ -182,7 +192,7 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        height: 40px;
+        min-height: 40px;
         overflow: hidden;
       }
       body.dark-mode .shortcut {
@@ -209,11 +219,21 @@
         transition:
           color 0.3s,
           font-size 0.3s;
-        flex-shrink: 0;
-        margin-right: 8px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        flex: 1 1 50%;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        display: flex;
+        align-items: center;
+        height: 100%;
+      }
+
+      .text-shortcut {
+        font-size: 0.95rem;
+        color: var(--latte-text);
+      }
+
+      body.dark-mode .text-shortcut {
+        color: var(--mocha-text);
       }
       body.dark-mode .shortcut-key {
         color: var(--mocha-red);
@@ -230,6 +250,8 @@
       .shortcut-key .separator {
           color: var(--latte-subtext0);
           font-weight: normal;
+          margin-right: 0.3em;
+          margin-left: 0.3em;
       }
 
       body.dark-mode .shortcut-key .separator {
@@ -250,11 +272,15 @@
       .shortcut-description {
         font-size: 0.85rem;
         text-align: right;
-        flex-grow: 1;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        flex: 1 1 50%;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
         transition: font-size 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        height: 100%;
+
       }
       @media (max-width: 600px) {
         .shortcuts-container {
@@ -470,21 +496,6 @@
         padding-left: 200px;
       }
 
-      h1 {
-        position: absolute;
-        left: 0;
-        right: 0;
-        text-align: center;
-        margin: 0;
-        font-size: 1.8rem;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        width: 100vw;
-        padding: 0;
-        left: 50%;
-        transform: translateX(-50%);
-      }
 
       #dark-mode-toggle {
         flex: 0 0 auto;
@@ -645,6 +656,7 @@
       </ul>
     </nav>
     <div id="content-wrapper">
+    {% if render_keys %}
       <p class="layout-info">
         Keyboard Layout: {{ layout.keyboard }} | System: {{ layout.system }}
       </p>
@@ -748,20 +760,24 @@
           </div>
         </div>
       </div>
-
+      {% endif %}
       {% for section, shortcuts in shortcuts.items() %}
       <div class="section" id="{{ section | replace(' ', '-') | lower }}">
         <h2>{{ section }}</h2>
         <div class="shortcuts-container">
           {% for shortcut, details in shortcuts.items() %}
-          <div class="shortcut" title="Click to highlight on keyboard">
-            <div class="shortcut-key">
+          <div class="shortcut" {% if not allow_text %}title="Click to highlight on keyboard"{% endif %}>
+            <div class="shortcut-key {% if allow_text %}text-shortcut{% endif %}">
+              {% if allow_text %}
+                {{ shortcut }}
+              {% else %}
                 {% for key in shortcut.split('<sep>') %}
-                    <span class="key-part">{{ key | safe }}</span>
-                    {% if not loop.last %}
-                        <span class="separator">+</span>
-                    {% endif %}
+                  <span class="key-part">{{ key | safe }}</span>
+                  {% if not loop.last %}
+                    <span class="separator">+</span>
+                  {% endif %}
                 {% endfor %}
+              {% endif %}
             </div>
             <div class="shortcut-description">{{ details.description }}</div>
           </div>
@@ -973,11 +989,13 @@
       }
 
       document.querySelectorAll(".shortcut").forEach((shortcut) => {
+        {% if not allow_text %}
         shortcut.addEventListener("click", function() {
             // Get the text content and replace <sep> with +
             const shortcutKey = this.querySelector(".shortcut-key").textContent.replace(/\s*\+\s*/g, '+');
             highlightKeys(shortcutKey);
         });
+        {% endif %}
       });
 
       // Keep original case for key data-attributes
@@ -1001,16 +1019,15 @@
       function adjustLayout() {
         const isNavActive = document.body.classList.contains("nav-active");
         const shortcutKeys = document.querySelectorAll(".shortcut-key");
-        const shortcutDescriptions = document.querySelectorAll(
-          ".shortcut-description",
-        );
+        const shortcutDescriptions = document.querySelectorAll(".shortcut-description");
         const shortcuts = document.querySelectorAll(".shortcut");
 
         shortcuts.forEach((shortcut) => {
           shortcut.style.flexDirection = "row";
-          shortcut.style.alignItems = "center";
-          shortcut.style.height = "40px";
-          shortcut.style.padding = "6px 8px";
+          shortcut.style.alignItems = "flex-start";
+          shortcut.style.minHeight = "40px";
+          shortcut.style.height = "auto";
+          shortcut.style.padding = "8px";
         });
 
         shortcutKeys.forEach((key) => {
@@ -1018,18 +1035,16 @@
           key.style.marginRight = "8px";
           key.style.marginBottom = "0";
           key.style.width = isNavActive ? "40%" : "50%";
-          key.style.whiteSpace = "nowrap";
-          key.style.overflow = "hidden";
-          key.style.textOverflow = "ellipsis";
+          key.style.wordWrap = "break-word";
+          key.style.overflowWrap = "break-word";
         });
 
         shortcutDescriptions.forEach((desc) => {
           desc.style.fontSize = isNavActive ? "0.75rem" : "0.85rem";
           desc.style.textAlign = "right";
           desc.style.width = isNavActive ? "60%" : "50%";
-          desc.style.whiteSpace = "nowrap";
-          desc.style.overflow = "hidden";
-          desc.style.textOverflow = "ellipsis";
+          desc.style.wordWrap = "break-word";
+          desc.style.overflowWrap = "break-word";
         });
       }
 

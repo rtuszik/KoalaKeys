@@ -2,7 +2,7 @@
 output/*
 
 cheatsheets/*
-!cheatsheets/example.yaml
+!cheatsheets/example-cheatsheet.yaml
 
 ### macOS ###
 # General

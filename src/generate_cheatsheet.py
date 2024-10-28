@@ -8,6 +8,8 @@ from template_renderer import render_template
 from logger import get_logger
 from pathlib import Path
 
+load_dotenv()
+
 # Define base paths
 BASE_DIR = Path(__file__).parent
 PROJECT_ROOT = BASE_DIR.parent
@@ -24,7 +26,6 @@ OUTPUT_DIR.mkdir(exist_ok=True, parents=True)
 logging = get_logger()
 
 # Load environment variables
-load_dotenv()
 
 def load_yaml(file_path: Path) -> dict | None:
     try:
@@ -94,12 +95,18 @@ def replace_shortcut_names(shortcut, system_mappings):
 
 def normalize_shortcuts(data, system_mappings):
     normalized = {}
+    allow_text = data.get('AllowText', False)
     try:
         for section, shortcuts in data.get("shortcuts", {}).items():
             normalized[section] = {}
             for shortcut, details in shortcuts.items():
-                normalized_shortcut = replace_shortcut_names(shortcut, system_mappings)
-                normalized[section][normalized_shortcut] = details
+                if allow_text:
+                    # When AllowText is true, just pass through the shortcut text
+                    normalized[section][shortcut] = details
+                else:
+                    # Normal processing for keyboard shortcuts
+                    normalized_shortcut = replace_shortcut_names(shortcut, system_mappings)
+                    normalized[section][normalized_shortcut] = details
     except Exception as e:
         logging.error(f"Error normalizing shortcuts: {e}")
     return normalized
@@ -121,6 +128,8 @@ def generate_html(data, keyboard_layouts, system_mappings):
     )
     data["layout"] = layout_info
     data["keyboard_layout"] = keyboard_layouts.get(layout_info["keyboard"], {}).get("layout")
+    data["render_keys"] = data.get("RenderKeys", True)
+    data["allow_text"] = data.get("AllowText", False)
     
     return render_template(template_path, data)
 

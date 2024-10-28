@@ -4,39 +4,41 @@
 
 # KoalaKeys
 
-A simple tool to create and manage interactive keyboard shortcut cheatsheets.
+A simple tool to create and manage portable keyboard shortcut cheat sheets.
 
-> **Demo**: Check out the [live demo](https://rtuszik.github.io/KoalaKeys-Collection/) to see a small collection of cheatsheets created with this project.
+> **Demo**: Check out the [live demo](https://rtuszik.github.io/KoalaKeys-Collection/) to see a small collection of cheat sheets created with this project.
 
 ## Overview
 
-KoalaKeys helps generate and organize interactive HTML cheatsheets for keyboard shortcuts. It's designed for developers, designers, and power users who want to keep their essential shortcuts easily accessible.
+KoalaKeys generates and organizes portable, interactive HTML cheat sheets for keyboard shortcuts. It's designed for developers, designers, and power users who want to keep their essential shortcuts easily accessible.
 
-> **Quick Start**: To create a cheatsheet, add a YAML file to the `cheatsheets` directory and run `python src/generate_cheatsheet.py`. For detailed YAML formatting instructions, see the [YAML Cheatsheet Specification Guide](yaml_cheatsheet_spec.md).
+> **Quick Start**: To create a cheat sheet, add a YAML file to the `cheatsheets` directory and run `python src/generate_cheatsheet.py`. For detailed YAML formatting instructions, see the [YAML Cheat Sheet Specification Guide](yaml_cheatsheet_spec.md).
 
 ## Screenshots
 
 <p align="center">
   <img src="assets/images/KoalaKeys_Example.png">
+    <a href="https://ibb.co/LZ862ZB"><img src="https://i.ibb.co/qrd9Prh/Koala-Keys-Screen-Cast.gif" alt="Koala-Keys-Screen-Cast" border="0">
+    </a>
 </p>
 
 ## Features
 
-- Generate HTML cheatsheets from YAML files
+- Generate HTML cheat sheets from YAML files
 - Interactive keyboard layout with real-time highlighting
 - Categorized shortcuts with descriptions
-- Index page for quick access to all cheatsheets
+- Index page for quick access to all cheat sheets
 - Search functionality
 - Support for different keyboard layouts and system mappings
 
 ## Demo and Examples
 
-A live demo instance is available, showcasing a selection of cheatsheets:
+A live demo instance is available, showcasing a selection of cheat sheets:
 
 - **Demo Site**: [https://rtuszik.github.io/KoalaKeys-Collection/](https://rtuszik.github.io/KoalaKeys-Collection/)
 - **Demo Repository**: [https://github.com/rtuszik/KoalaKeys-Collection](https://github.com/rtuszik/KoalaKeys-Collection)
 
-Explore the demo to see how KoalaKeys works and to get ideas for creating custom cheatsheets. The demo repository also contains example YAML files that can be used as templates for new cheatsheets.
+Explore the demo to see how KoalaKeys works and to get ideas for creating custom cheat sheets. The demo repository also contains example YAML files that can be used as templates for new cheat sheets.
 
 ## Available Systems and Keyboards
 
@@ -53,6 +55,7 @@ Explore the demo to see how KoalaKeys works and to get ideas for creating custom
 - DE (German)
 - FR (French)
 - ES (Spanish)
+- DVORAK
 
 ## Requirements
 
@@ -88,17 +91,17 @@ Explore the demo to see how KoalaKeys works and to get ideas for creating custom
 
 ## Usage
 
-1. Create YAML files for your cheatsheets in the `cheatsheets` directory. For detailed instructions on how to format YAML files, please refer to the [YAML Cheatsheet Specification Guide](yaml_cheatsheet_spec.md).
+1. Create YAML files for your cheat sheets in the `cheatsheets` directory. For detailed instructions on how to format YAML files, please refer to the [YAML Cheat Sheet Specification Guide](yaml_cheatsheet_spec.md).
 
-2. Generate cheatsheets:
+2. Generate cheat sheets:
 
    ```
    python src/generate_cheatsheet.py
    ```
 
-3. Find the HTML cheatsheets in the specified output directory.
+3. Find the HTML cheat sheets in the specified output directory.
 
-4. Open `index.html` to view the cheatsheet collection.
+4. Open `index.html` to view the cheat sheet collection.
 
 ## Contributing
 
