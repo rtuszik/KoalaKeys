@@ -18,7 +18,6 @@ KoalaKeys generates and organizes portable, interactive HTML cheat sheets for ke
 
 <p align="center">
   <img src="assets/images/KoalaKeys_Example.png">
-    <a href="https://ibb.co/LZ862ZB"><img src="https://i.ibb.co/qrd9Prh/Koala-Keys-Screen-Cast.gif" alt="Koala-Keys-Screen-Cast" border="0">
     </a>
 </p>
 
