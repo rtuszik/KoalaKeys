@@ -11,11 +11,15 @@ COPY --link requirements.txt /
 COPY --link /src /src
 COPY --link /assets /assets
 
-RUN --mount=type=cache,id=pip,target=/root/.cache,sharing=locked \
-    <<EOF
+RUN <<EOF
     set -xe
     mkdir -p /cheatsheets
     chmod -R +x /src/*.py
+EOF
+
+RUN --mount=type=cache,id=pip,target=/root/.cache,sharing=locked \
+    <<EOF
+    set -xe
     python3 -m pip install -U pip
     python3 -m pip install -Ur requirements.txt
 EOF
