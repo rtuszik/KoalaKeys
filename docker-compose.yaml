@@ -1,0 +1,8 @@
+services:
+  koala-keys:
+    image: tobiashochguertel/koala-keys
+    ports:
+      - "50505:5000"
+    volumes:
+      - ./cheatsheets:/home/myuser/code/cheatsheets
+      - ./output:/home/myuser/output
