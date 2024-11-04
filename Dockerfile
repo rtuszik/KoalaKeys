@@ -26,6 +26,4 @@ EOF
 
 VOLUME /cheatsheet
 
-# HEALTHCHECK --interval=30s --timeout=10s --start-period=20s --retries=3 CMD borgmatic config validate
-
 ENTRYPOINT ["python", "src/generate_cheatsheet.py"]
