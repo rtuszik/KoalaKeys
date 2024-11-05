@@ -119,9 +119,8 @@ def get_layout_info(data):
         "system": layout.get("system", "Darwin"),
     }
 
-
 def generate_html(data, keyboard_layouts, system_mappings):
-    template_path = TEMPLATES_DIR / "cheatsheet_template.html"
+    template_path = "cheatsheets/cheatsheet-template.html"
     layout_info = get_layout_info(data)
     data["shortcuts"] = normalize_shortcuts(
         data, system_mappings.get(layout_info["system"], {})
