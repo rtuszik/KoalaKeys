@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        {% block header %}{% endblock %}
+        <title>
+            {% block title %}{% endblock %}
+        </title>
+        {% block page_styles %}{% endblock %}
+    </head>
+    <body class="dark-mode">
+        {% block content %}{% endblock %}
+        {% block javascript %}{% endblock %}
+    </body>
+</html>

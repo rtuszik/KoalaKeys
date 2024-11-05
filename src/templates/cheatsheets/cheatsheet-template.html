@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} Cheatsheet{% endblock %}
+
+{% block page_styles %}
+<style>
+{% include 'cheatsheets/assets/cheatsheets.css' %}
+</style>
+{% endblock %}
+
+{% block header %}
+
+{% include 'cheatsheets/components/header.html' %}
+{% endblock %}
+
+{% block content %}
+{% include 'cheatsheets/components/body.html' %}
+{% endblock %}
+
+{% block javascript %}
+<script>
+{% include "cheatsheets/scripts/main.js" %}
+</script>
+{% endblock %}
