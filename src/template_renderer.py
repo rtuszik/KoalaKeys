@@ -7,13 +7,6 @@ logging = get_logger()
 def render_template(template_path, data):
     """
     Render a template from the given path with provided data.
-    
-    Args:
-        template_path: Path to the template file
-        data: Dictionary of data to render in the template
-    
-    Returns:
-        Rendered template string or None if error occurs
     """
     try:
         # Use the templates directory directly

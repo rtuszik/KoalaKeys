@@ -1,4 +1,4 @@
-import yaml
+from ruamel.yaml import YAML
 from jinja2 import Environment, FileSystemLoader
 import sys
 import os
@@ -7,6 +7,13 @@ from dotenv import load_dotenv
 from template_renderer import render_template
 from logger import get_logger
 from pathlib import Path
+
+# Create YAML instances once
+yaml_safe = YAML(typ='safe')
+yaml_rw = YAML()
+yaml_rw.indent(mapping=2, sequence=4, offset=2)
+yaml_rw.preserve_quotes = True
+yaml_rw.width = 100
 
 load_dotenv()
 
@@ -29,16 +36,13 @@ logging = get_logger()
 
 def load_yaml(file_path: Path) -> dict | None:
     try:
-        with open(file_path, "r") as file:
-            return yaml.safe_load(file)
+        with open(file_path, "r", encoding='utf-8') as file:
+            return yaml_safe.load(file)
     except FileNotFoundError:
         logging.error(f"Error: YAML file '{file_path}' not found.")
         return None
-    except yaml.YAMLError as e:
-        logging.error(f"Error parsing YAML file '{file_path}': {e}")
-        return None
     except Exception as e:
-        logging.error(f"Unexpected error reading file '{file_path}': {e}")
+        logging.error(f"Error reading YAML file '{file_path}': {e}")
         return None
 
 
@@ -134,13 +138,11 @@ def generate_html(data, keyboard_layouts, system_mappings):
 
 
 def validate_and_lint(yaml_file):
-    errors = validate_yaml(yaml_file)
+    validation_result = validate_yaml(yaml_file)
     warnings = lint_yaml(yaml_file)
 
-    if errors:
-        logging.error(f"Validation errors in {yaml_file}:")
-        for error in errors:
-            logging.error(f"  - {error}")
+    if not validation_result:
+        logging.error(f"Validation failed for {yaml_file}")
         return False
 
     if warnings:
@@ -152,7 +154,7 @@ def validate_and_lint(yaml_file):
 
 def write_html_content(html_output, html_content):
     try:
-        with open(html_output, "w") as file:
+        with open(html_output, "w", encoding='utf-8') as file:
             file.write(html_content)
     except IOError as e:
         logging.error(f"Error writing to output file: {e}")
@@ -196,7 +198,7 @@ def generate_index(cheatsheets):
 
     index_output = os.path.join(OUTPUT_DIR, "index.html")
 
-    with open(index_output, "w") as file:
+    with open(index_output, "w", encoding='utf-8') as file:
         file.write(html_content)
 
     logging.info(f"Index page generated: {index_output}")
