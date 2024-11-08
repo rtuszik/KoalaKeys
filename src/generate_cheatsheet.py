@@ -134,13 +134,11 @@ def generate_html(data, keyboard_layouts, system_mappings):
 
 
 def validate_and_lint(yaml_file):
-    errors = validate_yaml(yaml_file)
+    validation_result = validate_yaml(yaml_file)
     warnings = lint_yaml(yaml_file)
 
-    if errors:
-        logging.error(f"Validation errors in {yaml_file}:")
-        for error in errors:
-            logging.error(f"  - {error}")
+    if not validation_result:
+        logging.error(f"Validation failed for {yaml_file}")
         return False
 
     if warnings:

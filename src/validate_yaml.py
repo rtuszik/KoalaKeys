@@ -1,6 +1,9 @@
 from ruamel.yaml import YAML
 from ruamel.yaml.error import YAMLError
 import re
+from logger import get_logger
+
+logger = get_logger()
 
 # Create YAML instances once
 yaml_safe = YAML(typ='safe')
@@ -11,83 +14,95 @@ yaml_rw.width = 100
 
 def validate_required_keys(data):
     """Validate presence of required top-level keys."""
-    errors = []
     required_keys = ['title', 'shortcuts']
     for key in required_keys:
         if key not in data:
-            errors.append(f"Missing required top-level key: '{key}'")
-    return errors
+            logger.error(f"Missing required top-level key: '{key}'")
+            return False
+    return True
 
 def validate_title(data):
     """Validate title field."""
     if 'title' in data and not isinstance(data['title'], str):
-        return ["Title must be a string"]
-    return []
+        logger.error("Title must be a string")
+        return False
+    return True
 
 def validate_render_options(data):
     """Validate RenderKeys and AllowText options."""
-    errors = []
+    is_valid = True
     render_keys = data.get('RenderKeys', True)
     allow_text = data.get('AllowText', False)
 
     if 'RenderKeys' in data and not isinstance(render_keys, bool):
-        errors.append("RenderKeys must be a boolean value (true/false)")
+        logger.error("RenderKeys must be a boolean value (true/false)")
+        is_valid = False
 
     if 'AllowText' in data and not isinstance(allow_text, bool):
-        errors.append("AllowText must be a boolean value (true/false)")
+        logger.error("AllowText must be a boolean value (true/false)")
+        is_valid = False
 
     if allow_text and render_keys:
-        errors.append("AllowText can only be true when RenderKeys is false")
+        logger.error("AllowText can only be true when RenderKeys is false")
+        is_valid = False
 
-    return errors
+    return is_valid
 
 def validate_layout(data):
     """Validate keyboard layout configuration."""
-    errors = []
     if 'layout' not in data:
-        return errors
+        return True
 
     if not isinstance(data['layout'], dict):
-        return ["Layout must be a dictionary"]
+        logger.error("Layout must be a dictionary")
+        return False
 
     valid_keyboards = ['US', 'UK', 'DE', 'FR', 'ES']
     valid_systems = ['Darwin', 'Linux', 'Windows']
+    is_valid = True
     
     if 'keyboard' in data['layout'] and data['layout']['keyboard'] not in valid_keyboards:
-        errors.append(f"Invalid keyboard layout. Must be one of: {', '.join(valid_keyboards)}")
+        logger.error(f"Invalid keyboard layout. Must be one of: {', '.join(valid_keyboards)}")
+        is_valid = False
     
     if 'system' in data['layout'] and data['layout']['system'] not in valid_systems:
-        errors.append(f"Invalid system. Must be one of: {', '.join(valid_systems)}")
+        logger.error(f"Invalid system. Must be one of: {', '.join(valid_systems)}")
+        is_valid = False
 
-    return errors
+    return is_valid
 
 def validate_shortcuts(data):
     """Validate shortcuts structure and content."""
-    errors = []
     if 'shortcuts' not in data:
-        return errors
+        return True
 
     if not isinstance(data['shortcuts'], dict):
-        return ["Shortcuts must be a dictionary"]
+        logger.error("Shortcuts must be a dictionary")
+        return False
 
     allow_text = data.get('AllowText', False)
+    is_valid = True
     
     for category, shortcuts in data['shortcuts'].items():
         if not isinstance(shortcuts, dict):
-            errors.append(f"Category '{category}' must contain a dictionary of shortcuts")
+            logger.error(f"Category '{category}' must contain a dictionary of shortcuts")
+            is_valid = False
             continue
 
         for shortcut, details in shortcuts.items():
             if not isinstance(details, dict) or 'description' not in details:
-                errors.append(f"Shortcut '{shortcut}' in category '{category}' must have a 'description' key")
+                logger.error(f"Shortcut '{shortcut}' in category '{category}' must have a 'description' key")
+                is_valid = False
             elif not isinstance(details['description'], str):
-                errors.append(f"Description for shortcut '{shortcut}' in category '{category}' must be a string")
+                logger.error(f"Description for shortcut '{shortcut}' in category '{category}' must be a string")
+                is_valid = False
             
             if not allow_text:
                 if not re.match(r'^[A-Za-z0-9+⌘⌥⌃⇧←→↑↓\s\-\|\[\],.:/`"?<>=\\⌃]+$', shortcut):
-                    errors.append(f"Invalid shortcut format: '{shortcut}' in category '{category}'")
+                    logger.error(f"Invalid shortcut format: '{shortcut}' in category '{category}'")
+                    is_valid = False
 
-    return errors
+    return is_valid
 
 def validate_yaml(file_path):
     """Validate YAML file structure and content."""
@@ -95,20 +110,39 @@ def validate_yaml(file_path):
         with open(file_path, 'r', encoding='utf-8') as file:
             data = yaml_safe.load(file)
     except YAMLError as e:
-        return [f"YAML parsing error: {str(e)}"]
+        logger.error(f"YAML parsing error in {file_path}: {str(e)}")
+        return False
+    except FileNotFoundError:
+        logger.error(f"File not found: {file_path}")
+        return False
+    except Exception as e:
+        logger.error(f"Unexpected error reading {file_path}: {str(e)}")
+        return False
     
     if data is None:
-        return ["Empty YAML file"]
+        logger.error(f"Empty YAML file: {file_path}")
+        return False
 
-    # Collect all validation errors
-    errors = []
-    errors.extend(validate_required_keys(data))
-    errors.extend(validate_title(data))
-    errors.extend(validate_render_options(data))
-    errors.extend(validate_layout(data))
-    errors.extend(validate_shortcuts(data))
+    is_valid = True
 
-    return errors
+    # Perform all validations
+    if not validate_required_keys(data):
+        is_valid = False
+    if not validate_title(data):
+        is_valid = False
+    if not validate_render_options(data):
+        is_valid = False
+    if not validate_layout(data):
+        is_valid = False
+    if not validate_shortcuts(data):
+        is_valid = False
+
+    if is_valid:
+        logger.info(f"YAML validation successful: {file_path}")
+    else:
+        logger.error(f"YAML validation failed: {file_path}")
+
+    return is_valid
 
 def lint_yaml(file_path):
     warnings = []
