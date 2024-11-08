@@ -1,4 +1,4 @@
-import yaml
+from ruamel.yaml import YAML
 from jinja2 import Environment, FileSystemLoader
 import sys
 import os
@@ -7,6 +7,13 @@ from dotenv import load_dotenv
 from template_renderer import render_template
 from logger import get_logger
 from pathlib import Path
+
+# Create YAML instances once
+yaml_safe = YAML(typ='safe')
+yaml_rw = YAML()
+yaml_rw.indent(mapping=2, sequence=4, offset=2)
+yaml_rw.preserve_quotes = True
+yaml_rw.width = 100
 
 load_dotenv()
 
@@ -29,16 +36,13 @@ logging = get_logger()
 
 def load_yaml(file_path: Path) -> dict | None:
     try:
-        with open(file_path, "r") as file:
-            return yaml.safe_load(file)
+        with open(file_path, "r", encoding='utf-8') as file:
+            return yaml_safe.load(file)
     except FileNotFoundError:
         logging.error(f"Error: YAML file '{file_path}' not found.")
         return None
-    except yaml.YAMLError as e:
-        logging.error(f"Error parsing YAML file '{file_path}': {e}")
-        return None
     except Exception as e:
-        logging.error(f"Unexpected error reading file '{file_path}': {e}")
+        logging.error(f"Error reading YAML file '{file_path}': {e}")
         return None
 
 
