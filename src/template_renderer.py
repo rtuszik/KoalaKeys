@@ -1,12 +1,24 @@
-from jinja2 import Template
+from jinja2 import Environment, FileSystemLoader
 from logger import get_logger
+from pathlib import Path
 
 logging = get_logger()
 
 def render_template(template_path, data):
+    """
+    Render a template from the given path with provided data.
+    """
     try:
-        with open(template_path, "r") as file:
-            template = Template(file.read())
+        # Use the templates directory directly
+        templates_dir = Path(__file__).parent / "templates"
+        
+        env = Environment(
+            loader=FileSystemLoader(str(templates_dir))
+        )
+        
+        template = env.get_template(str(template_path))
+        return template.render(**data)
+        
     except FileNotFoundError:
         logging.error(f"Error: Template file '{template_path}' not found.")
         return None
@@ -14,8 +26,3 @@ def render_template(template_path, data):
         logging.error(f"Error reading template file: {e}")
         return None
 
-    try:
-        return template.render(**data)
-    except Exception as e:
-        logging.error(f"Error rendering template: {e}")
-        return None
