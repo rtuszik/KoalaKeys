@@ -1,29 +1,32 @@
-import yaml
-from yaml.parser import ParserError
-from yaml.scanner import ScannerError
-import re
 from ruamel.yaml import YAML
+from ruamel.yaml.error import YAMLError
+import re
 
-def validate_yaml(file_path):
+# Create YAML instances once
+yaml_safe = YAML(typ='safe')
+yaml_rw = YAML()
+yaml_rw.indent(mapping=2, sequence=4, offset=2)
+yaml_rw.preserve_quotes = True
+yaml_rw.width = 100
+
+def validate_required_keys(data):
+    """Validate presence of required top-level keys."""
     errors = []
-
-    try:
-        with open(file_path, 'r') as file:
-            data = yaml.safe_load(file)
-    except (ParserError, ScannerError) as e:
-        return [f"YAML parsing error: {str(e)}"]
-
-    # Check for required top-level keys
     required_keys = ['title', 'shortcuts']
     for key in required_keys:
         if key not in data:
             errors.append(f"Missing required top-level key: '{key}'")
+    return errors
 
-    # Validate title
+def validate_title(data):
+    """Validate title field."""
     if 'title' in data and not isinstance(data['title'], str):
-        errors.append("Title must be a string")
+        return ["Title must be a string"]
+    return []
 
-    # Validate RenderKeys and AllowText if present
+def validate_render_options(data):
+    """Validate RenderKeys and AllowText options."""
+    errors = []
     render_keys = data.get('RenderKeys', True)
     allow_text = data.get('AllowText', False)
 
@@ -33,43 +36,77 @@ def validate_yaml(file_path):
     if 'AllowText' in data and not isinstance(allow_text, bool):
         errors.append("AllowText must be a boolean value (true/false)")
 
-    # Check if AllowText is only enabled when RenderKeys is false
     if allow_text and render_keys:
         errors.append("AllowText can only be true when RenderKeys is false")
 
-    # Validate layout (if present)
-    if 'layout' in data:
-        if not isinstance(data['layout'], dict):
-            errors.append("Layout must be a dictionary")
-        else:
-            valid_keyboards = ['US', 'UK', 'DE', 'FR', 'ES']
-            valid_systems = ['Darwin', 'Linux', 'Windows']
-            
-            if 'keyboard' in data['layout'] and data['layout']['keyboard'] not in valid_keyboards:
-                errors.append(f"Invalid keyboard layout. Must be one of: {', '.join(valid_keyboards)}")
-            
-            if 'system' in data['layout'] and data['layout']['system'] not in valid_systems:
-                errors.append(f"Invalid system. Must be one of: {', '.join(valid_systems)}")
+    return errors
 
-    # Validate shortcuts
-    if 'shortcuts' in data:
-        if not isinstance(data['shortcuts'], dict):
-            errors.append("Shortcuts must be a dictionary")
-        else:
-            for category, shortcuts in data['shortcuts'].items():
-                if not isinstance(shortcuts, dict):
-                    errors.append(f"Category '{category}' must contain a dictionary of shortcuts")
-                else:
-                    for shortcut, details in shortcuts.items():
-                        if not isinstance(details, dict) or 'description' not in details:
-                            errors.append(f"Shortcut '{shortcut}' in category '{category}' must have a 'description' key")
-                        elif not isinstance(details['description'], str):
-                            errors.append(f"Description for shortcut '{shortcut}' in category '{category}' must be a string")
-                        
-                        # Only validate shortcut format if AllowText is false
-                        if not allow_text:
-                            if not re.match(r'^[A-Za-z0-9+⌘⌥⌃⇧←→↑↓\s\-\|\[\],.:/`"?<>=\\⌃]+$', shortcut):
-                                errors.append(f"Invalid shortcut format: '{shortcut}' in category '{category}'")
+def validate_layout(data):
+    """Validate keyboard layout configuration."""
+    errors = []
+    if 'layout' not in data:
+        return errors
+
+    if not isinstance(data['layout'], dict):
+        return ["Layout must be a dictionary"]
+
+    valid_keyboards = ['US', 'UK', 'DE', 'FR', 'ES']
+    valid_systems = ['Darwin', 'Linux', 'Windows']
+    
+    if 'keyboard' in data['layout'] and data['layout']['keyboard'] not in valid_keyboards:
+        errors.append(f"Invalid keyboard layout. Must be one of: {', '.join(valid_keyboards)}")
+    
+    if 'system' in data['layout'] and data['layout']['system'] not in valid_systems:
+        errors.append(f"Invalid system. Must be one of: {', '.join(valid_systems)}")
+
+    return errors
+
+def validate_shortcuts(data):
+    """Validate shortcuts structure and content."""
+    errors = []
+    if 'shortcuts' not in data:
+        return errors
+
+    if not isinstance(data['shortcuts'], dict):
+        return ["Shortcuts must be a dictionary"]
+
+    allow_text = data.get('AllowText', False)
+    
+    for category, shortcuts in data['shortcuts'].items():
+        if not isinstance(shortcuts, dict):
+            errors.append(f"Category '{category}' must contain a dictionary of shortcuts")
+            continue
+
+        for shortcut, details in shortcuts.items():
+            if not isinstance(details, dict) or 'description' not in details:
+                errors.append(f"Shortcut '{shortcut}' in category '{category}' must have a 'description' key")
+            elif not isinstance(details['description'], str):
+                errors.append(f"Description for shortcut '{shortcut}' in category '{category}' must be a string")
+            
+            if not allow_text:
+                if not re.match(r'^[A-Za-z0-9+⌘⌥⌃⇧←→↑↓\s\-\|\[\],.:/`"?<>=\\⌃]+$', shortcut):
+                    errors.append(f"Invalid shortcut format: '{shortcut}' in category '{category}'")
+
+    return errors
+
+def validate_yaml(file_path):
+    """Validate YAML file structure and content."""
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            data = yaml_safe.load(file)
+    except YAMLError as e:
+        return [f"YAML parsing error: {str(e)}"]
+    
+    if data is None:
+        return ["Empty YAML file"]
+
+    # Collect all validation errors
+    errors = []
+    errors.extend(validate_required_keys(data))
+    errors.extend(validate_title(data))
+    errors.extend(validate_render_options(data))
+    errors.extend(validate_layout(data))
+    errors.extend(validate_shortcuts(data))
 
     return errors
 
