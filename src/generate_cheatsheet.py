@@ -154,7 +154,7 @@ def validate_and_lint(yaml_file):
 
 def write_html_content(html_output, html_content):
     try:
-        with open(html_output, "w") as file:
+        with open(html_output, "w", encoding='utf-8') as file:
             file.write(html_content)
     except IOError as e:
         logging.error(f"Error writing to output file: {e}")
@@ -198,7 +198,7 @@ def generate_index(cheatsheets):
 
     index_output = os.path.join(OUTPUT_DIR, "index.html")
 
-    with open(index_output, "w") as file:
+    with open(index_output, "w", encoding='utf-8') as file:
         file.write(html_content)
 
     logging.info(f"Index page generated: {index_output}")

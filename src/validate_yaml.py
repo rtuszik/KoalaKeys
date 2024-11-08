@@ -147,7 +147,7 @@ def validate_yaml(file_path):
 def lint_yaml(file_path):
     warnings = []
 
-    with open(file_path, 'r') as file:
+    with open(file_path, 'r', encoding="utf-8") as file:
         lines = file.readlines()
 
     for i, line in enumerate(lines, start=1):
@@ -167,7 +167,7 @@ def lint_yaml(file_path):
     return warnings
 
 def fix_yaml(file_path):
-    with open(file_path, 'r') as file:
+    with open(file_path, 'r', encoding="utf-8") as file:
         content = file.read()
 
     fixes = []
@@ -201,7 +201,7 @@ def fix_yaml(file_path):
     fixed_content = '\n'.join(fixed_lines)
 
     # Write fixed content back to file
-    with open(file_path, 'w') as file:
+    with open(file_path, 'w', encoding="utf-8") as file:
         file.write(fixed_content)
 
     return fixes
@@ -212,10 +212,10 @@ def format_yaml(file_path):
     yaml.preserve_quotes = True
     yaml.width = 100
 
-    with open(file_path, 'r') as file:
+    with open(file_path, 'r', encoding='utf-8') as file:
         data = yaml.load(file)
 
-    with open(file_path, 'w') as file:
+    with open(file_path, 'w', encoding='utf-8') as file:
         yaml.dump(data, file)
 
     return "YAML file has been formatted for improved readability."
