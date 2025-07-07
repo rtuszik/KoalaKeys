@@ -5,7 +5,6 @@ from logger import get_logger
 
 logger = get_logger()
 
-# Create YAML instances once
 yaml_safe = YAML(typ='safe')
 yaml_rw = YAML()
 yaml_rw.indent(mapping=2, sequence=4, offset=2)
@@ -13,7 +12,6 @@ yaml_rw.preserve_quotes = True
 yaml_rw.width = 100
 
 def validate_required_keys(data):
-    """Validate presence of required top-level keys."""
     required_keys = ['title', 'shortcuts']
     for key in required_keys:
         if key not in data:
@@ -22,14 +20,12 @@ def validate_required_keys(data):
     return True
 
 def validate_title(data):
-    """Validate title field."""
     if 'title' in data and not isinstance(data['title'], str):
         logger.error("Title must be a string")
         return False
     return True
 
 def validate_render_options(data):
-    """Validate RenderKeys and AllowText options."""
     is_valid = True
     render_keys = data.get('RenderKeys', True)
     allow_text = data.get('AllowText', False)
@@ -49,7 +45,6 @@ def validate_render_options(data):
     return is_valid
 
 def validate_layout(data):
-    """Validate keyboard layout configuration."""
     if 'layout' not in data:
         return True
 
@@ -72,7 +67,6 @@ def validate_layout(data):
     return is_valid
 
 def validate_shortcuts(data):
-    """Validate shortcuts structure and content."""
     if 'shortcuts' not in data:
         return True
 
@@ -105,7 +99,6 @@ def validate_shortcuts(data):
     return is_valid
 
 def validate_yaml(file_path):
-    """Validate YAML file structure and content."""
     try:
         with open(file_path, 'r', encoding='utf-8') as file:
             data = yaml_safe.load(file)
@@ -125,7 +118,6 @@ def validate_yaml(file_path):
 
     is_valid = True
 
-    # Perform all validations
     if not validate_required_keys(data):
         is_valid = False
     if not validate_title(data):
@@ -151,16 +143,13 @@ def lint_yaml(file_path):
         lines = file.readlines()
 
     for i, line in enumerate(lines, start=1):
-        # Check for lines longer than 100 characters
         if len(line.rstrip()) > 100:
             warnings.append(f"Line {i} is longer than 100 characters")
 
-        # Check for inconsistent indentation
         indent = len(line) - len(line.lstrip())
         if indent % 2 != 0:
             warnings.append(f"Line {i} has inconsistent indentation")
 
-        # Check for trailing whitespace
         if line.rstrip() != line.rstrip('\n'):
             warnings.append(f"Line {i} has trailing whitespace")
 
@@ -172,14 +161,12 @@ def fix_yaml(file_path):
 
     fixes = []
 
-    # Replace special characters and convert to uppercase
     special_chars = {'⌘': 'CMD', '⌃': 'CTRL', '⌥': 'ALT', '⇧': 'SHIFT'}
     for char, replacement in special_chars.items():
         if char in content:
             content = content.replace(char, replacement)
             fixes.append(f"Replaced '{char}' with '{replacement}'")
 
-    # Convert lowercase special keys to uppercase
     lowercase_keys = ['cmd', 'ctrl', 'alt', 'shift']
     for key in lowercase_keys:
         pattern = re.compile(r'\b' + key + r'\b', re.IGNORECASE)
@@ -193,14 +180,13 @@ def fix_yaml(file_path):
     for line in lines:
         stripped = line.lstrip()
         indent = len(line) - len(stripped)
-        fixed_indent = (indent // 2) * 2  # Round down to nearest even number
+        fixed_indent = (indent // 2) * 2
         if fixed_indent != indent:
             fixes.append(f"Fixed indentation in line: {line.strip()}")
         fixed_lines.append(' ' * fixed_indent + stripped.rstrip())
 
     fixed_content = '\n'.join(fixed_lines)
 
-    # Write fixed content back to file
     with open(file_path, 'w', encoding="utf-8") as file:
         file.write(fixed_content)
 
@@ -223,7 +209,6 @@ def format_yaml(file_path):
 def process_yaml(file_path):
     print(f"Processing {file_path}...")
     
-    # Validate
     errors = validate_yaml(file_path)
     if errors:
         print("Validation errors:")
@@ -232,7 +217,6 @@ def process_yaml(file_path):
     else:
         print("Validation passed.")
 
-    # Lint
     warnings = lint_yaml(file_path)
     if warnings:
         print("Linting warnings:")
@@ -241,7 +225,6 @@ def process_yaml(file_path):
     else:
         print("Linting passed.")
 
-    # Fix
     fixes = fix_yaml(file_path)
     if fixes:
         print("Fixes applied:")
@@ -250,7 +233,6 @@ def process_yaml(file_path):
     else:
         print("No fixes were necessary.")
 
-    # Format
     format_message = format_yaml(file_path)
     print(format_message)
 
