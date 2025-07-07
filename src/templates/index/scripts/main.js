@@ -37,7 +37,7 @@ updateDarkModeToggle();
 
 const cheatsheets = [
     {% for cheatsheet in cheatsheets %}
-    { title: "{{ cheatsheet.title }}", filename: "{{ cheatsheet.filename }}" },
+    { title: {{ cheatsheet.title|tojson }}, filename: {{ cheatsheet.filename|tojson }} },
     {% endfor %}
 ];
 
@@ -85,8 +85,8 @@ function updateCheatsheets() {
 
 function updateLayout() {
     const containerWidth = cheatsheetList.offsetWidth;
-    const itemWidth = 250; // Approximate width of each item
-    const columns = Math.floor(containerWidth / itemWidth);
+    const itemWidth = 250;
+    const columns = Math.max(1, Math.floor(containerWidth / itemWidth));
     cheatsheetList.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
 }
 
