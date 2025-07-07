@@ -297,7 +297,8 @@ footer {
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    width: 40%;
+    width: 100%;
+    max-width: 480px;
     margin-left: auto;
     margin-right: auto;
     margin-top: 8px;

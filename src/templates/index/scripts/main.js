@@ -61,7 +61,7 @@ function updateCheatsheets() {
     });
 
     const totalPages = Math.ceil(filteredCheatsheets.length / itemsPerPage);
-    currentPage = Math.min(currentPage, totalPages);
+    currentPage = Math.max(1, Math.min(currentPage, totalPages || 1));
 
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
@@ -77,15 +77,25 @@ function updateCheatsheets() {
 
     noResults.style.display = filteredCheatsheets.length === 0 ? 'block' : 'none';
 
-    prevPageButton.disabled = currentPage === 1;
-    nextPageButton.disabled = currentPage === totalPages;
+    if (totalPages === 0) {
+        prevPageButton.disabled = true;
+        nextPageButton.disabled = true;
+    } else {
+        prevPageButton.disabled = currentPage === 1;
+        nextPageButton.disabled = currentPage === totalPages;
+    }
 
     updateLayout();
 }
 
 function updateLayout() {
-    const containerWidth = cheatsheetList.offsetWidth;
+    let containerWidth = cheatsheetList.offsetWidth;
     const itemWidth = 250;
+
+    if (containerWidth === 0) {
+        containerWidth = window.innerWidth || 1000;
+    }
+
     const columns = Math.max(1, Math.floor(containerWidth / itemWidth));
     cheatsheetList.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
 }
