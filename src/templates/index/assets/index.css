@@ -1,0 +1,396 @@
+:root {
+    --latte-rosewater: #dc8a78;
+    --latte-flamingo: #dd7878;
+    --latte-pink: #ea76cb;
+    --latte-mauve: #8839ef;
+    --latte-red: #d20f39;
+    --latte-maroon: #e64553;
+    --latte-peach: #fe640b;
+    --latte-yellow: #df8e1d;
+    --latte-green: #40a02b;
+    --latte-teal: #179299;
+    --latte-sky: #04a5e5;
+    --latte-sapphire: #209fb5;
+    --latte-blue: #1e66f5;
+    --latte-lavender: #7287fd;
+    --latte-text: #4c4f69;
+    --latte-subtext1: #5c5f77;
+    --latte-subtext0: #6c6f85;
+    --latte-overlay2: #7c7f93;
+    --latte-overlay1: #8c8fa1;
+    --latte-overlay0: #9ca0b0;
+    --latte-surface2: #acb0be;
+    --latte-surface1: #bcc0cc;
+    --latte-surface0: #ccd0da;
+    --latte-base: #eff1f5;
+    --latte-mantle: #e6e9ef;
+    --latte-crust: #dce0e8;
+
+    --mocha-rosewater: #f5e0dc;
+    --mocha-flamingo: #f2cdcd;
+    --mocha-pink: #f5c2e7;
+    --mocha-mauve: #cba6f7;
+    --mocha-red: #f38ba8;
+    --mocha-maroon: #eba0ac;
+    --mocha-peach: #fab387;
+    --mocha-yellow: #f9e2af;
+    --mocha-green: #a6e3a1;
+    --mocha-teal: #94e2d5;
+    --mocha-sky: #89dceb;
+    --mocha-sapphire: #74c7ec;
+    --mocha-blue: #89b4fa;
+    --mocha-lavender: #b4befe;
+    --mocha-text: #cdd6f4;
+    --mocha-subtext1: #bac2de;
+    --mocha-subtext0: #a6adc8;
+    --mocha-overlay2: #9399b2;
+    --mocha-overlay1: #7f849c;
+    --mocha-overlay0: #6c7086;
+    --mocha-surface2: #585b70;
+    --mocha-surface1: #45475a;
+    --mocha-surface0: #313244;
+    --mocha-base: #1e1e2e;
+    --mocha-mantle: #181825;
+    --mocha-crust: #11111b;
+}
+
+body {
+    font-family: "Iosevka Web", monospace;
+    line-height: 1.6;
+    color: var(--latte-text);
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    background-color: var(--latte-base);
+    transition:
+        background-color 0.3s,
+        color 0.3s;
+}
+
+body.dark-mode {
+    color: var(--mocha-text);
+    background-color: var(--mocha-base);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#logo_img {
+    top: 10px;
+    left: 10px;
+}
+
+h1 {
+    flex-grow: 2;
+    color: var(--latte-mauve);
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+    margin-right: 8rem;
+}
+
+body.dark-mode h1 {
+    color: var(--mocha-mauve);
+}
+
+#dark-mode-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 24px;
+    color: var(--text);
+    transition: color 0.3s;
+}
+
+body.dark-mode #dark-mode-toggle {
+    color: var(--mocha-text);
+}
+
+.controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.search-bar {
+    flex-grow: 1;
+    margin-right: 1rem;
+}
+
+.search-bar input {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 2px solid var(--latte-surface2);
+    border-radius: 5px;
+    background-color: var(--latte-base);
+    color: var(--latte-text);
+    transition:
+        border-color 0.3s,
+        background-color 0.3s,
+        color 0.3s,
+        box-shadow 0.3s;
+}
+
+.search-bar input:focus {
+    outline: none;
+    border-color: var(--latte-lavender);
+    box-shadow: 0 0 5px var(--latte-lavender);
+}
+
+body.dark-mode .search-bar input {
+    border-color: var(--mocha-surface2);
+    background-color: var(--mocha-base);
+    color: var(--mocha-text);
+}
+
+body.dark-mode .search-bar input:focus {
+    border-color: var(--mocha-lavender);
+    box-shadow: 0 0 5px var(--mocha-lavender);
+}
+
+.sort-select,
+.layout-select,
+.items-per-page-select {
+    padding: 10px;
+    font-size: 16px;
+    border: 2px solid var(--latte-surface2);
+    border-radius: 5px;
+    background-color: var(--latte-base);
+    color: var(--latte-text);
+    margin-left: 1rem;
+    transition:
+        border-color 0.3s,
+        background-color 0.3s,
+        color 0.3s,
+        box-shadow 0.3s;
+}
+
+.sort-select:focus,
+.layout-select:focus,
+.items-per-page-select:focus {
+    outline: none;
+    border-color: var(--latte-lavender);
+    box-shadow: 0 0 5px var(--latte-lavender);
+}
+
+body.dark-mode .sort-select,
+body.dark-mode .layout-select,
+body.dark-mode .items-per-page-select {
+    border-color: var(--mocha-surface2);
+    background-color: var(--mocha-base);
+    color: var(--mocha-text);
+}
+
+body.dark-mode .sort-select:focus,
+body.dark-mode .layout-select:focus,
+body.dark-mode .items-per-page-select:focus {
+    border-color: var(--mocha-lavender);
+    box-shadow: 0 0 5px var(--mocha-lavender);
+}
+
+.cheatsheet-list {
+    list-style-type: none;
+    padding: 0;
+    display: grid;
+    gap: 20px;
+}
+
+.cheatsheet-item {
+    background-color: var(--latte-surface0);
+    border-radius: 12px;
+    overflow: hidden;
+    transition:
+        transform 0.2s,
+        box-shadow 0.2s;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    min-height: 180px;
+    border: 1px solid var(--latte-overlay0);
+}
+
+.cheatsheet-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+}
+
+.cheatsheet-link {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    color: var(--latte-blue);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.2rem;
+}
+
+.cheatsheet-title {
+    padding: 25px;
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+body.dark-mode .cheatsheet-item {
+    background-color: var(--mocha-surface0);
+}
+
+body.dark-mode .cheatsheet-link {
+    color: var(--mocha-blue);
+}
+
+.no-results {
+    text-align: center;
+    font-size: 1.2rem;
+    color: var(--latte-subtext0);
+    margin-top: 2rem;
+}
+
+body.dark-mode .no-results {
+    color: var(--mocha-subtext0);
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+.pagination button {
+    padding: 0.5rem 1rem;
+    margin: 0 0.5rem;
+    background-color: var(--latte-surface1);
+    color: var(--latte-text);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.pagination button:hover {
+    background-color: var(--latte-surface2);
+}
+
+body.dark-mode .pagination button {
+    background-color: var(--mocha-surface1);
+    color: var(--mocha-text);
+}
+
+body.dark-mode .pagination button:hover {
+    background-color: var(--mocha-surface2);
+}
+
+.pagination button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width: 100%;
+    max-width: 480px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 8px;
+    padding: 10px;
+    font-family: "Iosevka Web", monospace;
+    line-height: 1.6;
+    transition:
+        background-color 0.3s,
+        color 0.3s;
+}
+
+.center {
+    margin: auto;
+    text-align: center;
+    padding: 10px;
+}
+
+#icon-footer {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 40%;
+}
+
+.GitHub_Button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 15px;
+    gap: 15px;
+    background-color: var(--latte-blue);
+    color: var(--latte-base);
+    outline-offset: -3px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    transition: 400ms;
+    height: auto;
+}
+
+.dark-mode .GitHub_Button {
+    background-color: var(--mocha-maroon);
+}
+
+.GitHub_Button .text {
+    color: black;
+    font-weight: 700;
+    font-size: 1.2em;
+    transition: 400ms;
+}
+
+.dark-mode .GitHub_Button .text {
+    color: black;
+}
+
+.GitHub_Button svg path {
+    transition: 400ms;
+}
+
+.GitHub_Button svg path {
+    fill: white;
+}
+
+.dark-mode .GitHub_Button svg path {
+    fill: #181717;
+}
+
+.GitHub_Button:hover {
+    background-color: var(--latte-sapphire);
+}
+
+.GitHub_Button:hover .text {
+    color: white;
+}
+
+.dark-mode .GitHub_Button:hover {
+    background-color: var(--mocha-maroon);
+}
+
+.dark-mode .GitHub_Button:hover .text {
+    color: black;
+}
+
+a:link {
+    text-decoration: none;
+}
+a:visited {
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: none;
+}
+a:active {
+    text-decoration: none;
+}
