@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Cheatsheet Index{% endblock %}
+
+
+{% block page_styles %}
+<style>
+{% include 'index/assets/index.css' %}
+</style>
+{% endblock %}
+
+{% block content %}
+{% include 'index/components/body.html' %}
+{% include 'index/components/footer.html' %}
+{% endblock %}
+
+{% block javascript %}
+<script>
+{% include "index/scripts/main.js" %}
+</script>
+{% endblock %}
