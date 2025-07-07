@@ -5,11 +5,7 @@ from pathlib import Path
 logging = get_logger()
 
 def render_template(template_path, data):
-    """
-    Render a template from the given path with provided data.
-    """
     try:
-        # Use the templates directory directly
         templates_dir = Path(__file__).parent / "templates"
         
         env = Environment(
