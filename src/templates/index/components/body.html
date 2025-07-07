@@ -1,0 +1,35 @@
+<div class="header">
+    <img src="https://github.com/rtuszik/KoalaKeys/raw/main/assets/icons/KoalaKeys.png"
+         id="logo_img"
+         width="128" />
+    <h1>Cheatsheet Index</h1>
+    <button id="dark-mode-toggle" aria-label="Toggle dark mode">
+        <span id="theme-icon">◐</span>
+    </button>
+    {% if DOCKERIZED == true %}
+        {% include 'index/components/serve.html' %}
+    {% endif %}
+</div>
+<div class="controls">
+    <div class="search-bar">
+        <input type="text" id="search" placeholder="Search cheatsheets..." />
+    </div>
+    <select id="sort" class="sort-select">
+        <option value="name-asc">Name (A-Z)</option>
+        <option value="name-desc">Name (Z-A)</option>
+    </select>
+    <select id="items-per-page" class="items-per-page-select">
+        <option value="8">8 per page</option>
+        <option value="16">16 per page</option>
+        <option value="32">32 per page</option>
+        <option value="64">64 per page</option>
+        <option value="128">128 per page</option>
+    </select>
+</div>
+<ul id="cheatsheet-list" class="cheatsheet-list">
+</ul>
+<div id="no-results" class="no-results" style="display: none">No cheatsheets found matching your search.</div>
+<div class="pagination">
+    <button id="prev-page">Previous</button>
+    <button id="next-page">Next</button>
+</div>
