@@ -8,7 +8,6 @@ from template_renderer import render_template
 from logger import get_logger
 from pathlib import Path
 
-# Create YAML instances once
 yaml_safe = YAML(typ='safe')
 yaml_rw = YAML()
 yaml_rw.indent(mapping=2, sequence=4, offset=2)
@@ -17,22 +16,18 @@ yaml_rw.width = 100
 
 load_dotenv()
 
-# Define base paths
 BASE_DIR = Path(__file__).parent
 PROJECT_ROOT = BASE_DIR.parent
 
-# Define directory paths
 OUTPUT_DIR = Path(os.getenv('CHEATSHEET_OUTPUT_DIR') or PROJECT_ROOT / "output")
 TEMPLATES_DIR = BASE_DIR / "templates"
 LAYOUTS_DIR = BASE_DIR / "layouts"
 CHEATSHEETS_DIR = PROJECT_ROOT / "cheatsheets"
 
-# Ensure output directory exists
 OUTPUT_DIR.mkdir(exist_ok=True, parents=True)
 
 logging = get_logger()
 
-# Load environment variables
 
 def load_yaml(file_path: Path) -> dict | None:
     try:
@@ -68,21 +63,18 @@ def replace_shortcut_names(shortcut, system_mappings):
         i = 0
         while i < len(shortcut):
             if shortcut[i] == '+':
-                # If next character is also +, it's a key
                 if i + 1 < len(shortcut) and shortcut[i + 1] == '+':
                     processed_parts.append('+')
-                    i += 2  # Skip both plus signs
-                    # Otherwise it's a separator
+                    i += 2
                 else:
                     processed_parts.append('<sep>')
                     i += 1
             else:
-                # Collect non-plus characters
                 current_part = ''
                 while i < len(shortcut) and shortcut[i] != '+':
                     current_part += shortcut[i]
                     i += 1
-                if current_part.strip():  # Only add non-empty parts
+                if current_part.strip():
                     part = current_part.strip()
                     part = system_mappings.get(part.lower(), part)
                     if part in ['⌘', '⌥', '⌃', '⇧']:
@@ -105,10 +97,8 @@ def normalize_shortcuts(data, system_mappings):
             normalized[section] = {}
             for shortcut, details in shortcuts.items():
                 if allow_text:
-                    # When AllowText is true, just pass through the shortcut text
                     normalized[section][shortcut] = details
                 else:
-                    # Normal processing for keyboard shortcuts
                     normalized_shortcut = replace_shortcut_names(shortcut, system_mappings)
                     normalized[section][normalized_shortcut] = details
     except Exception as e:
@@ -190,18 +180,8 @@ def main(yaml_file):
 
 
 def generate_index(cheatsheets):
-    template_path = TEMPLATES_DIR / "index_template.html"
-    env = Environment(loader=FileSystemLoader(os.path.dirname(template_path)))
-    template = env.get_template(os.path.basename(template_path))
-
-    html_content = template.render(cheatsheets=cheatsheets)
-
-    index_output = os.path.join(OUTPUT_DIR, "index.html")
-
-    with open(index_output, "w", encoding='utf-8') as file:
-        file.write(html_content)
-
-    logging.info(f"Index page generated: {index_output}")
+    template_path = "index/index_template.html"
+    return render_template(template_path, {"cheatsheets": cheatsheets})
 
 
 if __name__ == "__main__":
@@ -218,7 +198,15 @@ if __name__ == "__main__":
             cheatsheets.append({"title": title, "filename": filename})
 
     if cheatsheets:
-        generate_index(cheatsheets)
-        print(f"Generated cheatsheets for {len(cheatsheets)} YAML files.")
+        html_content = generate_index(cheatsheets)
+        if html_content:
+            index_output = os.path.join(OUTPUT_DIR, "index.html")
+            if write_html_content(index_output, html_content):
+                logging.info(f"Index page generated: {index_output}")
+                print(f"Generated cheatsheets for {len(cheatsheets)} YAML files.")
+            else:
+                print("Failed to write index page.")
+        else:
+            print("Failed to generate index page.")
     else:
         print("No valid cheatsheets were generated due to errors.")
