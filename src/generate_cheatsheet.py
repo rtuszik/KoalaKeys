@@ -1,5 +1,4 @@
 from ruamel.yaml import YAML
-from jinja2 import Environment, FileSystemLoader
 import sys
 import os
 from validate_yaml import validate_yaml, lint_yaml
@@ -172,6 +171,7 @@ def main(yaml_file):
     html_output = os.path.join(OUTPUT_DIR, f"{base_filename}.html")
 
     if not write_html_content(html_output, html_content):
+        logging.error(f"Failed to write HTML content to {html_output}")
         return None, None
 
     logging.info(f"Cheatsheet generated: {html_output}")
@@ -198,6 +198,8 @@ if __name__ == "__main__":
             cheatsheets.append({"title": title, "filename": filename})
 
     if cheatsheets:
+        OUTPUT_DIR.mkdir(exist_ok=True, parents=True)
+        
         html_content = generate_index(cheatsheets)
         if html_content:
             index_output = os.path.join(OUTPUT_DIR, "index.html")
@@ -205,8 +207,8 @@ if __name__ == "__main__":
                 logging.info(f"Index page generated: {index_output}")
                 print(f"Generated cheatsheets for {len(cheatsheets)} YAML files.")
             else:
-                print("Failed to write index page.")
+                logging.error("Failed to write index page.")
         else:
-            print("Failed to generate index page.")
+            logging.error("Failed to generate index page.")
     else:
         print("No valid cheatsheets were generated due to errors.")
