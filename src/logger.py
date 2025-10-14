@@ -11,6 +11,7 @@ DEFAULT_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 
 _logger: Optional[logging.Logger] = None
 
+
 def setup_logging(
     log_file: str = os.getenv("LOG_FILE", DEFAULT_LOG_FILE),
 ) -> logging.Logger:
@@ -20,7 +21,7 @@ def setup_logging(
 
     logger = logging.getLogger("app")
     logger.setLevel(logging.DEBUG)
-    
+
     formatter = logging.Formatter(DEFAULT_FORMAT)
 
     logger.handlers.clear()
@@ -32,10 +33,7 @@ def setup_logging(
 
     try:
         file_handler = RotatingFileHandler(
-            log_file,
-            maxBytes=DEFAULT_MAX_BYTES,
-            backupCount=DEFAULT_BACKUP_COUNT,
-            encoding='utf-8'
+            log_file, maxBytes=DEFAULT_MAX_BYTES, backupCount=DEFAULT_BACKUP_COUNT, encoding="utf-8"
         )
         file_handler.setLevel(logging.DEBUG)
         file_handler.setFormatter(formatter)
@@ -48,9 +46,9 @@ def setup_logging(
     _logger = logger
     return logger
 
+
 def get_logger() -> logging.Logger:
     global _logger
     if _logger is None:
         _logger = setup_logging()
     return _logger
-
