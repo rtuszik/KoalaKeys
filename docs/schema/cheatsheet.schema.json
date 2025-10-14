@@ -29,7 +29,7 @@
       "properties": {
         "keyboard": {
           "type": "string",
-          "enum": ["US", "UK", "DE", "FR", "ES"],
+          "enum": ["US", "UK", "DE", "FR", "ES", "DVORAK"],
           "description": "Keyboard layout."
         },
         "system": {
@@ -125,4 +125,3 @@
     }
   ]
 }
-

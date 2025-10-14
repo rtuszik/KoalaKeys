@@ -52,7 +52,7 @@ def validate_layout(data):
         logger.error("Layout must be a dictionary")
         return False
 
-    valid_keyboards = ['US', 'UK', 'DE', 'FR', 'ES']
+    valid_keyboards = ['US', 'UK', 'DE', 'FR', 'ES', 'DVORAK']
     valid_systems = ['Darwin', 'Linux', 'Windows']
     is_valid = True
     
