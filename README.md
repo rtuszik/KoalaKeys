@@ -95,6 +95,31 @@ Explore the demo to see how KoalaKeys works and to get ideas for creating custom
 
 4. Open `index.html` to view the cheat sheet collection.
 
+## Schema
+
+Validate your YAML with the published JSON Schema:
+
+- Public URL: https://rtuszik.github.io/KoalaKeys/schema/cheatsheet.schema.json
+- Per-file modeline (first line in each YAML):
+
+    ```
+    # yaml-language-server: $schema=https://rtuszik.github.io/KoalaKeys/schema/cheatsheet.schema.json
+    ```
+
+- Neovim yamlls mapping (optional):
+
+    ```lua
+    require('lspconfig').yamlls.setup({
+      settings = {
+        yaml = {
+          schemas = {
+            ["https://rtuszik.github.io/KoalaKeys/schema/cheatsheet.schema.json"] = "cheatsheets/*.yaml",
+          },
+        },
+      },
+    })
+    ```
+
 ## Contributing
 
 Contributions are welcome! Feel free to submit issues, feature requests, or pull requests.
