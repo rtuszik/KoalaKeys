@@ -61,6 +61,7 @@ Valid values for `keyboard` are:
 - `DE` (German)
 - `FR` (French)
 - `ES` (Spanish)
+- `DVORAK`
 
 ### System Types
 
