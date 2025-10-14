@@ -7,7 +7,7 @@ from template_renderer import render_template
 from logger import get_logger
 from pathlib import Path
 
-yaml_safe = YAML(typ='safe')
+yaml_safe = YAML(typ="safe")
 yaml_rw = YAML()
 yaml_rw.indent(mapping=2, sequence=4, offset=2)
 yaml_rw.preserve_quotes = True
@@ -18,7 +18,7 @@ load_dotenv()
 BASE_DIR = Path(__file__).parent
 PROJECT_ROOT = BASE_DIR.parent
 
-OUTPUT_DIR = Path(os.getenv('CHEATSHEET_OUTPUT_DIR') or PROJECT_ROOT / "output")
+OUTPUT_DIR = Path(os.getenv("CHEATSHEET_OUTPUT_DIR") or PROJECT_ROOT / "output")
 TEMPLATES_DIR = BASE_DIR / "templates"
 LAYOUTS_DIR = BASE_DIR / "layouts"
 CHEATSHEETS_DIR = PROJECT_ROOT / "cheatsheets"
@@ -30,7 +30,7 @@ logging = get_logger()
 
 def load_yaml(file_path: Path) -> dict | None:
     try:
-        with open(file_path, "r", encoding='utf-8') as file:
+        with open(file_path, "r", encoding="utf-8") as file:
             return yaml_safe.load(file)
     except FileNotFoundError:
         logging.error(f"Error: YAML file '{file_path}' not found.")
@@ -43,54 +43,50 @@ def load_yaml(file_path: Path) -> dict | None:
 def load_layout():
     keyboard_layouts = load_yaml(LAYOUTS_DIR / "keyboard_layouts.yaml")
     system_mappings = load_yaml(LAYOUTS_DIR / "system_mappings.yaml")
-    
+
     if keyboard_layouts is None or system_mappings is None:
         logging.error("Failed to load configuration files.")
         return None, None
-    
+
     return keyboard_layouts, system_mappings
 
+
 def replace_shortcut_names(shortcut, system_mappings):
-    arrow_key_mappings = {
-        "Up": "↑",
-        "Down": "↓",
-        "Left": "←",
-        "Right": "→"
-    }
+    arrow_key_mappings = {"Up": "↑", "Down": "↓", "Left": "←", "Right": "→"}
     try:
         processed_parts = []
         i = 0
         while i < len(shortcut):
-            if shortcut[i] == '+':
-                if i + 1 < len(shortcut) and shortcut[i + 1] == '+':
-                    processed_parts.append('+')
+            if shortcut[i] == "+":
+                if i + 1 < len(shortcut) and shortcut[i + 1] == "+":
+                    processed_parts.append("+")
                     i += 2
                 else:
-                    processed_parts.append('<sep>')
+                    processed_parts.append("<sep>")
                     i += 1
             else:
-                current_part = ''
-                while i < len(shortcut) and shortcut[i] != '+':
+                current_part = ""
+                while i < len(shortcut) and shortcut[i] != "+":
                     current_part += shortcut[i]
                     i += 1
                 if current_part.strip():
                     part = current_part.strip()
                     part = system_mappings.get(part.lower(), part)
-                    if part in ['⌘', '⌥', '⌃', '⇧']:
+                    if part in ["⌘", "⌥", "⌃", "⇧"]:
                         part = f'<span class="modifier-symbol">{part}</span>'
 
                     part = arrow_key_mappings.get(part, part)
                     processed_parts.append(part)
 
-
-        return ''.join(processed_parts)
+        return "".join(processed_parts)
     except Exception as e:
-         logging.error(f"Error replacing shortcut names: {e}")
-         return shortcut
+        logging.error(f"Error replacing shortcut names: {e}")
+        return shortcut
+
 
 def normalize_shortcuts(data, system_mappings):
     normalized = {}
-    allow_text = data.get('AllowText', False)
+    allow_text = data.get("AllowText", False)
     try:
         for section, shortcuts in data.get("shortcuts", {}).items():
             normalized[section] = {}
@@ -112,17 +108,16 @@ def get_layout_info(data):
         "system": layout.get("system", "Darwin"),
     }
 
+
 def generate_html(data, keyboard_layouts, system_mappings):
     template_path = "cheatsheets/cheatsheet-template.html"
     layout_info = get_layout_info(data)
-    data["shortcuts"] = normalize_shortcuts(
-        data, system_mappings.get(layout_info["system"], {})
-    )
+    data["shortcuts"] = normalize_shortcuts(data, system_mappings.get(layout_info["system"], {}))
     data["layout"] = layout_info
     data["keyboard_layout"] = keyboard_layouts.get(layout_info["keyboard"], {}).get("layout")
     data["render_keys"] = data.get("RenderKeys", True)
     data["allow_text"] = data.get("AllowText", False)
-    
+
     return render_template(template_path, data)
 
 
@@ -141,14 +136,16 @@ def validate_and_lint(yaml_file):
 
     return True
 
+
 def write_html_content(html_output, html_content):
     try:
-        with open(html_output, "w", encoding='utf-8') as file:
+        with open(html_output, "w", encoding="utf-8") as file:
             file.write(html_content)
     except IOError as e:
         logging.error(f"Error writing to output file: {e}")
         return False
     return True
+
 
 def main(yaml_file):
     if not validate_and_lint(yaml_file):
@@ -199,7 +196,7 @@ if __name__ == "__main__":
 
     if cheatsheets:
         OUTPUT_DIR.mkdir(exist_ok=True, parents=True)
-        
+
         html_content = generate_index(cheatsheets)
         if html_content:
             index_output = os.path.join(OUTPUT_DIR, "index.html")
