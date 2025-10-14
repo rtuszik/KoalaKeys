@@ -1,0 +1,128 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://rtuszik.github.io/KoalaKeys/schema/cheatsheet.schema.json",
+  "title": "KoalaKeys Cheatsheet",
+  "description": "Schema for KoalaKeys YAML cheatsheets.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["title", "layout", "shortcuts"],
+  "properties": {
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Title of the cheatsheet."
+    },
+    "RenderKeys": {
+      "type": "boolean",
+      "default": true,
+      "description": "When true (default), render keyboard layout with highlighted keys."
+    },
+    "AllowText": {
+      "type": "boolean",
+      "default": false,
+      "description": "When true, free-form shortcut text is allowed; requires RenderKeys=false."
+    },
+    "layout": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["keyboard", "system"],
+      "properties": {
+        "keyboard": {
+          "type": "string",
+          "enum": ["US", "UK", "DE", "FR", "ES"],
+          "description": "Keyboard layout."
+        },
+        "system": {
+          "type": "string",
+          "enum": ["Darwin", "Windows", "Linux"],
+          "description": "Operating system."
+        }
+      }
+    },
+    "shortcuts": {
+      "type": "object",
+      "minProperties": 1,
+      "description": "Categories mapped to shortcut definitions.",
+      "additionalProperties": {
+        "type": "object",
+        "minProperties": 1
+      }
+    }
+  },
+  "allOf": [
+    {
+      "description": "AllowText=true requires RenderKeys=false.",
+      "if": {
+        "properties": { "AllowText": { "const": true } },
+        "required": ["AllowText"]
+      },
+      "then": {
+        "properties": {
+          "RenderKeys": { "const": false },
+          "shortcuts": {
+            "additionalProperties": {
+              "additionalProperties": { "$ref": "#/$defs/shortcutEntry" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "description": "When AllowText is not true, restrict shortcut key syntax.",
+      "if": {
+        "not": {
+          "properties": { "AllowText": { "const": true } },
+          "required": ["AllowText"]
+        }
+      },
+      "then": {
+        "properties": {
+          "shortcuts": {
+            "additionalProperties": {
+              "type": "object",
+              "minProperties": 1,
+              "patternProperties": {
+                "^[A-Za-z0-9+⌘⌥⌃⇧←→↑↓\\s\\-\\|\\[\\],.:/`\"?<>=\\\\⌃]+$": {
+                  "$ref": "#/$defs/shortcutEntry"
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "shortcutEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["description"],
+      "properties": {
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Human-readable description of the shortcut."
+        }
+      },
+      "examples": [
+        { "description": "Copy selected item" }
+      ]
+    }
+  },
+  "examples": [
+    {
+      "title": "KoalaKeys",
+      "RenderKeys": true,
+      "AllowText": false,
+      "layout": { "keyboard": "US", "system": "Darwin" },
+      "shortcuts": {
+        "General": {
+          "CMD+C": { "description": "Copy selected item" },
+          "CMD+Right": { "description": "Move cursor to end of line" }
+        }
+      }
+    }
+  ]
+}
+
