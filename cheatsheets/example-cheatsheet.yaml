@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=https://rtuszik.github.io/KoalaKeys/schema/cheatsheet.schema.json
 title: "KoalaKeys"
 RenderKeys: true # defaults to true
 AllowText: false # defaults to false - requires RenderKeys: false
