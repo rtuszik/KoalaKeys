@@ -4,8 +4,4 @@ version = "0.6.0"
 description = "Build interactive, portable cheatsheets from YAML."
 readme = "README.md"
 requires-python = ">=3.9"
-dependencies = [
-    "jinja2>=3.1.6",
-    "python-dotenv>=1.1.1",
-    "ruamel-yaml>=0.18.14",
-]
+dependencies = ["jinja2>=3.1.6", "python-dotenv>=1.1.1", "ruamel-yaml>=0.18.14"]

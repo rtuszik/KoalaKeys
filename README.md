@@ -64,29 +64,22 @@ Explore the demo to see how KoalaKeys works and to get ideas for creating custom
 
 1. Clone the repository:
 
-   ```
-   git clone https://github.com/rtuszik/KoalaKeys
-   cd KoalaKeys
-   ```
+    ```
+    git clone https://github.com/rtuszik/KoalaKeys
+    cd KoalaKeys
+    ```
 
 2. Create and activate a virtual environment (optional):
 
-   ```
-   python -m venv .venv
-   source .venv/bin/activate  # On Windows, use `venv\Scripts\activate`
-   ```
+    ```
+    uv sync --locked
+    ```
 
-3. Install dependencies:
-
-   ```
-   pip install -r requirements.txt
-   ```
-
-4. Set up the output directory:
+3. Set up the output directory:
    Create a `.env` file in the project root with:
-   ```
-   CHEATSHEET_OUTPUT_DIR=path/to/your/output/directory
-   ```
+    ```
+    CHEATSHEET_OUTPUT_DIR=path/to/your/output/directory
+    ```
 
 ## Usage
 
@@ -94,9 +87,9 @@ Explore the demo to see how KoalaKeys works and to get ideas for creating custom
 
 2. Generate cheat sheets:
 
-   ```
-   python src/generate_cheatsheet.py
-   ```
+    ```
+    uv run src/generate_cheatsheet.py
+    ```
 
 3. Find the HTML cheat sheets in the specified output directory.
 

@@ -2,16 +2,16 @@ title: "KoalaKeys"
 RenderKeys: true # defaults to true
 AllowText: false # defaults to false - requires RenderKeys: false
 layout:
-  keyboard: US
-  system: Darwin
+    keyboard: US
+    system: Darwin
 shortcuts:
-  General:
-    "CMD+C":
-      description: "Copy selected item"
-    "CMD+X":
-      description: "Cut selected item"
-  File and App Management:
-    "CMD+N":
-      description: "Open new window or document"
-    "CMD+O":
-      description: "Open selected item or display dialog to choose file to open"
+    General:
+        "CMD+C":
+            description: "Copy selected item"
+        "CMD+X":
+            description: "Cut selected item"
+    File and App Management:
+        "CMD+N":
+            description: "Open new window or document"
+        "CMD+O":
+            description: "Open selected item or display dialog to choose file to open"
