@@ -171,15 +171,21 @@
       updateDarkModeToggle();
       adjustLayout();
 
-      function highlightKeys(shortcut) {
-        // Clear any previously highlighted keys
-        document.querySelectorAll(".key").forEach((key) => key.classList.remove("active"));
+      // Helper function to clear all active classes from keys
+      function clearActiveKeyClasses() {
+        const allClasses = ["active"];
+        // Generate classes dynamically for steps (support up to 20 steps)
+        for (let i = 1; i <= 20; i++) {
+          allClasses.push(`active-step-${i}`);
+        }
+        document.querySelectorAll(".key").forEach((key) => {
+          allClasses.forEach(className => key.classList.remove(className));
+        });
+      }
 
-        // Get the shortcut key parts
-        const shortcutParts = shortcut.split('+').map(part => part.trim());
-        const system = document.getElementById("keyboard").getAttribute("data-system");
 
-        shortcutParts.forEach((keyToFind) => {
+      function highlightChordsPart(chordsPart, stepClass) {
+        chordsPart.forEach((keyToFind) => {
             keyToFind = keyToFind.toLowerCase();
             const keyElements = document.querySelectorAll(".key");
 
@@ -192,18 +198,60 @@
                     keyLabel === keyToFind ||
                     (keyToFind === "cmd" && (dataKey === "cmd" || dataKey === "win" || dataKey === "super"))
                 ) {
-                    element.classList.add("active");
+                    element.classList.add(stepClass);
                 }
             });
         });
       }
 
+      // Track the current animation timeout so we can cancel/reset it
+      let sequentialShortcutTimeout = null;
+
+      function animateChords(chords) {
+        // Cancel any ongoing animation
+        if (sequentialShortcutTimeout) {
+          clearTimeout(sequentialShortcutTimeout);
+          sequentialShortcutTimeout = null;
+        }
+
+        clearActiveKeyClasses();
+
+        const animationDelay = 500;
+        let currentStep = 0;
+
+        const animateStep = () => {
+          if (currentStep < chords.length) {
+            const stepClass = `active-step-${currentStep + 1}`;
+            highlightChordsPart(chords[currentStep], stepClass);
+            currentStep++;
+            sequentialShortcutTimeout = setTimeout(animateStep, animationDelay);
+          } else {
+            sequentialShortcutTimeout = null;
+          }
+        };
+
+        animateStep();
+      }
+
       document.querySelectorAll(".shortcut").forEach((shortcut) => {
         {% if not allow_text %}
         shortcut.addEventListener("click", function() {
-            // Get the text content and replace <sep> with +
-            const shortcutKey = this.querySelector(".shortcut-key").textContent.replace(/\s*\+\s*/g, '+');
-            highlightKeys(shortcutKey);
+
+          const isKeyPart = (x) => {return x.classList.contains("key-part")}
+          const isSequenceSeparator = (x) => {return x.classList.contains("sequence-separator")}
+
+          const chords=[[]];
+          let chords_idx=0;
+          this.querySelectorAll(".shortcut-key span").forEach(x => {
+            if (isKeyPart(x)) {
+              chords[chords_idx].push(x.textContent.trim())
+            };
+            if (isSequenceSeparator(x)) {
+              chords.push([]);
+              chords_idx++;
+            }
+          })
+          animateChords(chords);
         });
         {% endif %}
       });

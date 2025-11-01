@@ -9,6 +9,7 @@
 - `shortcuts` organized by categories
 - Use all caps for key names (CMD, CTRL, SHIFT, ALT)
 - Use `+` to combine keys
+- Use `>` to combine chords
 - For arrow keys, use Up, Down, Left, Right
 - Your YAML will be validated, linted, and automatically fixed if possible
 
@@ -94,6 +95,7 @@ Each shortcut is represented by a key-value pair:
 - For special keys, use their full names: `Space`, `Tab`, `Enter`, `Backspace`, `Delete`, `Esc`.
 - For arrow keys, use `Up`, `Down`, `Left`, `Right`.
 - For function keys, use `F1`, `F2`, etc.
+- Use `>` to combine chords (separate keypress actions): `Super+T>W>S` (press `Super+T`, then `W`, then `S`)
 
 #### System-Specific Key Mappings
 
@@ -122,6 +124,8 @@ shortcuts:
       description: "Bold selected text"
     "CMD+Right":
       description: "Move cursor to end of current line"
+    "CTRL+K>CTRL+C": 
+      description: "Add Line Comment"
 ```
 
 ## Validation, Linting, and Fixing

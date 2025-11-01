@@ -7,7 +7,8 @@ requires-python = ">=3.9"
 dependencies = ["jinja2>=3.1.6", "python-dotenv>=1.1.1", "ruamel-yaml>=0.18.14"]
 
 [dependency-groups]
-dev = ["bandit>=1.8.6", "ruff>=0.14.0", "ty>=0.0.1a22", "vulture>=2.14"]
+dev = ["bandit>=1.8.6", "ruff>=0.14.0", "ty>=0.0.1a22", "vulture>=2.14", "pytest>=8.4.2"]
+
 
 
 [tool.ruff]
