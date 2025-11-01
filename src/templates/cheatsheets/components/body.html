@@ -145,9 +145,13 @@
                                 {% if allow_text %}
                                     {{ shortcut }}
                                 {% else %}
-                                    {% for key in shortcut.split('<sep>') %}
-                                        <span class="key-part">{{ key | safe }}</span>
-                                        {% if not loop.last %}<span class="separator">+</span>{% endif %}
+                                    {% set key_groups = shortcut.split('<seq>') %}
+                                    {% for group in key_groups %}
+                                        {% if loop.index > 1 %}<span class="sequence-separator"> </span>{% endif %}
+                                        {% for key in group.split('<sep>') %}
+                                            <span class="key-part">{{ key | safe }}</span>
+                                            {% if not loop.last %}<span class="separator">+</span>{% endif %}
+                                        {% endfor %}
                                     {% endfor %}
                                 {% endif %}
                             </div>
