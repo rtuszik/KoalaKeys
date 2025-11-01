@@ -238,6 +238,10 @@ body.dark-mode .shortcut-key .key-part {
     margin-left: 0.3em;
 }
 
+.shortcut-key .sequence-separator {
+    white-space-collapse: preserve;
+}
+
 body.dark-mode .shortcut-key .separator {
     color: var(--mocha-subtext0);
 }
@@ -337,6 +341,67 @@ body.dark-mode .key.active {
     background: var(--mocha-green);
     color: var(--mocha-base);
     box-shadow: 0 0 8px var(--mocha-green);
+}
+.key.active-step-1 {
+    background: var(--latte-green);
+    color: var(--latte-base);
+    box-shadow: 0 0 8px var(--latte-green);
+}
+body.dark-mode .key.active-step-1 {
+    background: var(--mocha-green);
+    color: var(--mocha-base);
+    box-shadow: 0 0 8px var(--mocha-green);
+}
+.key.active-step-2 {
+    background: var(--latte-sapphire);
+    color: var(--latte-base);
+    box-shadow: 0 0 8px var(--latte-sapphire);
+}
+body.dark-mode .key.active-step-2 {
+    background: var(--mocha-sapphire);
+    color: var(--mocha-base);
+    box-shadow: 0 0 8px var(--mocha-sapphire);
+}
+.key.active-step-3 {
+    background: var(--latte-peach);
+    color: var(--latte-base);
+    box-shadow: 0 0 8px var(--latte-peach);
+}
+body.dark-mode .key.active-step-3 {
+    background: var(--mocha-peach);
+    color: var(--mocha-base);
+    box-shadow: 0 0 8px var(--mocha-peach);
+}
+.key.active-step-4 {
+    background: var(--latte-mauve);
+    color: var(--latte-base);
+    box-shadow: 0 0 8px var(--latte-mauve);
+}
+body.dark-mode .key.active-step-4 {
+    background: var(--mocha-mauve);
+    color: var(--mocha-base);
+    box-shadow: 0 0 8px var(--mocha-mauve);
+}
+.key.active-step-5 {
+    background: var(--latte-lavender);
+    color: var(--latte-base);
+    box-shadow: 0 0 8px var(--latte-lavender);
+}
+body.dark-mode .key.active-step-5 {
+    background: var(--mocha-lavender);
+    color: var(--mocha-base);
+    box-shadow: 0 0 8px var(--mocha-lavender);
+}
+/* Default style for steps greater than 5 */
+.key[class*="active-step-"]:not(.active-step-1):not(.active-step-2):not(.active-step-3):not(.active-step-4):not(.active-step-5) {
+    background: var(--latte-yellow);
+    color: var(--latte-base);
+    box-shadow: 0 0 8px var(--latte-yellow);
+}
+body.dark-mode .key[class*="active-step-"]:not(.active-step-1):not(.active-step-2):not(.active-step-3):not(.active-step-4):not(.active-step-5) {
+    background: var(--mocha-yellow);
+    color: var(--mocha-base);
+    box-shadow: 0 0 8px var(--mocha-yellow);
 }
 .key__wide {
     width: 75px;

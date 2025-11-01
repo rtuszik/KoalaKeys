@@ -1,11 +1,14 @@
-from ruamel.yaml import YAML
-import sys
 import os
-from validate_yaml import validate_yaml, lint_yaml
-from dotenv import load_dotenv
-from template_renderer import render_template
-from logger import get_logger
+import re
+import sys
 from pathlib import Path
+
+from dotenv import load_dotenv
+from ruamel.yaml import YAML
+
+from logger import get_logger
+from template_renderer import render_template
+from validate_yaml import lint_yaml, validate_yaml
 
 yaml_safe = YAML(typ="safe")
 yaml_rw = YAML()
@@ -56,17 +59,32 @@ def replace_shortcut_names(shortcut, system_mappings):
     try:
         processed_parts = []
         i = 0
+        shortcut = re.sub(r"(\+|\>)\s*(\+|\>)", "\g<1>\g<2>", shortcut)
+
         while i < len(shortcut):
             if shortcut[i] == "+":
                 if i + 1 < len(shortcut) and shortcut[i + 1] == "+":
-                    processed_parts.append("+")
+                    processed_parts.append("<sep>+")
+                    i += 2
+                elif i + 1 < len(shortcut) and shortcut[i + 1] == ">":
+                    processed_parts.append("<sep>>")
                     i += 2
                 else:
                     processed_parts.append("<sep>")
                     i += 1
+            elif shortcut[i] == ">":
+                if i + 1 < len(shortcut) and shortcut[i + 1] == ">":
+                    processed_parts.append("<seq>>")
+                    i += 2
+                elif i + 1 < len(shortcut) and shortcut[i + 1] == "+":
+                    processed_parts.append("<seq>+")
+                    i += 2
+                else:
+                    processed_parts.append("<seq>")
+                    i += 1
             else:
                 current_part = ""
-                while i < len(shortcut) and shortcut[i] != "+":
+                while i < len(shortcut) and shortcut[i] not in ("+", ">"):
                     current_part += shortcut[i]
                     i += 1
                 if current_part.strip():

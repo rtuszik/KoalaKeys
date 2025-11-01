@@ -269,7 +269,7 @@ ES:
         "´",
         "Enter",
       ]
-    - ["Shift", "Ç", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "-", "Shift"]
+    - ["Shift", ">", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "-", "Shift"]
     - ["Ctrl", "Alt", "Cmd", "Space", "Cmd", "Alt", "Ctrl"]
 
 DVORAK:
