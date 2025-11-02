@@ -1,0 +1,20 @@
+name: "Setup Python and uv"
+description: "Setup Python and uv with caching"
+runs:
+    using: "composite"
+    steps:
+        - name: Set up Python
+          uses: actions/setup-python@v6
+          with:
+              python-version-file: "pyproject.toml"
+        - name: Install uv
+          uses: astral-sh/setup-uv@v7
+          with:
+              enable-cache: auto
+              version: 0.9.*
+        - name: Install dependencies
+          shell: bash
+          run: uv sync --locked --all-extras --dev
+        - name: Minimize cache
+          shell: bash
+          run: uv cache prune --ci

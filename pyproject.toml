@@ -28,8 +28,6 @@ ignore = [
     "T10",     # debugger
     "TID",     # flake8-tidy-imports
     "D100",
-    "D101",
-    "D102",
     "D103",
     "D104",
     "D105",
