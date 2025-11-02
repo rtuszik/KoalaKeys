@@ -59,7 +59,7 @@ def replace_shortcut_names(shortcut, system_mappings):
     try:
         processed_parts = []
         i = 0
-        shortcut = re.sub(r"(\+|\>)\s*(\+|\>)", "\g<1>\g<2>", shortcut)
+        shortcut = re.sub(r"(\+|\>)\s*(\+|\>)", r"\g<1>\g<2>", shortcut)
 
         while i < len(shortcut):
             if shortcut[i] == "+":
