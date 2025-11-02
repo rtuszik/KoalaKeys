@@ -65,5 +65,3 @@ def test_spaces():
     assert replace_shortcut_names("CTRL > +", {}) == "CTRL<seq>+"
 
 
-if __name__ == "__main__":
-    pytest.main([__file__, "-v"])
