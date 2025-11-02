@@ -42,7 +42,7 @@
     "shortcuts": {
       "type": "object",
       "minProperties": 1,
-      "description": "Categories mapped to shortcut definitions.",
+      "description": "Categories mapped to shortcut definitions. Shortcuts use '+' for simultaneous keys (e.g., 'CMD+C') and '>' for sequential keys/chords (e.g., 'Super+T>W>S').",
       "additionalProperties": {
         "type": "object",
         "minProperties": 1
@@ -68,7 +68,7 @@
       }
     },
     {
-      "description": "When AllowText is not true, restrict shortcut key syntax.",
+      "description": "When AllowText is not true, restrict shortcut key syntax. Supports '+' for simultaneous keys and '>' for sequential shortcuts (chords).",
       "if": {
         "not": {
           "properties": { "AllowText": { "const": true } },
@@ -120,6 +120,10 @@
         "General": {
           "CMD+C": { "description": "Copy selected item" },
           "CMD+Right": { "description": "Move cursor to end of line" }
+        },
+        "Sequential Shortcuts": {
+          "Super+T>W>S": { "description": "Multi-sequence shortcut example" },
+          "CTRL+K>CTRL+C": { "description": "Add line comment" }
         }
       }
     }
