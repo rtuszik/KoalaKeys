@@ -1,0 +1,5 @@
+title: "Bad Indentation"
+shortcuts:
+   General:
+    "Ctrl+C":
+      description: "Odd indentation on line 3"

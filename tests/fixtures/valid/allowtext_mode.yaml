@@ -1,0 +1,12 @@
+title: "AllowText Mode Test"
+RenderKeys: false
+AllowText: true
+layout:
+  keyboard: US
+  system: Darwin
+shortcuts:
+  Commands:
+    "kubectl get pods":
+      description: "List all pods"
+    "docker ps -a":
+      description: "List all containers"

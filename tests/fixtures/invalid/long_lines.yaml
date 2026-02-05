@@ -1,0 +1,5 @@
+title: "Long Lines Test"
+shortcuts:
+  General:
+    "Ctrl+C":
+      description: "This is a very long description that exceeds the 100 character limit for a single line in YAML files according to lint rules"
