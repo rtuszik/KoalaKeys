@@ -1,0 +1,6 @@
+title: "Malformed
+shortcuts:
+  - unclosed quote
+  General:
+    invalid yaml structure here
+      nested: wrong

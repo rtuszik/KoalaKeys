@@ -1,0 +1,17 @@
+title: "Full Featured Test"
+RenderKeys: true
+AllowText: false
+layout:
+  keyboard: US
+  system: Darwin
+shortcuts:
+  General:
+    "CMD+C":
+      description: "Copy selected item"
+    "CMD+V":
+      description: "Paste"
+  Navigation:
+    "CMD+Up":
+      description: "Go to top"
+    "Ctrl+Shift+A":
+      description: "Select all"

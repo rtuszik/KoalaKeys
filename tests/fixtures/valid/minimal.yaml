@@ -1,0 +1,5 @@
+title: "Minimal Test"
+shortcuts:
+  General:
+    "Ctrl+C":
+      description: "Copy"
