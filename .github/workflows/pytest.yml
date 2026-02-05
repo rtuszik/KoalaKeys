@@ -2,6 +2,10 @@ name: pytest
 on:
     pull_request:
     workflow_dispatch:
+
+permissions:
+    contents: read
+    pull-requests: write
 jobs:
     pytest:
         runs-on: ubuntu-latest
@@ -10,3 +14,17 @@ jobs:
             - uses: ./.github/actions/setup-python
             - run: |
                   uv run pytest
+
+            - name: Run tests (with coverage)
+              run: |
+                  uv run pytest \
+                    --junitxml=pytest.xml \
+                    --cov-report=term-missing:skip-covered \
+                    --cov=. \
+                    | tee pytest-coverage.txt
+
+            - name: Pytest coverage comment
+              uses: MishaKav/pytest-coverage-comment@main
+              with:
+                  pytest-coverage-path: ./pytest-coverage.txt
+                  junitxml-path: ./pytest.xml

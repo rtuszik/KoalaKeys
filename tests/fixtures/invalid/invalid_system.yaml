@@ -1,0 +1,8 @@
+title: "Invalid System"
+layout:
+  keyboard: US
+  system: INVALID
+shortcuts:
+  General:
+    "Ctrl+C":
+      description: "Copy"

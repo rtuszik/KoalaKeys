@@ -1,0 +1,5 @@
+title: "Invalid Shortcut Format"
+shortcuts:
+  General:
+    "Ctrl+@#$%^&*()":
+      description: "Invalid characters"
