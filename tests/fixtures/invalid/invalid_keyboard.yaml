@@ -1,0 +1,8 @@
+title: "Invalid Keyboard"
+layout:
+  keyboard: INVALID
+  system: Darwin
+shortcuts:
+  General:
+    "Ctrl+C":
+      description: "Copy"

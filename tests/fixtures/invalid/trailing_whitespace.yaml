@@ -1,0 +1,5 @@
+title: "Trailing Whitespace"   
+shortcuts:
+  General:
+    "Ctrl+C":
+      description: "Copy"
