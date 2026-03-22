@@ -9,6 +9,7 @@ dependencies = ["jinja2>=3.1.6", "python-dotenv>=1.1.1", "ruamel-yaml>=0.18.14"]
 [dependency-groups]
 dev = [
   "bandit>=1.8.6",
+  "prek>=0.3.6",
   "pytest>=8.4.2",
   "pytest-cov>=7.1.0",
   "ruff>=0.14.0",
