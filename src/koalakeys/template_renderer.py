@@ -1,6 +1,8 @@
-from jinja2 import Environment, FileSystemLoader
-from logger import get_logger
 from pathlib import Path
+
+from jinja2 import Environment, FileSystemLoader
+
+from koalakeys.logger import get_logger
 
 logging = get_logger()
 

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 import re
 import sys
@@ -6,9 +8,9 @@ from pathlib import Path
 from dotenv import load_dotenv
 from ruamel.yaml import YAML
 
-from logger import get_logger
-from template_renderer import render_template
-from validate_yaml import lint_yaml, validate_yaml
+from koalakeys.logger import get_logger
+from koalakeys.template_renderer import render_template
+from koalakeys.validate_yaml import lint_yaml, validate_yaml
 
 yaml_safe = YAML(typ="safe")
 yaml_rw = YAML()
@@ -18,22 +20,24 @@ yaml_rw.width = 100
 
 load_dotenv()
 
-BASE_DIR = Path(__file__).parent
-PROJECT_ROOT = BASE_DIR.parent
+PACKAGE_DIR = Path(__file__).parent
+PROJECT_ROOT = PACKAGE_DIR.parent.parent
 
 OUTPUT_DIR = Path(os.getenv("CHEATSHEET_OUTPUT_DIR") or PROJECT_ROOT / "output")
-TEMPLATES_DIR = BASE_DIR / "templates"
-LAYOUTS_DIR = BASE_DIR / "layouts"
 CHEATSHEETS_DIR = PROJECT_ROOT / "cheatsheets"
+LAYOUTS_DIR = PACKAGE_DIR / "layouts"
 
 OUTPUT_DIR.mkdir(exist_ok=True, parents=True)
+
+layout_file = LAYOUTS_DIR / "keyboard_layouts.yaml"
+system_mapping_file = LAYOUTS_DIR / "system_mappings.yaml"
 
 logging = get_logger()
 
 
 def load_yaml(file_path: Path) -> dict | None:
     try:
-        with open(file_path, "r", encoding="utf-8") as file:
+        with file_path.open(encoding="utf-8") as file:
             return yaml_safe.load(file)
     except FileNotFoundError:
         logging.error(f"Error: YAML file '{file_path}' not found.")
@@ -44,8 +48,8 @@ def load_yaml(file_path: Path) -> dict | None:
 
 
 def load_layout():
-    keyboard_layouts = load_yaml(LAYOUTS_DIR / "keyboard_layouts.yaml")
-    system_mappings = load_yaml(LAYOUTS_DIR / "system_mappings.yaml")
+    keyboard_layouts = load_yaml(layout_file)
+    system_mappings = load_yaml(system_mapping_file)
 
     if keyboard_layouts is None or system_mappings is None:
         logging.error("Failed to load configuration files.")
@@ -159,7 +163,7 @@ def write_html_content(html_output, html_content):
     try:
         with open(html_output, "w", encoding="utf-8") as file:
             file.write(html_content)
-    except IOError as e:
+    except OSError as e:
         logging.error(f"Error writing to output file: {e}")
         return False
     return True
