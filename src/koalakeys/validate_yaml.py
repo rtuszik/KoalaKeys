@@ -3,7 +3,7 @@ import re
 from ruamel.yaml import YAML
 from ruamel.yaml.error import YAMLError
 
-from logger import get_logger
+from koalakeys.logger import get_logger
 
 logger = get_logger()
 
@@ -98,17 +98,16 @@ def validate_shortcuts(data):
                 logger.error(f"Description for shortcut '{shortcut}' in category '{category}' must be a string")
                 is_valid = False
 
-            if not allow_text:
-                if not re.match(r'^[A-Za-z0-9+⌘⌥⌃⇧←→↑↓\s\-\|\[\],.:/`"?<>=\\⌃]+$', shortcut):
-                    logger.error(f"Invalid shortcut format: '{shortcut}' in category '{category}'")
-                    is_valid = False
+            if not allow_text and not re.match(r'^[A-Za-z0-9+⌘⌥⌃⇧←→↑↓\s\-\|\[\],.:/`"?<>=\\⌃]+$', shortcut):
+                logger.error(f"Invalid shortcut format: '{shortcut}' in category '{category}'")
+                is_valid = False
 
     return is_valid
 
 
 def validate_yaml(file_path):
     try:
-        with open(file_path, "r", encoding="utf-8") as file:
+        with open(file_path, encoding="utf-8") as file:
             data = yaml_safe.load(file)
     except YAMLError as e:
         logger.error(f"YAML parsing error in {file_path}: {str(e)}")
@@ -148,7 +147,7 @@ def validate_yaml(file_path):
 def lint_yaml(file_path):
     warnings = []
 
-    with open(file_path, "r", encoding="utf-8") as file:
+    with open(file_path, encoding="utf-8") as file:
         lines = file.readlines()
 
     for i, line in enumerate(lines, start=1):
@@ -166,7 +165,7 @@ def lint_yaml(file_path):
 
 
 def fix_yaml(file_path):
-    with open(file_path, "r", encoding="utf-8") as file:
+    with open(file_path, encoding="utf-8") as file:
         content = file.read()
 
     fixes = []
@@ -209,7 +208,7 @@ def format_yaml(file_path):
     yaml.preserve_quotes = True
     yaml.width = 100
 
-    with open(file_path, "r", encoding="utf-8") as file:
+    with open(file_path, encoding="utf-8") as file:
         data = yaml.load(file)
 
     with open(file_path, "w", encoding="utf-8") as file:
