@@ -9,7 +9,7 @@ def render_template(template_path, data):
     try:
         templates_dir = Path(__file__).parent / "templates"
 
-        env = Environment(loader=FileSystemLoader(str(templates_dir)))
+        env = Environment(autoescape=True, loader=FileSystemLoader(str(templates_dir)))
 
         template = env.get_template(str(template_path))
         return template.render(**data)
