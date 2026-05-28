@@ -123,18 +123,15 @@ def validate_yaml(file_path):
         logger.error(f"Empty YAML file: {file_path}")
         return False
 
-    is_valid = True
-
-    if not validate_required_keys(data):
-        is_valid = False
-    if not validate_title(data):
-        is_valid = False
-    if not validate_render_options(data):
-        is_valid = False
-    if not validate_layout(data):
-        is_valid = False
-    if not validate_shortcuts(data):
-        is_valid = False
+    validators = [
+        validate_required_keys,
+        validate_title,
+        validate_render_options,
+        validate_layout,
+        validate_shortcuts,
+    ]
+    results = [validator(data) for validator in validators]
+    is_valid = all(results)
 
     if is_valid:
         logger.info(f"YAML validation successful: {file_path}")
