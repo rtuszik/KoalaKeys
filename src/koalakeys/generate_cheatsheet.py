@@ -58,47 +58,51 @@ def load_layout():
     return keyboard_layouts, system_mappings
 
 
-def replace_shortcut_names(shortcut, system_mappings):
+def consume_separator(shortcut: str, index: int) -> tuple[str, int]:
+    current = shortcut[index]
+    next_index = index + 1
+
+    if next_index < len(shortcut):
+        next_char = shortcut[next_index]
+        if current == "+" and next_char == "+":
+            return "<sep>+", index + 2
+        if current == "+" and next_char == ">":
+            return "<sep>>", index + 2
+        if current == ">" and next_char == ">":
+            return "<seq>>", index + 2
+        if current == ">" and next_char == "+":
+            return "<seq>+", index + 2
+
+    return ("<sep>", index + 1) if current == "+" else ("<seq>", index + 1)
+
+
+def format_shortcut_part(part: str, system_mappings: dict) -> str:
     arrow_key_mappings = {"Up": "↑", "Down": "↓", "Left": "←", "Right": "→"}
+
+    mapped_part = system_mappings.get(part.lower(), part)
+    if mapped_part in ["⌘", "⌥", "⌃", "⇧"]:
+        mapped_part = f'<span class="modifier-symbol">{mapped_part}</span>'
+
+    return arrow_key_mappings.get(mapped_part, mapped_part)
+
+
+def replace_shortcut_names(shortcut, system_mappings):
     try:
         processed_parts = []
         i = 0
         shortcut = re.sub(r"(\+|\>)\s*(\+|\>)", r"\g<1>\g<2>", shortcut)
 
         while i < len(shortcut):
-            if shortcut[i] == "+":
-                if i + 1 < len(shortcut) and shortcut[i + 1] == "+":
-                    processed_parts.append("<sep>+")
-                    i += 2
-                elif i + 1 < len(shortcut) and shortcut[i + 1] == ">":
-                    processed_parts.append("<sep>>")
-                    i += 2
-                else:
-                    processed_parts.append("<sep>")
-                    i += 1
-            elif shortcut[i] == ">":
-                if i + 1 < len(shortcut) and shortcut[i + 1] == ">":
-                    processed_parts.append("<seq>>")
-                    i += 2
-                elif i + 1 < len(shortcut) and shortcut[i + 1] == "+":
-                    processed_parts.append("<seq>+")
-                    i += 2
-                else:
-                    processed_parts.append("<seq>")
-                    i += 1
+            if shortcut[i] in ("+", ">"):
+                separator, i = consume_separator(shortcut, i)
+                processed_parts.append(separator)
             else:
                 current_part = ""
                 while i < len(shortcut) and shortcut[i] not in ("+", ">"):
                     current_part += shortcut[i]
                     i += 1
                 if current_part.strip():
-                    part = current_part.strip()
-                    part = system_mappings.get(part.lower(), part)
-                    if part in ["⌘", "⌥", "⌃", "⇧"]:
-                        part = f'<span class="modifier-symbol">{part}</span>'
-
-                    part = arrow_key_mappings.get(part, part)
-                    processed_parts.append(part)
+                    processed_parts.append(format_shortcut_part(current_part.strip(), system_mappings))
 
         return "".join(processed_parts)
     except Exception as e:
