@@ -1,4 +1,4 @@
-from generate_cheatsheet import (
+from koalakeys.generate_cheatsheet import (
     generate_html,
     generate_index,
     get_layout_info,
@@ -231,7 +231,7 @@ class TestGenerateIndex:
 
 class TestMainFunction:
     def test_main_with_valid_file(self, valid_fixtures):
-        from generate_cheatsheet import main
+        from koalakeys.generate_cheatsheet import main
 
         title, filename = main(valid_fixtures / "minimal.yaml")
 
@@ -240,7 +240,7 @@ class TestMainFunction:
         assert filename.endswith(".html")
 
     def test_main_with_invalid_file(self, invalid_fixtures):
-        from generate_cheatsheet import main
+        from koalakeys.generate_cheatsheet import main
 
         title, filename = main(invalid_fixtures / "missing_title.yaml")
 
@@ -248,7 +248,7 @@ class TestMainFunction:
         assert filename is None
 
     def test_main_with_nonexistent_file(self, invalid_fixtures):
-        from generate_cheatsheet import main
+        from koalakeys.generate_cheatsheet import main
 
         title, filename = main(invalid_fixtures / "empty.yaml")
 

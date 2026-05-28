@@ -1,4 +1,4 @@
-from validate_yaml import (
+from koalakeys.validate_yaml import (
     lint_yaml,
     validate_layout,
     validate_render_options,
@@ -186,7 +186,7 @@ class TestLintYaml:
 
 class TestFixYaml:
     def test_fix_special_characters(self, tmp_path):
-        from validate_yaml import fix_yaml
+        from koalakeys.validate_yaml import fix_yaml
 
         test_file = tmp_path / "special_chars.yaml"
         test_file.write_text('title: "Test"\nshortcuts:\n  General:\n    "⌘+C":\n      description: "Copy"')
@@ -198,7 +198,7 @@ class TestFixYaml:
         assert any("Replaced" in f for f in fixes)
 
     def test_fix_lowercase_modifiers(self, tmp_path):
-        from validate_yaml import fix_yaml
+        from koalakeys.validate_yaml import fix_yaml
 
         test_file = tmp_path / "lowercase.yaml"
         test_file.write_text('title: "Test"\nshortcuts:\n  General:\n    "ctrl+c":\n      description: "Copy"')
@@ -209,7 +209,7 @@ class TestFixYaml:
         assert "CTRL" in content
 
     def test_fix_odd_indentation(self, tmp_path):
-        from validate_yaml import fix_yaml
+        from koalakeys.validate_yaml import fix_yaml
 
         test_file = tmp_path / "odd_indent.yaml"
         test_file.write_text('title: "Test"\n   odd_indent: true')
@@ -223,7 +223,7 @@ class TestFixYaml:
             assert indent % 2 == 0
 
     def test_no_fixes_needed(self, tmp_path):
-        from validate_yaml import fix_yaml
+        from koalakeys.validate_yaml import fix_yaml
 
         test_file = tmp_path / "clean.yaml"
         test_file.write_text('title: "Test"\nshortcuts:\n  General:\n    "CTRL+C":\n      description: "Copy"')
@@ -235,7 +235,7 @@ class TestFixYaml:
 
 class TestFormatYaml:
     def test_format_yaml_returns_message(self, tmp_path):
-        from validate_yaml import format_yaml
+        from koalakeys.validate_yaml import format_yaml
 
         test_file = tmp_path / "format_test.yaml"
         test_file.write_text('title: "Test"\nshortcuts:\n  General:\n    "Ctrl+C":\n      description: "Copy"')
@@ -245,7 +245,7 @@ class TestFormatYaml:
         assert "formatted" in result.lower()
 
     def test_format_yaml_preserves_content(self, tmp_path):
-        from validate_yaml import format_yaml
+        from koalakeys.validate_yaml import format_yaml
 
         test_file = tmp_path / "format_test.yaml"
         original = 'title: "Test Title"\nshortcuts:\n  General:\n    "Ctrl+C":\n      description: "Copy"'
