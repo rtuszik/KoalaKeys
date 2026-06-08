@@ -4,9 +4,30 @@ from koalakeys.validate_yaml import (
     validate_render_options,
     validate_required_keys,
     validate_shortcuts,
+    validate_styling,
     validate_title,
     validate_yaml,
 )
+
+
+class TestValidateStyling:
+    def test_no_styling_fields_ok(self, valid_yaml_data):
+        assert validate_styling(valid_yaml_data) is True
+
+    def test_valid_theme(self, valid_yaml_data):
+        assert validate_styling({**valid_yaml_data, "theme": "catppuccin"}) is True
+
+    def test_theme_must_be_string(self, valid_yaml_data):
+        assert validate_styling({**valid_yaml_data, "theme": 123}) is False
+
+    def test_theme_must_be_non_empty(self, valid_yaml_data):
+        assert validate_styling({**valid_yaml_data, "theme": "  "}) is False
+
+    def test_custom_css_must_be_string(self, valid_yaml_data):
+        assert validate_styling({**valid_yaml_data, "custom_css": ["a.css"]}) is False
+
+    def test_custom_css_inline_string_ok(self, valid_yaml_data):
+        assert validate_styling({**valid_yaml_data, "custom_css_inline": "h1{}"}) is True
 
 
 class TestValidateRequiredKeys:

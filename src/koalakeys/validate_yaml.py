@@ -50,6 +50,21 @@ def validate_render_options(data):
     return is_valid
 
 
+def validate_styling(data):
+    is_valid = True
+
+    if "theme" in data and (not isinstance(data["theme"], str) or not data["theme"].strip()):
+        logger.error("theme must be a non-empty string")
+        is_valid = False
+
+    for field in ("custom_css", "custom_css_inline"):
+        if field in data and not isinstance(data[field], str):
+            logger.error(f"{field} must be a string")
+            is_valid = False
+
+    return is_valid
+
+
 def validate_layout(data):
     if "layout" not in data:
         return True
@@ -127,6 +142,7 @@ def validate_yaml(file_path):
         validate_required_keys,
         validate_title,
         validate_render_options,
+        validate_styling,
         validate_layout,
         validate_shortcuts,
     ]

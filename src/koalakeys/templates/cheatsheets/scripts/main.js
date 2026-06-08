@@ -124,10 +124,11 @@
       // Call generateKeyboard on page load
       document.addEventListener("DOMContentLoaded", generateKeyboard);
 
-      // Dark-Mode toggle functionality
+      const body = document.body;
+      {% if theme_both_modes %}
+      // Dark-Mode toggle functionality (only present when the theme defines both modes)
       const darkModeToggle = document.getElementById('dark-mode-toggle');
       const themeIcon = document.getElementById("theme-icon");
-      const body = document.body;
 
       function updateDarkModeToggle() {
         themeIcon.textContent = body.classList.contains("dark-mode")
@@ -141,6 +142,7 @@
         updateDarkModeToggle();
         adjustLayout();
       });
+      {% endif %}
 
       function scrollToSection(targetId) {
         const targetElement = document.getElementById(targetId);
@@ -157,9 +159,10 @@
         }
       }
 
-      // Check for saved dark mode preference, default to dark mode
+      {% if theme_both_modes %}
+      // Check for saved dark mode preference, default to the theme's default mode
       if (localStorage.getItem("darkMode") === null) {
-        localStorage.setItem("darkMode", "true");
+        localStorage.setItem("darkMode", "{{ 'true' if theme_default_is_dark else 'false' }}");
       }
 
       if (localStorage.getItem("darkMode") === "true") {
@@ -169,6 +172,7 @@
       }
 
       updateDarkModeToggle();
+      {% endif %}
       adjustLayout();
 
       // Helper function to clear all active classes from keys
