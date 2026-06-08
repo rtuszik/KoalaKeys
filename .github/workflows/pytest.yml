@@ -15,6 +15,17 @@ jobs:
             - run: |
                   uv run pytest
 
+            # Browser/Playwright tests are excluded by default (pytest.ini) and run
+            # only on pull requests, where we install Chromium for them.
+            - name: Install Playwright browser
+              if: github.event_name == 'pull_request'
+              run: |
+                  uv run playwright install --with-deps chromium
+            - name: Run browser tests
+              if: github.event_name == 'pull_request'
+              run: |
+                  uv run pytest -m browser
+
             - name: Run tests (with coverage)
               run: |
                   uv run pytest \
