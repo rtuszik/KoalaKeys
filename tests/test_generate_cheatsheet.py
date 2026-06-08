@@ -174,9 +174,7 @@ class TestThemeIntegration:
         assert ".x { color: red; }" in result
         assert "</style><script>" not in result  # breakout neutralized
 
-    def test_no_theme_field_defaults_catppuccin(
-        self, valid_yaml_data, sample_keyboard_layouts, sample_system_mappings
-    ):
+    def test_no_theme_field_defaults_catppuccin(self, valid_yaml_data, sample_keyboard_layouts, sample_system_mappings):
         result = generate_html(dict(valid_yaml_data), sample_keyboard_layouts, self._sm(sample_system_mappings))
         assert "--kk-key-text: #f38ba8;" in result  # catppuccin dark key-text
 
@@ -301,7 +299,7 @@ class TestGenerateIndex:
 
 
 class TestMainFunction:
-    def test_main_with_valid_file(self, valid_fixtures):
+    def test_main_with_valid_file(self, valid_fixtures, isolated_output):
         from koalakeys.generate_cheatsheet import main
 
         title, filename = main(valid_fixtures / "minimal.yaml")
