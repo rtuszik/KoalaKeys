@@ -7,6 +7,16 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 
 @pytest.fixture
+def isolated_output(tmp_path, monkeypatch):
+    import koalakeys.generate_cheatsheet as gc
+
+    out = tmp_path / "output"
+    out.mkdir()
+    monkeypatch.setattr(gc, "OUTPUT_DIR", out)
+    return out
+
+
+@pytest.fixture
 def fixtures_dir():
     return Path(__file__).parent / "fixtures"
 
