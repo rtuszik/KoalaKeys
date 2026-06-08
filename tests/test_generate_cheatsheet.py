@@ -151,6 +151,77 @@ class TestGenerateHtml:
         assert "<" in result and ">" in result
 
 
+class TestThemeIntegration:
+    def _sm(self, sample_system_mappings):
+        return {"Darwin": sample_system_mappings}
+
+    def test_injects_token_block(self, valid_yaml_data, sample_keyboard_layouts, sample_system_mappings):
+        result = generate_html(dict(valid_yaml_data), sample_keyboard_layouts, self._sm(sample_system_mappings))
+        assert ":root {" in result
+        assert "--kk-bg:" in result
+        assert "body.dark-mode {" in result  # catppuccin defines both modes
+
+    def test_unknown_theme_returns_none(self, valid_yaml_data, sample_keyboard_layouts, sample_system_mappings):
+        data = {**valid_yaml_data, "theme": "does-not-exist-xyz"}
+        result = generate_html(data, sample_keyboard_layouts, self._sm(sample_system_mappings))
+        assert result is None
+
+    def test_inline_custom_css_emitted_and_sanitized(
+        self, valid_yaml_data, sample_keyboard_layouts, sample_system_mappings
+    ):
+        data = {**valid_yaml_data, "custom_css_inline": ".x { color: red; } </style><script>evil()</script>"}
+        result = generate_html(data, sample_keyboard_layouts, self._sm(sample_system_mappings))
+        assert ".x { color: red; }" in result
+        assert "</style><script>" not in result  # breakout neutralized
+
+    def test_no_theme_field_defaults_catppuccin(
+        self, valid_yaml_data, sample_keyboard_layouts, sample_system_mappings
+    ):
+        result = generate_html(dict(valid_yaml_data), sample_keyboard_layouts, self._sm(sample_system_mappings))
+        assert "--kk-key-text: #f38ba8;" in result  # catppuccin dark key-text
+
+    def test_dark_only_user_theme_hides_toggle(
+        self, valid_yaml_data, sample_keyboard_layouts, sample_system_mappings, tmp_path, monkeypatch
+    ):
+        import koalakeys.generate_cheatsheet as gc
+
+        themes = tmp_path / "themes"
+        themes.mkdir()
+        (themes / "vimdark.yaml").write_text("extends: catppuccin\nmodes: [dark]\n", encoding="utf-8")
+        monkeypatch.setattr(gc, "THEMES_DIR", themes)
+
+        data = {**valid_yaml_data, "theme": "vimdark"}
+        result = generate_html(data, sample_keyboard_layouts, self._sm(sample_system_mappings))
+        assert 'id="dark-mode-toggle"' not in result  # single-mode: no toggle button
+        assert "body.dark-mode {" not in result  # dark folded into :root
+
+
+class TestCustomCssFile:
+    def test_loads_and_sanitizes_file(self, tmp_path, monkeypatch):
+        import koalakeys.generate_cheatsheet as gc
+
+        styles = tmp_path / "styles"
+        styles.mkdir()
+        (styles / "extra.css").write_text(".x { color: red; } </style>", encoding="utf-8")
+        monkeypatch.setattr(gc, "STYLES_DIR", styles)
+
+        out = gc.load_custom_css_file("extra.css")
+        assert ".x { color: red; }" in out
+        assert "</style>" not in out
+
+    def test_missing_file_logs_and_returns_empty(self, tmp_path, monkeypatch):
+        import koalakeys.generate_cheatsheet as gc
+
+        monkeypatch.setattr(gc, "STYLES_DIR", tmp_path / "styles")
+        assert gc.load_custom_css_file("nope.css") == ""
+
+    def test_empty_filename_returns_empty(self):
+        from koalakeys.generate_cheatsheet import load_custom_css_file
+
+        assert load_custom_css_file("") == ""
+        assert load_custom_css_file(None) == ""
+
+
 class TestValidateAndLint:
     def test_valid_file_returns_true(self, valid_fixtures):
         assert validate_and_lint(valid_fixtures / "minimal.yaml") is True

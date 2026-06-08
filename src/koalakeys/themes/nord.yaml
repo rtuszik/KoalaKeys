@@ -1,0 +1,38 @@
+---
+# Built-in theme: Nord (https://www.nordtheme.com). Dark-only -> no toggle.
+# Palette derived from Nord, Copyright (c) 2016-present Sven Greb, MIT.
+default_mode: dark
+font_url: "https://iosevka-webfonts.github.io/iosevka/Iosevka.css"
+
+font: "'Iosevka Web', monospace"
+font-size: "16px"
+line-height: "1.6"
+radius: "6px"
+gap: "12px"
+section-gap: "15px"
+key-size: "50px"
+max-width: "1200px"
+
+dark: # Polar Night + Snow Storm + Frost + Aurora
+    bg: "#2e3440"
+    surface: "#3b4252"
+    card: "#434c5e"
+    card-hover: "#4c566a"
+    key-bg: "#3b4252"
+    keyboard-bg: "#2e3440"
+    border: "#4c566a"
+    border-input: "#434c5e"
+    text: "#d8dee9"
+    text-muted: "#7b88a1"
+    accent: "#88c0d0"
+    accent-2: "#81a1c1"
+    key-text: "#b48ead"
+    step-1: "#a3be8c"
+    step-2: "#88c0d0"
+    step-3: "#d08770"
+    step-4: "#b48ead"
+    step-5: "#81a1c1"
+    step-overflow: "#ebcb8b"
+    step-text: "#2e3440"
+    shadow: "rgba(0, 0, 0, 0.3)"
+    shadow-strong: "rgba(0, 0, 0, 0.4)"
