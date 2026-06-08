@@ -1,0 +1,38 @@
+---
+# Built-in theme: Dracula (https://draculatheme.com). Dark-only 
+# Palette derived from Dracula, Copyright (c) 2023 Dracula Theme, MIT.
+default_mode: dark
+font_url: "https://iosevka-webfonts.github.io/iosevka/Iosevka.css"
+
+font: "'Iosevka Web', monospace"
+font-size: "16px"
+line-height: "1.6"
+radius: "6px"
+gap: "12px"
+section-gap: "15px"
+key-size: "50px"
+max-width: "1200px"
+
+dark:
+    bg: "#282a36"
+    surface: "#343746"
+    card: "#44475a"
+    card-hover: "#565872"
+    key-bg: "#343746"
+    keyboard-bg: "#21222c"
+    border: "#44475a"
+    border-input: "#6272a4"
+    text: "#f8f8f2"
+    text-muted: "#6272a4"
+    accent: "#bd93f9"
+    accent-2: "#8be9fd"
+    key-text: "#ff79c6"
+    step-1: "#50fa7b"
+    step-2: "#8be9fd"
+    step-3: "#ffb86c"
+    step-4: "#bd93f9"
+    step-5: "#ff79c6"
+    step-overflow: "#f1fa8c"
+    step-text: "#282a36"
+    shadow: "rgba(0, 0, 0, 0.3)"
+    shadow-strong: "rgba(0, 0, 0, 0.4)"

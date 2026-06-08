@@ -10,6 +10,7 @@ from ruamel.yaml import YAML
 
 from koalakeys.logger import get_logger
 from koalakeys.template_renderer import render_template
+from koalakeys.theming import ThemeError, resolve_theme, sanitize_css
 from koalakeys.validate_yaml import lint_yaml, validate_yaml
 
 yaml_safe = YAML(typ="safe")
@@ -25,6 +26,8 @@ PROJECT_ROOT = PACKAGE_DIR.parent.parent
 
 OUTPUT_DIR = Path(os.getenv("CHEATSHEET_OUTPUT_DIR") or PROJECT_ROOT / "output")
 CHEATSHEETS_DIR = PROJECT_ROOT / "cheatsheets"
+THEMES_DIR = PROJECT_ROOT / "themes"
+STYLES_DIR = PROJECT_ROOT / "styles"
 LAYOUTS_DIR = PACKAGE_DIR / "layouts"
 
 OUTPUT_DIR.mkdir(exist_ok=True, parents=True)
@@ -135,6 +138,41 @@ def get_layout_info(data):
     }
 
 
+def load_custom_css_file(filename):
+    if not filename:
+        return ""
+    path = STYLES_DIR / filename
+    try:
+        return sanitize_css(path.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        logging.error(f"Custom CSS file not found: {path}")
+        return ""
+    except OSError as e:
+        logging.error(f"Error reading custom CSS file '{path}': {e}")
+        return ""
+
+
+def apply_styling(data):
+    """Resolve the cheatsheet's theme and custom CSS into render-ready context.
+
+    Returns True on success; False if the theme cannot be resolved.
+    """
+    try:
+        theme = resolve_theme(data.get("theme"), themes_dir=THEMES_DIR)
+    except ThemeError as e:
+        logging.error(f"Theme error: {e}")
+        return False
+
+    data["theme_token_css"] = theme.render_token_css()
+    data["theme_font_url"] = theme.font_url
+    data["theme_default_is_dark"] = theme.default_is_dark
+    data["theme_both_modes"] = theme.both_modes
+    data["theme_custom_css"] = theme.custom_css
+    data["custom_css_file"] = load_custom_css_file(data.get("custom_css"))
+    data["custom_css_inline"] = sanitize_css(str(data.get("custom_css_inline") or ""))
+    return True
+
+
 def generate_html(data, keyboard_layouts, system_mappings):
     template_path = "cheatsheets/cheatsheet-template.html"
     layout_info = get_layout_info(data)
@@ -143,6 +181,9 @@ def generate_html(data, keyboard_layouts, system_mappings):
     data["keyboard_layout"] = keyboard_layouts.get(layout_info["keyboard"], {}).get("layout")
     data["render_keys"] = data.get("RenderKeys", True)
     data["allow_text"] = data.get("AllowText", False)
+
+    if not apply_styling(data):
+        return None
 
     return render_template(template_path, data)
 
