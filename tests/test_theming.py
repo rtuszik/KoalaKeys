@@ -50,6 +50,7 @@ class TestResolveBuiltin:
 
     def test_exact_token_values_preserved(self):
         theme = resolve_theme("catppuccin")
+        assert theme.light is not None and theme.dark is not None
         assert theme.light["bg"] == "#eff1f5"
         assert theme.dark["bg"] == "#1e1e2e"
         assert theme.dark["card"] == "#45475a"
@@ -74,6 +75,7 @@ class TestUserTheme:
     def test_inherits_and_overrides(self, tmp_path):
         write_theme(tmp_path, "mine", "extends: catppuccin\ndark:\n  accent: '#82aaff'\n")
         theme = resolve_theme("mine", themes_dir=tmp_path)
+        assert theme.dark is not None
         assert theme.dark["accent"] == "#82aaff"  # overridden
         assert theme.dark["bg"] == "#1e1e2e"  # inherited
         assert theme.light is not None  # both modes inherited
@@ -129,7 +131,9 @@ class TestValueValidation:
     @pytest.mark.parametrize("value", ["#abc", "#aabbcc", "rgba(0, 0, 0, 0.3)", "hsl(200, 50%, 50%)", "tomato"])
     def test_valid_color_values_accepted(self, tmp_path, value):
         write_theme(tmp_path, "ok", f"extends: catppuccin\ndark:\n  accent: '{value}'\n")
-        assert resolve_theme("ok", themes_dir=tmp_path).dark["accent"] == value
+        theme = resolve_theme("ok", themes_dir=tmp_path)
+        assert theme.dark is not None
+        assert theme.dark["accent"] == value
 
     def test_bad_font_url_rejected(self, tmp_path):
         write_theme(tmp_path, "bad", "extends: catppuccin\nfont_url: 'http://insecure.example/f.css'\n")
