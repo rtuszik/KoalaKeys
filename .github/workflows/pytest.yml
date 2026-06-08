@@ -10,7 +10,9 @@ jobs:
     pytest:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+              with:
+                  persist-credentials: false
             - uses: ./.github/actions/setup-python
             - run: |
                   uv run pytest
@@ -35,7 +37,7 @@ jobs:
                     | tee pytest-coverage.txt
 
             - name: Pytest coverage comment
-              uses: MishaKav/pytest-coverage-comment@main
+              uses: MishaKav/pytest-coverage-comment@dda025d84b1dd831193ed9cd5b1d7e33c79efa9b # v1.1.59
               with:
                   pytest-coverage-path: ./pytest-coverage.txt
                   junitxml-path: ./pytest.xml
