@@ -11,6 +11,7 @@ dev = [
   "prek>=0.3.6",
   "pytest>=8.4.2",
   "pytest-cov>=7.1.0",
+  "pytest-playwright>=0.7.1",
   "ruff>=0.14.0",
   "ty>=0.0.1a22",
   "vulture>=2.14",
