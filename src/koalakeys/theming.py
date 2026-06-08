@@ -197,6 +197,7 @@ def resolve_theme(
         )
 
     if name in user_names:
+        assert themes_dir is not None  # user_names is only populated when themes_dir is set
         return _resolve_user_theme(name, themes_dir, builtins_dir, builtin_names)
     if name in builtin_names:
         return _resolve_builtin(name, builtins_dir)
