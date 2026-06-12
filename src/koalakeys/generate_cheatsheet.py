@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 import re
 import sys
@@ -6,9 +8,10 @@ from pathlib import Path
 from dotenv import load_dotenv
 from ruamel.yaml import YAML
 
-from logger import get_logger
-from template_renderer import render_template
-from validate_yaml import lint_yaml, validate_yaml
+from koalakeys.logger import get_logger
+from koalakeys.template_renderer import render_template
+from koalakeys.theming import ThemeError, resolve_theme, sanitize_css
+from koalakeys.validate_yaml import lint_yaml, validate_yaml
 
 yaml_safe = YAML(typ="safe")
 yaml_rw = YAML()
@@ -18,22 +21,26 @@ yaml_rw.width = 100
 
 load_dotenv()
 
-BASE_DIR = Path(__file__).parent
-PROJECT_ROOT = BASE_DIR.parent
+PACKAGE_DIR = Path(__file__).parent
+PROJECT_ROOT = PACKAGE_DIR.parent.parent
 
 OUTPUT_DIR = Path(os.getenv("CHEATSHEET_OUTPUT_DIR") or PROJECT_ROOT / "output")
-TEMPLATES_DIR = BASE_DIR / "templates"
-LAYOUTS_DIR = BASE_DIR / "layouts"
 CHEATSHEETS_DIR = PROJECT_ROOT / "cheatsheets"
+THEMES_DIR = PROJECT_ROOT / "themes"
+STYLES_DIR = PROJECT_ROOT / "styles"
+LAYOUTS_DIR = PACKAGE_DIR / "layouts"
 
 OUTPUT_DIR.mkdir(exist_ok=True, parents=True)
+
+layout_file = LAYOUTS_DIR / "keyboard_layouts.yaml"
+system_mapping_file = LAYOUTS_DIR / "system_mappings.yaml"
 
 logging = get_logger()
 
 
 def load_yaml(file_path: Path) -> dict | None:
     try:
-        with open(file_path, "r", encoding="utf-8") as file:
+        with file_path.open(encoding="utf-8") as file:
             return yaml_safe.load(file)
     except FileNotFoundError:
         logging.error(f"Error: YAML file '{file_path}' not found.")
@@ -44,8 +51,8 @@ def load_yaml(file_path: Path) -> dict | None:
 
 
 def load_layout():
-    keyboard_layouts = load_yaml(LAYOUTS_DIR / "keyboard_layouts.yaml")
-    system_mappings = load_yaml(LAYOUTS_DIR / "system_mappings.yaml")
+    keyboard_layouts = load_yaml(layout_file)
+    system_mappings = load_yaml(system_mapping_file)
 
     if keyboard_layouts is None or system_mappings is None:
         logging.error("Failed to load configuration files.")
@@ -54,47 +61,51 @@ def load_layout():
     return keyboard_layouts, system_mappings
 
 
-def replace_shortcut_names(shortcut, system_mappings):
+def consume_separator(shortcut: str, index: int) -> tuple[str, int]:
+    current = shortcut[index]
+    next_index = index + 1
+
+    if next_index < len(shortcut):
+        next_char = shortcut[next_index]
+        if current == "+" and next_char == "+":
+            return "<sep>+", index + 2
+        if current == "+" and next_char == ">":
+            return "<sep>>", index + 2
+        if current == ">" and next_char == ">":
+            return "<seq>>", index + 2
+        if current == ">" and next_char == "+":
+            return "<seq>+", index + 2
+
+    return ("<sep>", index + 1) if current == "+" else ("<seq>", index + 1)
+
+
+def format_shortcut_part(part: str, system_mappings: dict) -> str:
     arrow_key_mappings = {"Up": "↑", "Down": "↓", "Left": "←", "Right": "→"}
+
+    mapped_part = system_mappings.get(part.lower(), part)
+    if mapped_part in ["⌘", "⌥", "⌃", "⇧"]:
+        mapped_part = f'<span class="modifier-symbol">{mapped_part}</span>'
+
+    return arrow_key_mappings.get(mapped_part, mapped_part)
+
+
+def replace_shortcut_names(shortcut, system_mappings):
     try:
         processed_parts = []
         i = 0
         shortcut = re.sub(r"(\+|\>)\s*(\+|\>)", r"\g<1>\g<2>", shortcut)
 
         while i < len(shortcut):
-            if shortcut[i] == "+":
-                if i + 1 < len(shortcut) and shortcut[i + 1] == "+":
-                    processed_parts.append("<sep>+")
-                    i += 2
-                elif i + 1 < len(shortcut) and shortcut[i + 1] == ">":
-                    processed_parts.append("<sep>>")
-                    i += 2
-                else:
-                    processed_parts.append("<sep>")
-                    i += 1
-            elif shortcut[i] == ">":
-                if i + 1 < len(shortcut) and shortcut[i + 1] == ">":
-                    processed_parts.append("<seq>>")
-                    i += 2
-                elif i + 1 < len(shortcut) and shortcut[i + 1] == "+":
-                    processed_parts.append("<seq>+")
-                    i += 2
-                else:
-                    processed_parts.append("<seq>")
-                    i += 1
+            if shortcut[i] in ("+", ">"):
+                separator, i = consume_separator(shortcut, i)
+                processed_parts.append(separator)
             else:
                 current_part = ""
                 while i < len(shortcut) and shortcut[i] not in ("+", ">"):
                     current_part += shortcut[i]
                     i += 1
                 if current_part.strip():
-                    part = current_part.strip()
-                    part = system_mappings.get(part.lower(), part)
-                    if part in ["⌘", "⌥", "⌃", "⇧"]:
-                        part = f'<span class="modifier-symbol">{part}</span>'
-
-                    part = arrow_key_mappings.get(part, part)
-                    processed_parts.append(part)
+                    processed_parts.append(format_shortcut_part(current_part.strip(), system_mappings))
 
         return "".join(processed_parts)
     except Exception as e:
@@ -127,6 +138,41 @@ def get_layout_info(data):
     }
 
 
+def load_custom_css_file(filename):
+    if not filename:
+        return ""
+    path = STYLES_DIR / filename
+    try:
+        return sanitize_css(path.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        logging.error(f"Custom CSS file not found: {path}")
+        return ""
+    except OSError as e:
+        logging.error(f"Error reading custom CSS file '{path}': {e}")
+        return ""
+
+
+def apply_styling(data):
+    """Resolve the cheatsheet's theme and custom CSS into render-ready context.
+
+    Returns True on success; False if the theme cannot be resolved.
+    """
+    try:
+        theme = resolve_theme(data.get("theme"), themes_dir=THEMES_DIR)
+    except ThemeError as e:
+        logging.error(f"Theme error: {e}")
+        return False
+
+    data["theme_token_css"] = theme.render_token_css()
+    data["theme_font_url"] = theme.font_url
+    data["theme_default_is_dark"] = theme.default_is_dark
+    data["theme_both_modes"] = theme.both_modes
+    data["theme_custom_css"] = theme.custom_css
+    data["custom_css_file"] = load_custom_css_file(data.get("custom_css"))
+    data["custom_css_inline"] = sanitize_css(str(data.get("custom_css_inline") or ""))
+    return True
+
+
 def generate_html(data, keyboard_layouts, system_mappings):
     template_path = "cheatsheets/cheatsheet-template.html"
     layout_info = get_layout_info(data)
@@ -135,6 +181,9 @@ def generate_html(data, keyboard_layouts, system_mappings):
     data["keyboard_layout"] = keyboard_layouts.get(layout_info["keyboard"], {}).get("layout")
     data["render_keys"] = data.get("RenderKeys", True)
     data["allow_text"] = data.get("AllowText", False)
+
+    if not apply_styling(data):
+        return None
 
     return render_template(template_path, data)
 
@@ -159,7 +208,7 @@ def write_html_content(html_output, html_content):
     try:
         with open(html_output, "w", encoding="utf-8") as file:
             file.write(html_content)
-    except IOError as e:
+    except OSError as e:
         logging.error(f"Error writing to output file: {e}")
         return False
     return True

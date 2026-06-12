@@ -3,7 +3,7 @@ import re
 from ruamel.yaml import YAML
 from ruamel.yaml.error import YAMLError
 
-from logger import get_logger
+from koalakeys.logger import get_logger
 
 logger = get_logger()
 
@@ -46,6 +46,21 @@ def validate_render_options(data):
     if allow_text and render_keys:
         logger.error("AllowText can only be true when RenderKeys is false")
         is_valid = False
+
+    return is_valid
+
+
+def validate_styling(data):
+    is_valid = True
+
+    if "theme" in data and (not isinstance(data["theme"], str) or not data["theme"].strip()):
+        logger.error("theme must be a non-empty string")
+        is_valid = False
+
+    for field in ("custom_css", "custom_css_inline"):
+        if field in data and not isinstance(data[field], str):
+            logger.error(f"{field} must be a string")
+            is_valid = False
 
     return is_valid
 
@@ -98,17 +113,16 @@ def validate_shortcuts(data):
                 logger.error(f"Description for shortcut '{shortcut}' in category '{category}' must be a string")
                 is_valid = False
 
-            if not allow_text:
-                if not re.match(r'^[A-Za-z0-9+⌘⌥⌃⇧←→↑↓\s\-\|\[\],.:/`"?<>=\\⌃]+$', shortcut):
-                    logger.error(f"Invalid shortcut format: '{shortcut}' in category '{category}'")
-                    is_valid = False
+            if not allow_text and not re.match(r'^[A-Za-z0-9+⌘⌥⌃⇧←→↑↓\s\-\|\[\],.:/`"?<>=\\⌃]+$', shortcut):
+                logger.error(f"Invalid shortcut format: '{shortcut}' in category '{category}'")
+                is_valid = False
 
     return is_valid
 
 
 def validate_yaml(file_path):
     try:
-        with open(file_path, "r", encoding="utf-8") as file:
+        with open(file_path, encoding="utf-8") as file:
             data = yaml_safe.load(file)
     except YAMLError as e:
         logger.error(f"YAML parsing error in {file_path}: {str(e)}")
@@ -124,18 +138,16 @@ def validate_yaml(file_path):
         logger.error(f"Empty YAML file: {file_path}")
         return False
 
-    is_valid = True
-
-    if not validate_required_keys(data):
-        is_valid = False
-    if not validate_title(data):
-        is_valid = False
-    if not validate_render_options(data):
-        is_valid = False
-    if not validate_layout(data):
-        is_valid = False
-    if not validate_shortcuts(data):
-        is_valid = False
+    validators = [
+        validate_required_keys,
+        validate_title,
+        validate_render_options,
+        validate_styling,
+        validate_layout,
+        validate_shortcuts,
+    ]
+    results = [validator(data) for validator in validators]
+    is_valid = all(results)
 
     if is_valid:
         logger.info(f"YAML validation successful: {file_path}")
@@ -148,7 +160,7 @@ def validate_yaml(file_path):
 def lint_yaml(file_path):
     warnings = []
 
-    with open(file_path, "r", encoding="utf-8") as file:
+    with open(file_path, encoding="utf-8") as file:
         lines = file.readlines()
 
     for i, line in enumerate(lines, start=1):
@@ -166,7 +178,7 @@ def lint_yaml(file_path):
 
 
 def fix_yaml(file_path):
-    with open(file_path, "r", encoding="utf-8") as file:
+    with open(file_path, encoding="utf-8") as file:
         content = file.read()
 
     fixes = []
@@ -209,7 +221,7 @@ def format_yaml(file_path):
     yaml.preserve_quotes = True
     yaml.width = 100
 
-    with open(file_path, "r", encoding="utf-8") as file:
+    with open(file_path, encoding="utf-8") as file:
         data = yaml.load(file)
 
     with open(file_path, "w", encoding="utf-8") as file:

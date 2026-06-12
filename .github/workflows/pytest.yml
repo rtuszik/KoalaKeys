@@ -1,3 +1,4 @@
+---
 name: pytest
 on:
     pull_request:
@@ -10,21 +11,34 @@ jobs:
     pytest:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+              with:
+                persist-credentials: false
             - uses: ./.github/actions/setup-python
             - run: |
-                  uv run pytest
+                uv run pytest
+
+            # Browser/Playwright tests are excluded by default (pytest.ini) and run
+            # only on pull requests, where we install Chromium for them.
+            - name: Install Playwright browser
+              if: github.event_name == 'pull_request'
+              run: |
+                uv run playwright install --with-deps chromium
+            - name: Run browser tests
+              if: github.event_name == 'pull_request'
+              run: |
+                uv run pytest -m browser
 
             - name: Run tests (with coverage)
               run: |
-                  uv run pytest \
-                    --junitxml=pytest.xml \
-                    --cov-report=term-missing:skip-covered \
-                    --cov=. \
-                    | tee pytest-coverage.txt
+                uv run pytest \
+                  --junitxml=pytest.xml \
+                  --cov-report=term-missing:skip-covered \
+                  --cov=. \
+                  | tee pytest-coverage.txt
 
             - name: Pytest coverage comment
-              uses: MishaKav/pytest-coverage-comment@a01708271d42c5703d489b13eb503ba47c01e82a # main
+              uses: MishaKav/pytest-coverage-comment@dda025d84b1dd831193ed9cd5b1d7e33c79efa9b # v1.1.59
               with:
-                  pytest-coverage-path: ./pytest-coverage.txt
-                  junitxml-path: ./pytest.xml
+                pytest-coverage-path: ./pytest-coverage.txt
+                junitxml-path: ./pytest.xml

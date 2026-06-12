@@ -1,4 +1,4 @@
-from template_renderer import render_template
+from koalakeys.template_renderer import render_template
 
 
 class TestRenderTemplate:

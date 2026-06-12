@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} Cheatsheet{% endblock %}
+
+{% block body_class %}{% if theme_default_is_dark %}dark-mode{% endif %}{% endblock %}
+
+{% block fonts %}{% if theme_font_url %}<link href="{{ theme_font_url }}" rel="stylesheet" />{% endif %}{% endblock %}
+
+{% block page_styles %}
+<style>
+/* resolved theme tokens */
+{{ theme_token_css | safe }}
+/* base component stylesheet */
+{% include 'cheatsheets/assets/cheatsheets.css' %}
+/* theme custom css */
+{{ theme_custom_css | safe }}
+/* cheatsheet custom css (file then inline) */
+{{ custom_css_file | safe }}
+{{ custom_css_inline | safe }}
+</style>
+{% endblock %}
+
+
+{% block content %}
+{% include 'cheatsheets/components/body.html' %}
+{% endblock %}
+
+{% block javascript %}
+<script>
+{% include "cheatsheets/scripts/main.js" %}
+</script>
+{% endblock %}

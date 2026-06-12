@@ -22,6 +22,20 @@
       "default": false,
       "description": "When true, free-form shortcut text is allowed; requires RenderKeys=false."
     },
+    "theme": {
+      "type": "string",
+      "minLength": 1,
+      "default": "catppuccin",
+      "description": "Theme name: a built-in (e.g. 'catppuccin') or a user theme in the project's themes/ directory. Defaults to 'catppuccin'."
+    },
+    "custom_css": {
+      "type": "string",
+      "description": "Filename of a custom CSS file (resolved from the project's styles/ directory), layered after the theme."
+    },
+    "custom_css_inline": {
+      "type": "string",
+      "description": "Inline custom CSS, emitted last in the cascade so it overrides the theme and the custom CSS file."
+    },
     "layout": {
       "type": "object",
       "additionalProperties": false,
