@@ -12,7 +12,7 @@ A simple tool to create and manage portable keyboard shortcut cheat sheets.
 
 KoalaKeys generates and organizes portable, interactive HTML cheat sheets for keyboard shortcuts. It's designed for developers, designers, and power users who want to keep their essential shortcuts easily accessible.
 
-> **Quick Start**: To create a cheat sheet, add a YAML file to the `cheatsheets` directory and run `python src/generate_cheatsheet.py`. For detailed YAML formatting instructions, see the [YAML Cheat Sheet Specification Guide](yaml_cheatsheet_spec.md).
+> **Quick Start**: Run `uvx koalakeys init` to scaffold a project, add or edit YAML files in its `cheatsheets/` directory, then run `koalakeys generate`. For detailed YAML formatting instructions, see the [YAML Cheat Sheet Specification Guide](yaml_cheatsheet_spec.md).
 
 ## Screenshots
 
@@ -25,6 +25,7 @@ KoalaKeys generates and organizes portable, interactive HTML cheat sheets for ke
 
 - Generate HTML cheat sheets from YAML files
 - Interactive keyboard layout with real-time highlighting
+- Six built-in themes (catppuccin, dracula, gruvbox, nord, rosé-pine, solarized) plus user themes and custom CSS
 - Categorized shortcuts with descriptions
 - Index page for quick access to all cheat sheets
 - Search functionality
@@ -58,42 +59,74 @@ Explore the demo to see how KoalaKeys works and to get ideas for creating custom
 
 ## Requirements
 
-- Python 3.8+
+- Python 3.9+
+- [uv](https://docs.astral.sh/uv/)
 
 ## Installation
 
-1. Clone the repository:
+### Recommended: run as a tool (no clone)
+
+Run KoalaKeys directly with [uv](https://docs.astral.sh/uv/), no need to clone the repository:
+
+```
+uvx koalakeys init        # scaffold ./koalakeys/cheatsheets/ with an example sheet
+```
+
+Or install it on your PATH:
+
+```
+uv tool install koalakeys     # or: pipx install koalakeys
+```
+
+### From source (for development)
+
+1. Clone the repository and install dependencies:
 
     ```
     git clone https://github.com/rtuszik/KoalaKeys
     cd KoalaKeys
-    ```
-
-2. Create and activate a virtual environment (optional):
-
-    ```
     uv sync --locked
     ```
 
-3. Set up the output directory:
-   Create a `.env` file in the project root with:
-    ```
-    CHEATSHEET_OUTPUT_DIR=path/to/your/output/directory
-    ```
+2. Run via `uv run koalakeys ...`.
 
 ## Usage
 
-1. Create YAML files for your cheat sheets in the `cheatsheets` directory. For detailed instructions on how to format YAML files, please refer to the [YAML Cheat Sheet Specification Guide](yaml_cheatsheet_spec.md).
+KoalaKeys is a multi-command CLI. All commands operate on the **current directory**: they read `cheatsheets/` and write to `output/` (or `CHEATSHEET_OUTPUT_DIR` if set).
 
-2. Generate cheat sheets:
+| Command                     | What it does                                                                                                                                                            |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `koalakeys init [path]`     | Scaffold a new project directory with an example cheat sheet. Defaults to `./koalakeys`; use `.` for the current directory. Pass `--force` to overwrite existing files. |
+| `koalakeys generate`        | Generate HTML for every YAML file in `cheatsheets/`, plus an index page.                                                                                                |
+| `koalakeys validate [file]` | Validate cheat sheet YAML. Checks all of `cheatsheets/` by default, or a single file. Exits non-zero on failure (CI-friendly).                                          |
 
-    ```
-    uv run src/generate_cheatsheet.py
-    ```
+Typical first run:
 
-3. Find the HTML cheat sheets in the specified output directory.
+```
+koalakeys init
+cd koalakeys
+koalakeys generate
+```
 
-4. Open `index.html` to view the cheat sheet collection.
+Then open `output/index.html` to view the cheat sheet collection. For detailed YAML formatting, see the [YAML Cheat Sheet Specification Guide](yaml_cheatsheet_spec.md).
+
+### Output directory (optional)
+
+By default cheat sheets are written to `output/` in the current directory. To change this, set `CHEATSHEET_OUTPUT_DIR` (e.g. in a `.env` file):
+
+```
+CHEATSHEET_OUTPUT_DIR=path/to/your/output/directory
+```
+
+## Theming
+
+Set a theme per cheat sheet with a single key:
+
+```yaml
+theme: dracula
+```
+
+See the [YAML Cheat Sheet Specification Guide](yaml_cheatsheet_spec.md) for the built-in themes, user-theme authoring, and custom CSS.
 
 ## Schema
 
