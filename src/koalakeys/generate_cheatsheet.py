@@ -22,15 +22,13 @@ yaml_rw.width = 100
 load_dotenv()
 
 PACKAGE_DIR = Path(__file__).parent
-PROJECT_ROOT = PACKAGE_DIR.parent.parent
+PROJECT_ROOT = Path.cwd()
 
 OUTPUT_DIR = Path(os.getenv("CHEATSHEET_OUTPUT_DIR") or PROJECT_ROOT / "output")
 CHEATSHEETS_DIR = PROJECT_ROOT / "cheatsheets"
 THEMES_DIR = PROJECT_ROOT / "themes"
 STYLES_DIR = PROJECT_ROOT / "styles"
 LAYOUTS_DIR = PACKAGE_DIR / "layouts"
-
-OUTPUT_DIR.mkdir(exist_ok=True, parents=True)
 
 layout_file = LAYOUTS_DIR / "keyboard_layouts.yaml"
 system_mapping_file = LAYOUTS_DIR / "system_mappings.yaml"
@@ -153,10 +151,6 @@ def load_custom_css_file(filename):
 
 
 def apply_styling(data):
-    """Resolve the cheatsheet's theme and custom CSS into render-ready context.
-
-    Returns True on success; False if the theme cannot be resolved.
-    """
     try:
         theme = resolve_theme(data.get("theme"), themes_dir=THEMES_DIR)
     except ThemeError as e:
@@ -248,12 +242,14 @@ def generate_index(cheatsheets):
     return render_template(template_path, {"cheatsheets": cheatsheets})
 
 
-if __name__ == "__main__":
-    yaml_files = yaml_files = list(CHEATSHEETS_DIR.glob("*.yaml"))
+def generate_all() -> int:
+    yaml_files = list(CHEATSHEETS_DIR.glob("*.yaml"))
 
     if not yaml_files:
-        print("No YAML files found in the cheatsheets directory.")
-        sys.exit(1)
+        print("No YAML files found in the cheatsheets directory. Run `koalakeys init` to create one.")
+        return 1
+
+    OUTPUT_DIR.mkdir(exist_ok=True, parents=True)
 
     cheatsheets = []
     for yaml_file in yaml_files:
@@ -261,18 +257,30 @@ if __name__ == "__main__":
         if title and filename:
             cheatsheets.append({"title": title, "filename": filename})
 
-    if cheatsheets:
-        OUTPUT_DIR.mkdir(exist_ok=True, parents=True)
-
-        html_content = generate_index(cheatsheets)
-        if html_content:
-            index_output = os.path.join(OUTPUT_DIR, "index.html")
-            if write_html_content(index_output, html_content):
-                logging.info(f"Index page generated: {index_output}")
-                print(f"Generated cheatsheets for {len(cheatsheets)} YAML files.")
-            else:
-                logging.error("Failed to write index page.")
-        else:
-            logging.error("Failed to generate index page.")
-    else:
+    if not cheatsheets:
         print("No valid cheatsheets were generated due to errors.")
+        return 1
+
+    html_content = generate_index(cheatsheets)
+    if not html_content:
+        logging.error("Failed to generate index page.")
+        return 1
+
+    index_output = os.path.join(OUTPUT_DIR, "index.html")
+    if not write_html_content(index_output, html_content):
+        logging.error("Failed to write index page.")
+        return 1
+
+    logging.info(f"Index page generated: {index_output}")
+    print(f"Generated cheatsheets for {len(cheatsheets)} YAML files.")
+    return 0
+
+
+def cli():
+    code = generate_all()
+    if code:
+        sys.exit(code)
+
+
+if __name__ == "__main__":
+    cli()

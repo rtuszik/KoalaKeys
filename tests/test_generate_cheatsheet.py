@@ -1,3 +1,5 @@
+import pytest
+
 from koalakeys.generate_cheatsheet import (
     generate_html,
     generate_index,
@@ -323,3 +325,41 @@ class TestMainFunction:
 
         assert title is None
         assert filename is None
+
+
+class TestCli:
+    def test_cli_with_no_yaml_files_exits_nonzero(self, tmp_path, monkeypatch):
+        import koalakeys.generate_cheatsheet as gc
+
+        empty = tmp_path / "cheatsheets"
+        empty.mkdir()
+        monkeypatch.setattr(gc, "CHEATSHEETS_DIR", empty)
+
+        with pytest.raises(SystemExit) as exc_info:
+            gc.cli()
+
+        assert exc_info.value.code == 1
+
+    def test_cli_generates_sheets_and_index(self, valid_fixtures, tmp_path, monkeypatch):
+        import koalakeys.generate_cheatsheet as gc
+
+        out = tmp_path / "output"
+        monkeypatch.setattr(gc, "CHEATSHEETS_DIR", valid_fixtures)
+        monkeypatch.setattr(gc, "OUTPUT_DIR", out)
+
+        gc.cli()
+
+        generated = list(out.glob("*.html"))
+        assert (out / "index.html").exists()
+        assert len(generated) > 1  # at least one sheet plus the index
+
+    def test_cli_creates_output_dir(self, valid_fixtures, tmp_path, monkeypatch):
+        import koalakeys.generate_cheatsheet as gc
+
+        out = tmp_path / "does" / "not" / "exist"
+        monkeypatch.setattr(gc, "CHEATSHEETS_DIR", valid_fixtures)
+        monkeypatch.setattr(gc, "OUTPUT_DIR", out)
+
+        gc.cli()
+
+        assert out.is_dir()
