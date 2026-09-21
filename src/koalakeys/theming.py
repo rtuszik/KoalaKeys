@@ -257,7 +257,7 @@ def _resolve_user_theme(
 
     merged_modes = _narrow_modes(name, merged_modes, data.get("modes"))
 
-    # font_url / default_mode / custom_css fall back to the parent's.
+    # font_url / default_mode / custom_css fall back to parent's.
     font_url = base.font_url
     if "font_url" in data:
         font_url = _validate_font_url(data.get("font_url"))
@@ -277,7 +277,6 @@ def _finalize(
     if default_mode is None:
         default_mode = "dark" if "dark" in modes else next(iter(modes))
     if default_mode not in modes:
-        # Narrowed away the declared default; fall back to a present mode.
         default_mode = "dark" if "dark" in modes else next(iter(modes))
 
     if base is None:

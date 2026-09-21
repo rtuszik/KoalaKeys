@@ -1,0 +1,20 @@
+---
+# yaml-language-server: $schema=https://rtuszik.github.io/KoalaKeys/schema/cheatsheet.schema.json
+# Starter cheatsheet created by `koalakeys init`.
+title: "Example"
+# Keyboard layout and target system used to render the on-screen keyboard.
+layout:
+    keyboard: US
+    system: Darwin
+# Shortcuts are grouped into named sections. Each shortcut needs a description.
+shortcuts:
+    General:
+        "CMD+C":
+            description: "Copy selected item"
+        "CMD+V":
+            description: "Paste from clipboard"
+    Editing:
+        "CMD+Z":
+            description: "Undo last action"
+        "CMD+SHIFT+Z":
+            description: "Redo last undone action"

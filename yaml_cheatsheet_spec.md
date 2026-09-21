@@ -4,8 +4,9 @@
 
 - Use `.yaml` extension
 - Required top-level keys: `title`, `layout`, `shortcuts`
-- Optional top-level keys: `RenderKeys`,`AllowText`
+- Optional top-level keys: `RenderKeys`, `AllowText`, `theme`, `custom_css`, `custom_css_inline`
 - `layout` specifies `keyboard` (US, UK, ...) and `system` (Darwin, Windows, Linux)
+- `theme` picks a built-in or user theme (default: `catppuccin`)
 - `shortcuts` organized by categories
 - Use all caps for key names (CMD, CTRL, SHIFT, ALT)
 - Use `+` to combine keys
@@ -29,8 +30,11 @@ Optionally, the following keys are also supported:
 
 1. `RenderKeys`: `true`/`false` (default: true)
 2. `AllowText`: `true`/`false` (default: false)
+3. `theme`: Name of a built-in or user theme (default: `catppuccin`). See [Theming](#theming).
+4. `custom_css`: Filename of a CSS file in the project's `styles/` directory, layered after the theme.
+5. `custom_css_inline`: Inline CSS string, emitted last so it overrides everything else.
 
-### Example:
+### Example
 
 ```yaml
 title: ""
@@ -100,17 +104,17 @@ Each shortcut is represented by a key-value pair:
 #### System-Specific Key Mappings
 
 - macOS (Darwin):
-  - `CMD` for Command key (⌘)
-  - `CTRL` for Control key (⌃)
-  - `ALT` for Option key (⌥)
-  - `SHIFT` for Shift key
+    - `CMD` for Command key (⌘)
+    - `CTRL` for Control key (⌃)
+    - `ALT` for Option key (⌥)
+    - `SHIFT` for Shift key
 - Windows:
-  - `Windows` for Windows key
-  - `CTRL` for Control key
-  - `ALT` for Alt key
-  - `SHIFT` for Shift key
+    - `Windows` for Windows key
+    - `CTRL` for Control key
+    - `ALT` for Alt key
+    - `SHIFT` for Shift key
 
-### Example:
+### Example
 
 ```yaml
 shortcuts:
@@ -127,6 +131,73 @@ shortcuts:
     "CTRL+K>CTRL+C": 
       description: "Add Line Comment"
 ```
+
+## Theming
+
+Every cheat sheet renders with exactly one theme. A theme is a named set of design
+tokens (colors, typography, spacing) that the stylesheet consumes; it may define
+light tokens, dark tokens, or both. The light/dark toggle only appears when the
+active theme defines both modes.
+
+### Built-in Themes
+
+Select with `theme: <name>`; omitting the key uses `catppuccin`.
+
+| Name | Modes |
+|---|---|
+| `catppuccin` | light + dark (default) |
+| `rose-pine` | light + dark |
+| `gruvbox` | light + dark |
+| `solarized` | light + dark |
+| `nord` | dark only (no toggle) |
+| `dracula` | dark only (no toggle) |
+
+### User Themes
+
+Create `<name>.yaml` in a `themes/` directory next to your `cheatsheets/`
+directory. A user theme must extend exactly one built-in and overrides only the
+tokens it declares. There is no user→user inheritance:
+
+```yaml
+# themes/my-dracula.yaml
+extends: dracula
+accent: "#50fa7b"          # override individual tokens
+font-size: "18px"
+custom_css: |              # optional reusable CSS shipped with the theme
+  .key { text-transform: uppercase; }
+```
+
+Optional theme keys:
+
+- `modes`: narrow the parent's modes, e.g. `modes: [dark]` makes the theme
+  dark-only and hides the toggle.
+- `default_mode`: `light` or `dark`; which mode a generated page starts in.
+- `font_url`: an `https://` stylesheet URL for a web font.
+
+A user theme must not reuse a built-in theme's name. Reference it from a cheat
+sheet exactly like a built-in: `theme: my-dracula`.
+
+The full token list (all color, typography, and spacing tokens a theme can set)
+is documented in [docs/themes/tokens.md](docs/themes/tokens.md).
+
+### Custom CSS
+
+Two per-cheatsheet escape hatches, layered on top of the theme:
+
+```yaml
+theme: gruvbox
+custom_css: tweaks.css          # read from styles/tweaks.css
+custom_css_inline: |
+  .shortcut-description { font-style: italic; }
+```
+
+Styles are emitted in a fixed order, later layers winning on equal specificity:
+theme tokens → base stylesheet → theme `custom_css` → cheatsheet `custom_css`
+file → cheatsheet `custom_css_inline`.
+
+All theme values are validated (colors, lengths, fonts must match expected
+patterns) and custom CSS is sanitized before emission, since generated sheets
+are treated as publishable artifacts.
 
 ## Validation, Linting, and Fixing
 
