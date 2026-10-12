@@ -11,7 +11,7 @@ runs:
           uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e # v10.3.2
           with:
               enable-cache: auto
-              version: 0.9.*
+              version: 0.13.*
         - name: Install dependencies
           shell: bash
           run: uv sync --locked --all-extras --dev
