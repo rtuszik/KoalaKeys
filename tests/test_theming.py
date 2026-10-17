@@ -112,6 +112,16 @@ class TestUserTheme:
         with pytest.raises(ThemeError, match="collide"):
             resolve_theme("catppuccin", themes_dir=tmp_path)
 
+    def test_non_mapping_mode_raises(self, tmp_path):
+        write_theme(tmp_path, "bad", "extends: catppuccin\ndark: oops\n")
+        with pytest.raises(ThemeError, match="must be a mapping"):
+            resolve_theme("bad", themes_dir=tmp_path)
+
+    def test_non_string_modes_entry_raises(self, tmp_path):
+        write_theme(tmp_path, "bad", "extends: catppuccin\nmodes: [[dark]]\n")
+        with pytest.raises(ThemeError, match="subset"):
+            resolve_theme("bad", themes_dir=tmp_path)
+
     def test_empty_modes_narrowing_raises(self, tmp_path):
         write_theme(tmp_path, "bad", "extends: catppuccin\nmodes: []\n")
         with pytest.raises(ThemeError, match="cannot be empty"):

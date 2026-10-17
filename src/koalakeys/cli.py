@@ -45,6 +45,8 @@ def cmd_validate(args: argparse.Namespace) -> int:
         print(f"Validating {path}...")
         if not validate_yaml(path):
             all_valid = False
+        if not path.is_file():
+            continue
         for warning in lint_yaml(path):
             print(f"  warning: {warning}")
 

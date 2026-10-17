@@ -137,6 +137,9 @@ def validate_yaml(file_path):
     if data is None:
         logger.error(f"Empty YAML file: {file_path}")
         return False
+    if not isinstance(data, dict):
+        logger.error(f"Top-level YAML must be a mapping: {file_path}")
+        return False
 
     validators = [
         validate_required_keys,

@@ -1,5 +1,5 @@
 /*
- * Component stylesheet — consumes only the --kk-* semantic token contract.
+ * Component stylesheet, consumes only the --kk-* semantic token contract.
  * Token VALUES are emitted per-theme by the generator (see koalakeys/themes.py);
  * this file never references palette-specific variables or mode overrides.
  * Token reference: docs/themes/tokens.md
@@ -28,7 +28,6 @@ body.nav-active #content-wrapper {
 h1 {
 	color: var(--kk-accent);
 	text-align: center;
-	margin-bottom: 10px;
 	font-weight: 700;
 	font-size: 2.2rem;
 	position: absolute;
@@ -114,7 +113,6 @@ h1 {
 		color 0.3s,
 		font-size 0.3s;
 	flex: 1 1 50%;
-	word-wrap: break-word;
 	overflow-wrap: break-word;
 	display: flex;
 	align-items: center;
@@ -155,7 +153,6 @@ h1 {
 	font-size: 0.85rem;
 	text-align: right;
 	flex: 1 1 50%;
-	word-wrap: break-word;
 	overflow-wrap: break-word;
 	transition: font-size 0.3s;
 	display: flex;

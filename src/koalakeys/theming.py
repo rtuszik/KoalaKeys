@@ -144,6 +144,8 @@ def _split_theme_doc(data: dict) -> tuple[dict[str, str], dict[str, dict[str, st
     for key, value in data.items():
         if key in RESERVED_KEYS:
             if key in MODES and value:
+                if not isinstance(value, dict):
+                    raise ThemeError(f"Theme mode '{key}' must be a mapping of token -> value")
                 modes[key] = {k: _validate_token_value(k, v) for k, v in value.items()}
             continue
         shared[key] = _validate_token_value(key, value)
@@ -221,7 +223,11 @@ def _narrow_modes(
 ) -> dict[str, dict[str, str]]:
     """Apply a user theme's `modes:` narrowing (e.g. dark-only hides the toggle)."""
     if narrowed is not None:
-        if not isinstance(narrowed, list) or not set(narrowed) <= set(MODES):
+        if (
+            not isinstance(narrowed, list)
+            or not all(isinstance(mode, str) for mode in narrowed)
+            or not set(narrowed) <= set(MODES)
+        ):
             raise ThemeError(f"User theme '{name}': 'modes' must be a subset of {list(MODES)}")
         if not narrowed:
             raise ThemeError(f"User theme '{name}': 'modes' cannot be empty")

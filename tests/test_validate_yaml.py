@@ -165,6 +165,11 @@ class TestValidateYaml:
     def test_malformed_yaml(self, invalid_fixtures):
         assert validate_yaml(invalid_fixtures / "malformed.yaml") is False
 
+    def test_non_mapping_top_level(self, tmp_path):
+        sheet = tmp_path / "list.yaml"
+        sheet.write_text("- title\n- shortcuts\n", encoding="utf-8")
+        assert validate_yaml(sheet) is False
+
     def test_missing_title(self, invalid_fixtures):
         assert validate_yaml(invalid_fixtures / "missing_title.yaml") is False
 
