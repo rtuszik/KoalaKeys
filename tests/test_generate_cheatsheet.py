@@ -215,6 +215,29 @@ class TestCustomCssFile:
         monkeypatch.setattr(gc, "STYLES_DIR", tmp_path / "styles")
         assert gc.load_custom_css_file("nope.css") == ""
 
+    @pytest.mark.parametrize("absolute", [False, True])
+    def test_rejects_file_outside_styles_dir(self, tmp_path, monkeypatch, absolute):
+        import koalakeys.generate_cheatsheet as gc
+
+        styles = tmp_path / "styles"
+        styles.mkdir()
+        secret = tmp_path / "secret.css"
+        secret.write_text(".secret {}", encoding="utf-8")
+        monkeypatch.setattr(gc, "STYLES_DIR", styles)
+
+        filename = str(secret.resolve()) if absolute else "../secret.css"
+        assert gc.load_custom_css_file(filename) == ""
+
+    def test_allows_nested_file_inside_styles_dir(self, tmp_path, monkeypatch):
+        import koalakeys.generate_cheatsheet as gc
+
+        nested = tmp_path / "styles" / "sub"
+        nested.mkdir(parents=True)
+        (nested / "extra.css").write_text(".nested {}", encoding="utf-8")
+        monkeypatch.setattr(gc, "STYLES_DIR", tmp_path / "styles")
+
+        assert ".nested {}" in gc.load_custom_css_file("sub/extra.css")
+
     def test_empty_filename_returns_empty(self):
         from koalakeys.generate_cheatsheet import load_custom_css_file
 
@@ -363,3 +386,22 @@ class TestCli:
         gc.cli()
 
         assert out.is_dir()
+
+    def test_partial_failure_returns_nonzero_and_indexes_good_sheets(
+        self, valid_fixtures, invalid_fixtures, tmp_path, monkeypatch, capsys
+    ):
+        import shutil
+
+        import koalakeys.generate_cheatsheet as gc
+
+        sheets = tmp_path / "cheatsheets"
+        sheets.mkdir()
+        shutil.copy(valid_fixtures / "minimal.yaml", sheets)
+        shutil.copy(invalid_fixtures / "missing_title.yaml", sheets)
+        out = tmp_path / "output"
+        monkeypatch.setattr(gc, "CHEATSHEETS_DIR", sheets)
+        monkeypatch.setattr(gc, "OUTPUT_DIR", out)
+
+        assert gc.generate_all() == 1
+        assert "Minimal Test" in (out / "index.html").read_text(encoding="utf-8")
+        assert "missing_title.yaml" in capsys.readouterr().out

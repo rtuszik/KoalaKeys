@@ -101,7 +101,7 @@ body.dark-mode h1 {
 	border: none;
 	cursor: pointer;
 	font-size: 24px;
-	color: var(--text);
+	color: var(--latte-text);
 	transition: color 0.3s;
 }
 

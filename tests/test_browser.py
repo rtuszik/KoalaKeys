@@ -53,7 +53,7 @@ def page(browser, cheatsheet_url):
 class TestCheatsheetInBrowser:
     def test_loads_without_console_errors(self, page):
         assert page.console_errors == [], f"unexpected JS errors: {page.console_errors}"
-        assert "Full Featured Test" in page.title() or page.locator("h1").count() >= 0
+        assert "Full Featured Test" in page.title()
 
     def test_keyboard_and_shortcuts_render(self, page):
         assert page.locator(".key").count() > 0, "keyboard keys should be rendered"

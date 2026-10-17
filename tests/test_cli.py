@@ -102,6 +102,12 @@ class TestValidateCommand:
 
         assert main(["validate", str(bad)]) != 0
 
+    def test_validate_missing_file_returns_nonzero(self, tmp_path):
+        assert main(["validate", str(tmp_path / "nope.yaml")]) != 0
+
+    def test_validate_directory_returns_nonzero(self, tmp_path):
+        assert main(["validate", str(tmp_path)]) != 0
+
 
 class TestGenerateCommand:
     def test_generate_dispatches_to_generation(self, valid_fixtures, tmp_path, monkeypatch):
