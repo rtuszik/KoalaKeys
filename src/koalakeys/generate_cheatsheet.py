@@ -139,7 +139,10 @@ def get_layout_info(data):
 def load_custom_css_file(filename):
     if not filename:
         return ""
-    path = STYLES_DIR / filename
+    path = (STYLES_DIR / filename).resolve()
+    if not path.is_relative_to(STYLES_DIR.resolve()):
+        logging.error(f"Custom CSS file must be inside {STYLES_DIR}: {filename}")
+        return ""
     try:
         return sanitize_css(path.read_text(encoding="utf-8"))
     except FileNotFoundError:
@@ -252,10 +255,13 @@ def generate_all() -> int:
     OUTPUT_DIR.mkdir(exist_ok=True, parents=True)
 
     cheatsheets = []
+    failed = []
     for yaml_file in yaml_files:
         title, filename = main(yaml_file)
         if title and filename:
             cheatsheets.append({"title": title, "filename": filename})
+        else:
+            failed.append(yaml_file.name)
 
     if not cheatsheets:
         print("No valid cheatsheets were generated due to errors.")
@@ -273,6 +279,9 @@ def generate_all() -> int:
 
     logging.info(f"Index page generated: {index_output}")
     print(f"Generated cheatsheets for {len(cheatsheets)} YAML files.")
+    if failed:
+        print(f"Failed to generate {len(failed)} cheatsheet(s): {', '.join(failed)}")
+        return 1
     return 0
 
 

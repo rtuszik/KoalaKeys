@@ -15,8 +15,6 @@ jobs:
               with:
                 persist-credentials: false
             - uses: ./.github/actions/setup-python
-            - run: |
-                uv run pytest
 
             # Browser/Playwright tests are excluded by default (pytest.ini) and run
             # only on pull requests, where we install Chromium for them.
@@ -30,6 +28,7 @@ jobs:
                 uv run pytest -m browser
 
             - name: Run tests (with coverage)
+              shell: bash # adds pipefail so test failures survive the tee
               run: |
                 uv run pytest \
                   --junitxml=pytest.xml \
