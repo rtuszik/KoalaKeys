@@ -1,15 +1,16 @@
+from __future__ import annotations
+
 import logging
 import os
 import sys
 from logging.handlers import RotatingFileHandler
-from typing import Optional
 
 DEFAULT_LOG_FILE = "app.log"
 DEFAULT_MAX_BYTES = 10 * 1024 * 1024
 DEFAULT_BACKUP_COUNT = 5
 DEFAULT_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 
-_logger: Optional[logging.Logger] = None
+_logger: logging.Logger | None = None
 
 
 def setup_logging(

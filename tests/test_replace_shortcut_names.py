@@ -1,4 +1,4 @@
-from generate_cheatsheet import replace_shortcut_names
+from koalakeys.generate_cheatsheet import replace_shortcut_names
 
 
 def test_three_keys():

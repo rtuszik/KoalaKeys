@@ -1,4 +1,6 @@
-from generate_cheatsheet import (
+import pytest
+
+from koalakeys.generate_cheatsheet import (
     generate_html,
     generate_index,
     get_layout_info,
@@ -151,6 +153,98 @@ class TestGenerateHtml:
         assert "<" in result and ">" in result
 
 
+class TestThemeIntegration:
+    def _sm(self, sample_system_mappings):
+        return {"Darwin": sample_system_mappings}
+
+    def test_injects_token_block(self, valid_yaml_data, sample_keyboard_layouts, sample_system_mappings):
+        result = generate_html(dict(valid_yaml_data), sample_keyboard_layouts, self._sm(sample_system_mappings))
+        assert ":root {" in result
+        assert "--kk-bg:" in result
+        assert "body.dark-mode {" in result  # catppuccin defines both modes
+
+    def test_unknown_theme_returns_none(self, valid_yaml_data, sample_keyboard_layouts, sample_system_mappings):
+        data = {**valid_yaml_data, "theme": "does-not-exist-xyz"}
+        result = generate_html(data, sample_keyboard_layouts, self._sm(sample_system_mappings))
+        assert result is None
+
+    def test_inline_custom_css_emitted_and_sanitized(
+        self, valid_yaml_data, sample_keyboard_layouts, sample_system_mappings
+    ):
+        data = {**valid_yaml_data, "custom_css_inline": ".x { color: red; } </style><script>evil()</script>"}
+        result = generate_html(data, sample_keyboard_layouts, self._sm(sample_system_mappings))
+        assert ".x { color: red; }" in result
+        assert "</style><script>" not in result  # breakout neutralized
+
+    def test_no_theme_field_defaults_catppuccin(self, valid_yaml_data, sample_keyboard_layouts, sample_system_mappings):
+        result = generate_html(dict(valid_yaml_data), sample_keyboard_layouts, self._sm(sample_system_mappings))
+        assert "--kk-key-text: #f38ba8;" in result  # catppuccin dark key-text
+
+    def test_dark_only_user_theme_hides_toggle(
+        self, valid_yaml_data, sample_keyboard_layouts, sample_system_mappings, tmp_path, monkeypatch
+    ):
+        import koalakeys.generate_cheatsheet as gc
+
+        themes = tmp_path / "themes"
+        themes.mkdir()
+        (themes / "vimdark.yaml").write_text("extends: catppuccin\nmodes: [dark]\n", encoding="utf-8")
+        monkeypatch.setattr(gc, "THEMES_DIR", themes)
+
+        data = {**valid_yaml_data, "theme": "vimdark"}
+        result = generate_html(data, sample_keyboard_layouts, self._sm(sample_system_mappings))
+        assert 'id="dark-mode-toggle"' not in result  # single-mode: no toggle button
+        assert "body.dark-mode {" not in result  # dark folded into :root
+
+
+class TestCustomCssFile:
+    def test_loads_and_sanitizes_file(self, tmp_path, monkeypatch):
+        import koalakeys.generate_cheatsheet as gc
+
+        styles = tmp_path / "styles"
+        styles.mkdir()
+        (styles / "extra.css").write_text(".x { color: red; } </style>", encoding="utf-8")
+        monkeypatch.setattr(gc, "STYLES_DIR", styles)
+
+        out = gc.load_custom_css_file("extra.css")
+        assert ".x { color: red; }" in out
+        assert "</style>" not in out
+
+    def test_missing_file_logs_and_returns_empty(self, tmp_path, monkeypatch):
+        import koalakeys.generate_cheatsheet as gc
+
+        monkeypatch.setattr(gc, "STYLES_DIR", tmp_path / "styles")
+        assert gc.load_custom_css_file("nope.css") == ""
+
+    @pytest.mark.parametrize("absolute", [False, True])
+    def test_rejects_file_outside_styles_dir(self, tmp_path, monkeypatch, absolute):
+        import koalakeys.generate_cheatsheet as gc
+
+        styles = tmp_path / "styles"
+        styles.mkdir()
+        secret = tmp_path / "secret.css"
+        secret.write_text(".secret {}", encoding="utf-8")
+        monkeypatch.setattr(gc, "STYLES_DIR", styles)
+
+        filename = str(secret.resolve()) if absolute else "../secret.css"
+        assert gc.load_custom_css_file(filename) == ""
+
+    def test_allows_nested_file_inside_styles_dir(self, tmp_path, monkeypatch):
+        import koalakeys.generate_cheatsheet as gc
+
+        nested = tmp_path / "styles" / "sub"
+        nested.mkdir(parents=True)
+        (nested / "extra.css").write_text(".nested {}", encoding="utf-8")
+        monkeypatch.setattr(gc, "STYLES_DIR", tmp_path / "styles")
+
+        assert ".nested {}" in gc.load_custom_css_file("sub/extra.css")
+
+    def test_empty_filename_returns_empty(self):
+        from koalakeys.generate_cheatsheet import load_custom_css_file
+
+        assert load_custom_css_file("") == ""
+        assert load_custom_css_file(None) == ""
+
+
 class TestValidateAndLint:
     def test_valid_file_returns_true(self, valid_fixtures):
         assert validate_and_lint(valid_fixtures / "minimal.yaml") is True
@@ -230,8 +324,8 @@ class TestGenerateIndex:
 
 
 class TestMainFunction:
-    def test_main_with_valid_file(self, valid_fixtures):
-        from generate_cheatsheet import main
+    def test_main_with_valid_file(self, valid_fixtures, isolated_output):
+        from koalakeys.generate_cheatsheet import main
 
         title, filename = main(valid_fixtures / "minimal.yaml")
 
@@ -240,7 +334,7 @@ class TestMainFunction:
         assert filename.endswith(".html")
 
     def test_main_with_invalid_file(self, invalid_fixtures):
-        from generate_cheatsheet import main
+        from koalakeys.generate_cheatsheet import main
 
         title, filename = main(invalid_fixtures / "missing_title.yaml")
 
@@ -248,9 +342,66 @@ class TestMainFunction:
         assert filename is None
 
     def test_main_with_nonexistent_file(self, invalid_fixtures):
-        from generate_cheatsheet import main
+        from koalakeys.generate_cheatsheet import main
 
         title, filename = main(invalid_fixtures / "empty.yaml")
 
         assert title is None
         assert filename is None
+
+
+class TestCli:
+    def test_cli_with_no_yaml_files_exits_nonzero(self, tmp_path, monkeypatch):
+        import koalakeys.generate_cheatsheet as gc
+
+        empty = tmp_path / "cheatsheets"
+        empty.mkdir()
+        monkeypatch.setattr(gc, "CHEATSHEETS_DIR", empty)
+
+        with pytest.raises(SystemExit) as exc_info:
+            gc.cli()
+
+        assert exc_info.value.code == 1
+
+    def test_cli_generates_sheets_and_index(self, valid_fixtures, tmp_path, monkeypatch):
+        import koalakeys.generate_cheatsheet as gc
+
+        out = tmp_path / "output"
+        monkeypatch.setattr(gc, "CHEATSHEETS_DIR", valid_fixtures)
+        monkeypatch.setattr(gc, "OUTPUT_DIR", out)
+
+        gc.cli()
+
+        generated = list(out.glob("*.html"))
+        assert (out / "index.html").exists()
+        assert len(generated) > 1  # at least one sheet plus the index
+
+    def test_cli_creates_output_dir(self, valid_fixtures, tmp_path, monkeypatch):
+        import koalakeys.generate_cheatsheet as gc
+
+        out = tmp_path / "does" / "not" / "exist"
+        monkeypatch.setattr(gc, "CHEATSHEETS_DIR", valid_fixtures)
+        monkeypatch.setattr(gc, "OUTPUT_DIR", out)
+
+        gc.cli()
+
+        assert out.is_dir()
+
+    def test_partial_failure_returns_nonzero_and_indexes_good_sheets(
+        self, valid_fixtures, invalid_fixtures, tmp_path, monkeypatch, capsys
+    ):
+        import shutil
+
+        import koalakeys.generate_cheatsheet as gc
+
+        sheets = tmp_path / "cheatsheets"
+        sheets.mkdir()
+        shutil.copy(valid_fixtures / "minimal.yaml", sheets)
+        shutil.copy(invalid_fixtures / "missing_title.yaml", sheets)
+        out = tmp_path / "output"
+        monkeypatch.setattr(gc, "CHEATSHEETS_DIR", sheets)
+        monkeypatch.setattr(gc, "OUTPUT_DIR", out)
+
+        assert gc.generate_all() == 1
+        assert "Minimal Test" in (out / "index.html").read_text(encoding="utf-8")
+        assert "missing_title.yaml" in capsys.readouterr().out

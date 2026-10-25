@@ -18,11 +18,13 @@
         <div class="search-container">
             <input type="text" id="shortcut-search" placeholder="Search shortcuts..." />
         </div>
+        {% if theme_both_modes %}
         <button id="dark-mode-toggle"
                 class="dark-mode-toggle"
                 aria-label="Toggle dark mode">
             <span id="theme-icon">◐</span>
         </button>
+        {% endif %}
     </div>
     <nav id="category-nav" aria-label="Category navigation">
         <ul>
