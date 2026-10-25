@@ -12,7 +12,7 @@ A simple tool to create and manage portable keyboard shortcut cheat sheets.
 
 KoalaKeys generates and organizes portable, interactive HTML cheat sheets for keyboard shortcuts. It's designed for developers, designers, and power users who want to keep their essential shortcuts easily accessible.
 
-> **Quick Start**: Run `uvx koalakeys init` to scaffold a project, add or edit YAML files in its `cheatsheets/` directory, then run `koalakeys generate`. For detailed YAML formatting instructions, see the [YAML Cheat Sheet Specification Guide](yaml_cheatsheet_spec.md).
+> **Quick Start**: Run `uvx koalakeys init` to scaffold a project, `cd koalakeys`, add or edit YAML files in its `cheatsheets/` directory, then run `uvx koalakeys generate`. For detailed YAML formatting instructions, see the [YAML Cheat Sheet Specification Guide](yaml_cheatsheet_spec.md).
 
 ## Screenshots
 
@@ -100,7 +100,7 @@ KoalaKeys is a multi-command CLI. All commands operate on the **current director
 | `koalakeys generate`        | Generate HTML for every YAML file in `cheatsheets/`, plus an index page.                                                                                                |
 | `koalakeys validate [file]` | Validate cheat sheet YAML. Checks all of `cheatsheets/` by default, or a single file. Exits non-zero on failure (CI-friendly).                                          |
 
-Typical first run:
+Typical first run (with `koalakeys` on your PATH; otherwise prefix each command with `uvx`):
 
 ```
 koalakeys init

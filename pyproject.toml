@@ -1,6 +1,6 @@
 [project]
 name = "koalakeys"
-version = "0.6.0"
+version = "1.0.0"
 description = "Build interactive, portable cheatsheets from YAML."
 readme = "README.md"
 requires-python = ">=3.9"
