@@ -1,0 +1,6 @@
+[tools]
+prek = "latest"
+uv = "latest"
+
+[settings]
+lockfile = false
