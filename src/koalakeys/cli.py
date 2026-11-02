@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import argparse
 import shlex
-import subprocess
 import sys
 from pathlib import Path
 
@@ -13,8 +12,13 @@ from koalakeys.validate_yaml import lint_yaml, validate_yaml
 DEFAULT_PROJECT_DIRNAME = "koalakeys"
 
 
+_CMD_SPECIAL = frozenset(" \t&|<>^(),;=")
+
+
 def _quote_path(path: str) -> str:
-    return subprocess.list2cmdline([path]) if sys.platform == "win32" else shlex.quote(path)
+    if sys.platform != "win32":
+        return shlex.quote(path)
+    return f'"{path}"' if _CMD_SPECIAL.intersection(path) else path
 
 
 def cmd_init(args: argparse.Namespace) -> int:
