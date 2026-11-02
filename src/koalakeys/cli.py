@@ -12,15 +12,6 @@ from koalakeys.validate_yaml import lint_yaml, validate_yaml
 DEFAULT_PROJECT_DIRNAME = "koalakeys"
 
 
-_CMD_SPECIAL = frozenset(" \t&|<>^(),;=")
-
-
-def _quote_path(path: str) -> str:
-    if sys.platform != "win32":
-        return shlex.quote(path)
-    return f'"{path}"' if _CMD_SPECIAL.intersection(path) else path
-
-
 def cmd_init(args: argparse.Namespace) -> int:
     in_place = args.path == "."
     target = Path(args.path) if args.path else Path.cwd() / DEFAULT_PROJECT_DIRNAME
@@ -33,7 +24,7 @@ def cmd_init(args: argparse.Namespace) -> int:
 
     print("\nNext steps:")
     if not in_place:
-        print(f"  cd {_quote_path(args.path or DEFAULT_PROJECT_DIRNAME)}")
+        print(f"  cd {shlex.quote(args.path or DEFAULT_PROJECT_DIRNAME)}")
     print("  koalakeys generate    # or, without installing: uvx koalakeys generate")
     return 0
 
