@@ -4,3 +4,63 @@ uv = "latest"
 
 [settings]
 lockfile = false
+
+[tasks.install]
+description = "Install dependencies (incl. dev group)"
+run = "uv sync --locked"
+
+[tasks.generate]
+description = "Generate all cheat sheets + index"
+run = "uv run koalakeys generate"
+alias = "gen"
+
+[tasks.validate]
+description = "Validate cheat sheet YAML (all, or pass a file)"
+run = "uv run koalakeys validate"
+
+[tasks.test]
+description = "Run tests (browser tests excluded)"
+run = "uv run pytest"
+alias = "t"
+
+[tasks."test:cov"]
+description = "Run tests with coverage report"
+run = "uv run pytest --cov=src --cov-report=term-missing:skip-covered"
+
+[tasks."test:browser"]
+description = "Run Playwright browser tests"
+depends = ["playwright:install"]
+run = "uv run pytest -m browser"
+
+[tasks."playwright:install"]
+description = "Install Chromium for Playwright"
+run = "uv run playwright install chromium"
+
+[tasks.lint]
+description = "Lint and auto-fix with ruff"
+run = "uv run ruff check --fix ."
+
+[tasks.format]
+description = "Format with ruff"
+run = "uv run ruff format ."
+alias = "fmt"
+
+[tasks.typecheck]
+description = "Type check with ty"
+run = "uv run ty check"
+
+[tasks.deadcode]
+description = "Detect dead code with vulture"
+run = "uv run vulture --min-confidence 100 --exclude .venv ."
+
+[tasks.hooks]
+description = "Run pre-commit hooks on all files"
+run = "prek run --all-files"
+
+[tasks.check]
+description = "Run all CI checks"
+run = [
+  { task = "lint" },
+  { task = "format" },
+  { tasks = ["typecheck", "deadcode", "test"] },
+]
