@@ -94,7 +94,7 @@ class TestNormalizeShortcuts:
 
     def test_preserves_description(self, valid_yaml_data):
         result = normalize_shortcuts(valid_yaml_data, {})
-        for key, details in result["General"].items():
+        for details in result["General"].values():
             assert "description" in details
             assert details["description"] == "Copy"
 

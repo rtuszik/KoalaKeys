@@ -125,13 +125,13 @@ def validate_yaml(file_path):
         with open(file_path, encoding="utf-8") as file:
             data = yaml_safe.load(file)
     except YAMLError as e:
-        logger.error(f"YAML parsing error in {file_path}: {str(e)}")
+        logger.error(f"YAML parsing error in {file_path}: {e!s}")
         return False
     except FileNotFoundError:
         logger.error(f"File not found: {file_path}")
         return False
     except Exception as e:
-        logger.error(f"Unexpected error reading {file_path}: {str(e)}")
+        logger.error(f"Unexpected error reading {file_path}: {e!s}")
         return False
 
     if data is None:
