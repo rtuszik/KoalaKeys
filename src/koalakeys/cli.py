@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import shlex
 import sys
 from pathlib import Path
 
@@ -25,7 +26,7 @@ def cmd_init(args: argparse.Namespace) -> int:
     if in_place:
         print("  koalakeys generate")
     else:
-        print(f"  cd {args.path or DEFAULT_PROJECT_DIRNAME} && koalakeys generate")
+        print(f"  cd {shlex.quote(args.path or DEFAULT_PROJECT_DIRNAME)} && koalakeys generate")
     return 0
 
 
@@ -47,7 +48,13 @@ def cmd_validate(args: argparse.Namespace) -> int:
             all_valid = False
         if not path.is_file():
             continue
-        for warning in lint_yaml(path):
+        try:
+            warnings = lint_yaml(path)
+        except (OSError, UnicodeDecodeError) as e:
+            print(f"  error: cannot lint {path}: {e}")
+            all_valid = False
+            continue
+        for warning in warnings:
             print(f"  warning: {warning}")
 
     return 0 if all_valid else 1

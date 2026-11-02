@@ -66,6 +66,7 @@ _FONT_RE = re.compile(r"^[a-zA-Z0-9\s,'\"\-]+$")
 _FONT_URL_RE = re.compile(r"^https://[^\s\"'<>]+$")
 
 _LENGTH_TOKEN_NAMES = {"radius", "gap", "section-gap", "key-size", "max-width", "font-size"}
+_KNOWN_TOKENS = {*COLOR_TOKENS, *SHARED_TOKENS}
 
 
 class ThemeError(ValueError):
@@ -106,7 +107,9 @@ class ResolvedTheme:
         return "\n".join(lines)
 
 
-def _validate_token_value(name: str, value: object) -> str:
+def _validate_token_value(name: object, value: object) -> str:
+    if name not in _KNOWN_TOKENS:
+        raise ThemeError(f"Unknown token {name!r}. Allowed: {sorted(_KNOWN_TOKENS)}")
     if not isinstance(value, (str, int, float)):
         raise ThemeError(f"Token '{name}' must be a scalar, got {type(value).__name__}")
     text = str(value).strip()
@@ -247,7 +250,7 @@ def _resolve_user_theme(
     parent = data.get("extends")
     if not parent:
         raise ThemeError(f"User theme '{name}' must declare 'extends: <built-in>'")
-    if parent not in builtin_names:
+    if not isinstance(parent, str) or parent not in builtin_names:
         raise ThemeError(f"User theme '{name}' extends unknown built-in '{parent}'. Available: {sorted(builtin_names)}")
 
     base = _resolve_builtin(parent, builtins_dir)
@@ -262,6 +265,10 @@ def _resolve_user_theme(
         merged_modes[mode] = {**(base_tokens or {}), **user_modes.get(mode, {})}
 
     merged_modes = _narrow_modes(name, merged_modes, data.get("modes"))
+    for mode, tokens in merged_modes.items():
+        missing = [t for t in COLOR_TOKENS if t not in tokens]
+        if missing:
+            raise ThemeError(f"User theme '{name}' mode '{mode}' missing tokens: {missing}")
 
     # font_url / default_mode / custom_css fall back to parent's.
     font_url = base.font_url
@@ -282,7 +289,7 @@ def _finalize(
     default_mode = data.get("default_mode") or (base.default_mode if base else None)
     if default_mode is None:
         default_mode = "dark" if "dark" in modes else next(iter(modes))
-    if default_mode not in modes:
+    if not isinstance(default_mode, str) or default_mode not in modes:
         default_mode = "dark" if "dark" in modes else next(iter(modes))
 
     if base is None:

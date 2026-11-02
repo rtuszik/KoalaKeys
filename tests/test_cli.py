@@ -39,6 +39,13 @@ class TestInitCommand:
         assert "cd koalakeys" in out
         assert "koalakeys generate" in out
 
+    def test_init_quotes_path_with_spaces_in_next_steps(self, tmp_path, monkeypatch, capsys):
+        monkeypatch.chdir(tmp_path)
+
+        main(["init", "my project"])
+
+        assert "cd 'my project' && koalakeys generate" in capsys.readouterr().out
+
     def test_init_dot_omits_cd_from_next_steps(self, tmp_path, monkeypatch, capsys):
         monkeypatch.chdir(tmp_path)
 
@@ -107,6 +114,16 @@ class TestValidateCommand:
 
     def test_validate_directory_returns_nonzero(self, tmp_path):
         assert main(["validate", str(tmp_path)]) != 0
+
+    def test_validate_reports_undecodable_file_without_traceback(self, tmp_path, monkeypatch, capsys):
+        d = self._make_cheatsheets(tmp_path)
+        (d / "broken.yaml").write_bytes(b"title: \xff\xfe\n")
+        monkeypatch.chdir(tmp_path)
+
+        code = main(["validate"])
+
+        assert code == 1
+        assert "cannot lint" in capsys.readouterr().out
 
 
 class TestGenerateCommand:

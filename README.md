@@ -12,7 +12,14 @@ A simple tool to create and manage portable keyboard shortcut cheat sheets.
 
 KoalaKeys generates and organizes portable, interactive HTML cheat sheets for keyboard shortcuts. It's designed for developers, designers, and power users who want to keep their essential shortcuts easily accessible.
 
-> **Quick Start**: Run `uvx koalakeys init` to scaffold a project, `cd koalakeys`, add or edit YAML files in its `cheatsheets/` directory, then run `uvx koalakeys generate`. For detailed YAML formatting instructions, see the [YAML Cheat Sheet Specification Guide](yaml_cheatsheet_spec.md).
+> **Quick Start**:
+>
+> 1. Run `uvx koalakeys init` to scaffold a project.
+> 2. Run `cd koalakeys`.
+> 3. Add or edit YAML files in the `cheatsheets/` directory.
+> 4. Run `uvx koalakeys generate`.
+>
+> For detailed YAML formatting instructions, see the [YAML Cheat Sheet Specification Guide](yaml_cheatsheet_spec.md).
 
 ## Screenshots
 
@@ -25,7 +32,7 @@ KoalaKeys generates and organizes portable, interactive HTML cheat sheets for ke
 
 - Generate HTML cheat sheets from YAML files
 - Interactive keyboard layout with real-time highlighting
-- Six built-in themes (catppuccin, dracula, gruvbox, nord, rosé-pine, solarized) plus user themes and custom CSS
+- Six built-in themes (catppuccin, dracula, gruvbox, nord, rose-pine, solarized) plus user themes and custom CSS
 - Categorized shortcuts with descriptions
 - Index page for quick access to all cheat sheets
 - Search functionality
@@ -92,7 +99,7 @@ uv tool install koalakeys     # or: pipx install koalakeys
 
 ## Usage
 
-KoalaKeys is a multi-command CLI. All commands operate on the **current directory**: they read `cheatsheets/` and write to `output/` (or `CHEATSHEET_OUTPUT_DIR` if set).
+KoalaKeys is a multi-command CLI. `generate` and `validate` operate on the **current directory**: they read `cheatsheets/` and `generate` writes to `output/` (or `CHEATSHEET_OUTPUT_DIR` if set). `init` creates the project in its path argument.
 
 | Command                     | What it does                                                                                                                                                            |
 | --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
