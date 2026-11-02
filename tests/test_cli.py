@@ -1,5 +1,7 @@
 import sys
 
+import pytest
+
 from koalakeys.cli import main
 
 VALID_SHEET = 'title: Good\nshortcuts:\n  General:\n    "CMD+C":\n      description: "Copy"\n'
@@ -43,6 +45,7 @@ class TestInitCommand:
 
     def test_init_quotes_path_with_spaces_in_next_steps(self, tmp_path, monkeypatch, capsys):
         monkeypatch.chdir(tmp_path)
+        monkeypatch.setattr(sys, "platform", "linux")
 
         main(["init", "my project"])
 
@@ -55,6 +58,23 @@ class TestInitCommand:
         main(["init", "my project"])
 
         assert 'cd "my project"\n' in capsys.readouterr().out
+
+    @pytest.mark.parametrize("name", ["R&D", "a|b", "x^y", "(dir)"])
+    def test_init_quotes_cmd_metacharacters_on_windows(self, name, tmp_path, monkeypatch, capsys):
+        monkeypatch.chdir(tmp_path)
+        monkeypatch.setattr(sys, "platform", "win32")
+
+        main(["init", name])
+
+        assert f'cd "{name}"\n' in capsys.readouterr().out
+
+    def test_init_leaves_plain_path_unquoted_on_windows(self, tmp_path, monkeypatch, capsys):
+        monkeypatch.chdir(tmp_path)
+        monkeypatch.setattr(sys, "platform", "win32")
+
+        main(["init", "plain"])
+
+        assert "cd plain\n" in capsys.readouterr().out
 
     def test_init_next_steps_mention_uvx(self, tmp_path, monkeypatch, capsys):
         monkeypatch.chdir(tmp_path)

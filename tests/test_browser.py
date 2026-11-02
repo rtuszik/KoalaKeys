@@ -126,3 +126,15 @@ class TestDarkModeDefault:
         page.goto(sheets["light"])
         assert self._is_dark(page)
         context.close()
+
+    def test_light_choice_overrides_dark_default(self, browser, sheets):
+        context = browser.new_context()
+        page = context.new_page()
+        page.goto(sheets["dark"])
+        page.click("#dark-mode-toggle")
+        assert not self._is_dark(page)
+
+        page.goto(sheets["light"])
+        page.goto(sheets["dark"])
+        assert not self._is_dark(page)
+        context.close()
