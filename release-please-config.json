@@ -6,7 +6,6 @@
   "packages": {
     ".": {
       "package-name": "koalakeys",
-      "release-as": "1.0.0",
       "extra-files": [
         {
           "type": "toml",

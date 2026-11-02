@@ -1,3 +1,5 @@
+import sys
+
 from koalakeys.cli import main
 
 VALID_SHEET = 'title: Good\nshortcuts:\n  General:\n    "CMD+C":\n      description: "Copy"\n'
@@ -44,7 +46,22 @@ class TestInitCommand:
 
         main(["init", "my project"])
 
-        assert "cd 'my project' && koalakeys generate" in capsys.readouterr().out
+        assert "cd 'my project'\n" in capsys.readouterr().out
+
+    def test_init_uses_double_quotes_on_windows(self, tmp_path, monkeypatch, capsys):
+        monkeypatch.chdir(tmp_path)
+        monkeypatch.setattr(sys, "platform", "win32")
+
+        main(["init", "my project"])
+
+        assert 'cd "my project"\n' in capsys.readouterr().out
+
+    def test_init_next_steps_mention_uvx(self, tmp_path, monkeypatch, capsys):
+        monkeypatch.chdir(tmp_path)
+
+        main(["init"])
+
+        assert "uvx koalakeys generate" in capsys.readouterr().out
 
     def test_init_dot_omits_cd_from_next_steps(self, tmp_path, monkeypatch, capsys):
         monkeypatch.chdir(tmp_path)

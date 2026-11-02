@@ -75,3 +75,54 @@ class TestCheatsheetInBrowser:
         visible.first.wait_for(state="visible", timeout=2000)
         assert 0 < visible.count() < total, "search should narrow the visible shortcuts"
         assert page.get_by_text("Paste").is_visible()
+
+
+class TestDarkModeDefault:
+    @pytest.fixture
+    def sheets(self, tmp_path, isolated_output, monkeypatch):
+        import koalakeys.generate_cheatsheet as gc
+
+        themes = tmp_path / "themes"
+        themes.mkdir()
+        (themes / "light-first.yaml").write_text("extends: catppuccin\ndefault_mode: light\n")
+        monkeypatch.setattr(gc, "THEMES_DIR", themes)
+
+        urls = {}
+        for name, theme in (("dark", "catppuccin"), ("light", "light-first")):
+            src = tmp_path / f"{name}.yaml"
+            src.write_text(
+                f"title: {name} sheet\ntheme: {theme}\nlayout:\n  keyboard: US\n  system: Darwin\n"
+                "shortcuts:\n  General:\n    CMD+C:\n      description: Copy\n"
+            )
+            _, filename = main(src)
+            assert filename
+            urls[name] = (isolated_output / filename).resolve().as_uri()
+        return urls
+
+    @staticmethod
+    def _is_dark(page) -> bool:
+        return page.evaluate("document.body.classList.contains('dark-mode')")
+
+    def test_visit_without_toggle_keeps_each_theme_default(self, browser, sheets):
+        context = browser.new_context()
+        page = context.new_page()
+        page.goto(sheets["dark"])
+        assert self._is_dark(page)
+        assert page.evaluate("localStorage.getItem('darkMode')") is None
+
+        page.goto(sheets["light"])
+        assert not self._is_dark(page)
+        context.close()
+
+    def test_toggle_choice_applies_to_other_sheets(self, browser, sheets):
+        context = browser.new_context()
+        page = context.new_page()
+        page.goto(sheets["light"])
+        page.click("#dark-mode-toggle")
+        assert self._is_dark(page)
+
+        page.goto(sheets["dark"])
+        assert self._is_dark(page)
+        page.goto(sheets["light"])
+        assert self._is_dark(page)
+        context.close()
