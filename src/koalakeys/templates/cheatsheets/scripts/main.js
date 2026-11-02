@@ -160,12 +160,9 @@
       }
 
       {% if theme_both_modes %}
-      // Check for saved dark mode preference, default to the theme's default mode
-      if (localStorage.getItem("darkMode") === null) {
-        localStorage.setItem("darkMode", "{{ 'true' if theme_default_is_dark else 'false' }}");
-      }
-
-      if (localStorage.getItem("darkMode") === "true") {
+      // Saved preference only after a toggle click; otherwise use the theme's default mode
+      const savedDarkMode = localStorage.getItem("darkMode");
+      if (savedDarkMode === null ? {{ 'true' if theme_default_is_dark else 'false' }} : savedDarkMode === "true") {
         body.classList.add("dark-mode");
       } else {
         body.classList.remove("dark-mode");

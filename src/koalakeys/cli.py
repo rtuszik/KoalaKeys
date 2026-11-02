@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import shlex
+import subprocess
 import sys
 from pathlib import Path
 
@@ -10,6 +11,10 @@ from koalakeys.scaffold import scaffold_project
 from koalakeys.validate_yaml import lint_yaml, validate_yaml
 
 DEFAULT_PROJECT_DIRNAME = "koalakeys"
+
+
+def _quote_path(path: str) -> str:
+    return subprocess.list2cmdline([path]) if sys.platform == "win32" else shlex.quote(path)
 
 
 def cmd_init(args: argparse.Namespace) -> int:
@@ -23,10 +28,9 @@ def cmd_init(args: argparse.Namespace) -> int:
         print(f"skipped  {path} (already exists; use --force to overwrite)")
 
     print("\nNext steps:")
-    if in_place:
-        print("  koalakeys generate")
-    else:
-        print(f"  cd {shlex.quote(args.path or DEFAULT_PROJECT_DIRNAME)} && koalakeys generate")
+    if not in_place:
+        print(f"  cd {_quote_path(args.path or DEFAULT_PROJECT_DIRNAME)}")
+    print("  koalakeys generate    # or, without installing: uvx koalakeys generate")
     return 0
 
 

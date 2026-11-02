@@ -22,12 +22,8 @@ darkModeToggle.addEventListener('click', () => {
     updateDarkModeToggle();
 });
 
-// Check for saved dark mode preference, default to dark mode
-if (localStorage.getItem('darkMode') === null) {
-    localStorage.setItem('darkMode', 'true');
-}
-
-if (localStorage.getItem('darkMode') === 'true') {
+// Saved preference only after a toggle click; otherwise default to dark
+if (localStorage.getItem('darkMode') !== 'false') {
     body.classList.add('dark-mode');
 } else {
     body.classList.remove('dark-mode');
