@@ -127,6 +127,24 @@ class TestUserTheme:
         with pytest.raises(ThemeError, match="cannot be empty"):
             resolve_theme("bad", themes_dir=tmp_path)
 
+    def test_non_string_extends_raises(self, tmp_path):
+        write_theme(tmp_path, "bad", "extends: [nord]\n")
+        with pytest.raises(ThemeError, match="unknown built-in"):
+            resolve_theme("bad", themes_dir=tmp_path)
+
+    def test_non_string_default_mode_falls_back(self, tmp_path):
+        write_theme(tmp_path, "odd", "extends: catppuccin\ndefault_mode: [light]\n")
+        assert resolve_theme("odd", themes_dir=tmp_path).default_mode == "dark"
+
+    def test_partial_new_mode_raises(self, tmp_path):
+        write_theme(tmp_path, "half", "extends: nord\nlight:\n  bg: '#ffffff'\n")
+        with pytest.raises(ThemeError, match="mode 'light' missing tokens"):
+            resolve_theme("half", themes_dir=tmp_path)
+
+    def test_partial_mode_dropped_by_narrowing_is_allowed(self, tmp_path):
+        write_theme(tmp_path, "half", "extends: nord\nmodes: [dark]\nlight:\n  bg: '#ffffff'\n")
+        assert resolve_theme("half", themes_dir=tmp_path).both_modes is False
+
 
 class TestValueValidation:
     @pytest.mark.parametrize(
@@ -144,6 +162,20 @@ class TestValueValidation:
         theme = resolve_theme("ok", themes_dir=tmp_path)
         assert theme.dark is not None
         assert theme.dark["accent"] == value
+
+    @pytest.mark.parametrize(
+        "body",
+        [
+            "'a: red; } body {display:none} .x {--b': red\n",
+            "'</style><script>': red\n",
+            "dark:\n  'x: 1} body {color': red\n",
+            "made-up-token: red\n",
+        ],
+    )
+    def test_unknown_token_names_rejected(self, tmp_path, body):
+        write_theme(tmp_path, "evil", f"extends: catppuccin\n{body}")
+        with pytest.raises(ThemeError, match="Unknown token"):
+            resolve_theme("evil", themes_dir=tmp_path)
 
     def test_bad_font_url_rejected(self, tmp_path):
         write_theme(tmp_path, "bad", "extends: catppuccin\nfont_url: 'http://insecure.example/f.css'\n")
