@@ -2,7 +2,7 @@
 # Built-in theme: Catppuccin (Latte = light, Mocha = dark).
 # This is the default theme.
 # Palette derived from Catppuccin, Copyright (c) 2021 Catppuccin, MIT.
-# Token keys drop the --kk- prefix. See docs/themes/tokens.md.
+# Token keys drop the --kk- prefix. See docs/themes.md.
 default_mode: dark
 font_url: "https://iosevka-webfonts.github.io/iosevka/Iosevka.css"
 

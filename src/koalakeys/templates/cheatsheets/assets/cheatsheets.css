@@ -2,7 +2,7 @@
  * Component stylesheet, consumes only the --kk-* semantic token contract.
  * Token VALUES are emitted per-theme by the generator (see koalakeys/themes.py);
  * this file never references palette-specific variables or mode overrides.
- * Token reference: docs/themes/tokens.md
+ * Token reference: docs/themes.md
  */
 
 body {

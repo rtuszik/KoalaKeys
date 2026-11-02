@@ -178,7 +178,7 @@ A user theme must not reuse a built-in theme's name. Reference it from a cheat
 sheet exactly like a built-in: `theme: my-dracula`.
 
 The full token list (all color, typography, and spacing tokens a theme can set)
-is documented in [docs/themes/tokens.md](docs/themes/tokens.md).
+is documented in [docs/themes.md](docs/themes.md).
 
 ### Custom CSS
 
