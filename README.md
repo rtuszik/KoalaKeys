@@ -25,7 +25,10 @@ KoalaKeys generates and organizes portable, interactive HTML cheat sheets for ke
 
 <p align="center">
   <img src="assets/images/KoalaKeys_Example.png">
-    </a>
+</p>
+
+<p align="center">
+  <img src="assets/images/KoalaKeys_Themes.png" alt="The built-in themes: catppuccin, dracula, gruvbox, nord, rose-pine, solarized">
 </p>
 
 ## Features
