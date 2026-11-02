@@ -115,4 +115,4 @@ custom_css_inline: |         # optional inline block
 ```
 
 Emission cascade (later wins on equal specificity):
-`base stylesheet → theme tokens → theme custom_css → cheatsheet custom_css file → cheatsheet inline`.
+`theme tokens → base stylesheet → theme custom_css → cheatsheet custom_css file → cheatsheet inline`.
