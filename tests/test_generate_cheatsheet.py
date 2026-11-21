@@ -145,11 +145,13 @@ class TestGenerateHtml:
     def test_contains_title(self, valid_yaml_data, sample_keyboard_layouts, sample_system_mappings):
         system_mappings = {"Darwin": sample_system_mappings}
         result = generate_html(valid_yaml_data, sample_keyboard_layouts, system_mappings)
+        assert result is not None
         assert valid_yaml_data["title"] in result
 
     def test_contains_html_structure(self, valid_yaml_data, sample_keyboard_layouts, sample_system_mappings):
         system_mappings = {"Darwin": sample_system_mappings}
         result = generate_html(valid_yaml_data, sample_keyboard_layouts, system_mappings)
+        assert result is not None
         assert "<" in result and ">" in result
 
 
@@ -159,6 +161,7 @@ class TestThemeIntegration:
 
     def test_injects_token_block(self, valid_yaml_data, sample_keyboard_layouts, sample_system_mappings):
         result = generate_html(dict(valid_yaml_data), sample_keyboard_layouts, self._sm(sample_system_mappings))
+        assert result is not None
         assert ":root {" in result
         assert "--kk-bg:" in result
         assert "body.dark-mode {" in result  # catppuccin defines both modes
@@ -173,11 +176,13 @@ class TestThemeIntegration:
     ):
         data = {**valid_yaml_data, "custom_css_inline": ".x { color: red; } </style><script>evil()</script>"}
         result = generate_html(data, sample_keyboard_layouts, self._sm(sample_system_mappings))
+        assert result is not None
         assert ".x { color: red; }" in result
         assert "</style><script>" not in result  # breakout neutralized
 
     def test_no_theme_field_defaults_catppuccin(self, valid_yaml_data, sample_keyboard_layouts, sample_system_mappings):
         result = generate_html(dict(valid_yaml_data), sample_keyboard_layouts, self._sm(sample_system_mappings))
+        assert result is not None
         assert "--kk-key-text: #f38ba8;" in result  # catppuccin dark key-text
 
     def test_dark_only_user_theme_hides_toggle(
@@ -192,6 +197,7 @@ class TestThemeIntegration:
 
         data = {**valid_yaml_data, "theme": "vimdark"}
         result = generate_html(data, sample_keyboard_layouts, self._sm(sample_system_mappings))
+        assert result is not None
         assert 'id="dark-mode-toggle"' not in result  # single-mode: no toggle button
         assert "body.dark-mode {" not in result  # dark folded into :root
 
@@ -269,10 +275,12 @@ class TestLoadLayout:
 
     def test_load_layout_contains_us_keyboard(self):
         keyboard_layouts, _ = load_layout()
+        assert keyboard_layouts is not None
         assert "US" in keyboard_layouts
 
     def test_load_layout_contains_darwin_mappings(self):
         _, system_mappings = load_layout()
+        assert system_mappings is not None
         assert "Darwin" in system_mappings
 
 
@@ -314,6 +322,7 @@ class TestGenerateIndex:
         ]
 
         result = generate_index(cheatsheets)
+        assert result is not None
 
         assert "VS Code Shortcuts" in result
 
