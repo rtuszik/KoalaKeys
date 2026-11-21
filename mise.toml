@@ -47,8 +47,8 @@ run = "uv run ruff format ."
 alias = "fmt"
 
 [tasks.typecheck]
-description = "Type check with ty"
-run = "uv run ty check"
+description = "Type check with pyrefly"
+run = "uv run pyrefly check"
 
 [tasks.deadcode]
 description = "Detect dead code with vulture"
