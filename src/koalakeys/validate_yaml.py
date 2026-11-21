@@ -8,10 +8,6 @@ from koalakeys.logger import get_logger
 logger = get_logger()
 
 yaml_safe = YAML(typ="safe")
-yaml_rw = YAML()
-yaml_rw.indent(mapping=2, sequence=4, offset=2)
-yaml_rw.preserve_quotes = True
-yaml_rw.width = 100
 
 
 def validate_required_keys(data):
@@ -178,56 +174,3 @@ def lint_yaml(file_path):
             warnings.append(f"Line {i} has trailing whitespace")
 
     return warnings
-
-
-def fix_yaml(file_path):
-    with open(file_path, encoding="utf-8") as file:
-        content = file.read()
-
-    fixes = []
-
-    special_chars = {"⌘": "CMD", "⌃": "CTRL", "⌥": "ALT", "⇧": "SHIFT"}
-    for char, replacement in special_chars.items():
-        if char in content:
-            content = content.replace(char, replacement)
-            fixes.append(f"Replaced '{char}' with '{replacement}'")
-
-    lowercase_keys = ["cmd", "ctrl", "alt", "shift"]
-    for key in lowercase_keys:
-        pattern = re.compile(r"\b" + key + r"\b", re.IGNORECASE)
-        content = pattern.sub(key.upper(), content)
-        if pattern.search(content):
-            fixes.append(f"Converted '{key}' to uppercase")
-
-    # Fix indentation
-    lines = content.split("\n")
-    fixed_lines = []
-    for line in lines:
-        stripped = line.lstrip()
-        indent = len(line) - len(stripped)
-        fixed_indent = (indent // 2) * 2
-        if fixed_indent != indent:
-            fixes.append(f"Fixed indentation in line: {line.strip()}")
-        fixed_lines.append(" " * fixed_indent + stripped.rstrip())
-
-    fixed_content = "\n".join(fixed_lines)
-
-    with open(file_path, "w", encoding="utf-8") as file:
-        file.write(fixed_content)
-
-    return fixes
-
-
-def format_yaml(file_path):
-    yaml = YAML()
-    yaml.indent(mapping=2, sequence=4, offset=2)
-    yaml.preserve_quotes = True
-    yaml.width = 100
-
-    with open(file_path, encoding="utf-8") as file:
-        data = yaml.load(file)
-
-    with open(file_path, "w", encoding="utf-8") as file:
-        yaml.dump(data, file)
-
-    return "YAML file has been formatted for improved readability."

@@ -14,10 +14,6 @@ from koalakeys.theming import ThemeError, resolve_theme, sanitize_css
 from koalakeys.validate_yaml import lint_yaml, validate_yaml
 
 yaml_safe = YAML(typ="safe")
-yaml_rw = YAML()
-yaml_rw.indent(mapping=2, sequence=4, offset=2)
-yaml_rw.preserve_quotes = True
-yaml_rw.width = 100
 
 load_dotenv()
 
