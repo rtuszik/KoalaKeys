@@ -53,7 +53,10 @@ class TestIndexIntegration:
         cheatsheets = [{"title": t, "filename": f} for t, f in results]
 
         index_html = generate_index(cheatsheets)
+        assert index_html is not None
 
         for title, filename in results:
+            assert title is not None
+            assert filename is not None
             assert title in index_html
             assert filename in index_html

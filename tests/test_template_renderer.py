@@ -34,6 +34,7 @@ class TestRenderTemplate:
     def test_template_renders_variables(self):
         data = {"cheatsheets": [{"title": "Test Title", "filename": "test.html"}]}
         result = render_template("index/index_template.html", data)
+        assert result is not None
         assert "Test Title" in result
 
     def test_empty_cheatsheets_list(self):
@@ -43,6 +44,7 @@ class TestRenderTemplate:
     def test_index_contains_html_structure(self):
         data = {"cheatsheets": [{"title": "Test", "filename": "test.html"}]}
         result = render_template("index/index_template.html", data)
+        assert result is not None
         assert "<" in result and ">" in result
 
     def test_cheatsheet_template_contains_title(self, valid_yaml_data, sample_keyboard_layouts):
@@ -55,4 +57,5 @@ class TestRenderTemplate:
             "allow_text": False,
         }
         result = render_template("cheatsheets/cheatsheet-template.html", data)
+        assert result is not None
         assert valid_yaml_data["title"] in result
