@@ -1,6 +1,7 @@
 [tools]
 prek = "latest"
 uv = "latest"
+zizmor = "latest"
 
 [settings]
 lockfile = false
