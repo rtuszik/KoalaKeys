@@ -1,4 +1,7 @@
 title: "Non Dict Shortcuts"
+layout:
+  keyboard: US
+  system: Darwin
 shortcuts:
   - "item1"
   - "item2"

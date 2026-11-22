@@ -3,14 +3,20 @@ import pytest
 from koalakeys.generate_cheatsheet import (
     generate_html,
     generate_index,
-    get_layout_info,
+    load_and_lint,
     load_layout,
     load_yaml,
     normalize_shortcuts,
     replace_shortcut_names,
-    validate_and_lint,
     write_html_content,
 )
+from koalakeys.models import Cheatsheet
+
+LAYOUT = {"keyboard": "US", "system": "Darwin"}
+
+
+def sheet(**overrides):
+    return Cheatsheet.model_validate({"title": "T", "layout": LAYOUT, **overrides})
 
 
 class TestLoadYaml:
@@ -73,84 +79,61 @@ class TestReplaceShortcutNamesWithMappings:
 
 class TestNormalizeShortcuts:
     def test_basic_normalization(self, valid_yaml_data):
-        result = normalize_shortcuts(valid_yaml_data, {})
+        result = normalize_shortcuts(Cheatsheet.model_validate(valid_yaml_data), {})
         assert "General" in result
         keys = list(result["General"].keys())
         assert any("<sep>" in k for k in keys)
 
     def test_with_system_mappings(self, valid_yaml_data, sample_system_mappings):
-        result = normalize_shortcuts(valid_yaml_data, sample_system_mappings)
-        keys = list(result["General"].keys())
-        assert len(keys) > 0
+        result = normalize_shortcuts(Cheatsheet.model_validate(valid_yaml_data), sample_system_mappings)
+        assert any("modifier-symbol" in k for k in result["General"])
 
     def test_allowtext_mode_skips_processing(self):
-        data = {"AllowText": True, "shortcuts": {"Commands": {"kubectl get pods": {"description": "List pods"}}}}
+        data = sheet(
+            AllowText=True,
+            RenderKeys=False,
+            shortcuts={"Commands": {"kubectl get pods": {"description": "List pods"}}},
+        )
         result = normalize_shortcuts(data, {})
         assert "kubectl get pods" in result["Commands"]
 
-    def test_empty_shortcuts(self):
-        result = normalize_shortcuts({"shortcuts": {}}, {})
-        assert result == {}
-
     def test_preserves_description(self, valid_yaml_data):
-        result = normalize_shortcuts(valid_yaml_data, {})
+        result = normalize_shortcuts(Cheatsheet.model_validate(valid_yaml_data), {})
         for details in result["General"].values():
-            assert "description" in details
-            assert details["description"] == "Copy"
+            assert details.description == "Copy"
 
     def test_multiple_categories(self):
-        data = {
-            "shortcuts": {
+        data = sheet(
+            shortcuts={
                 "General": {"Ctrl+C": {"description": "Copy"}},
                 "Navigation": {"Ctrl+N": {"description": "New"}},
             }
-        }
+        )
         result = normalize_shortcuts(data, {})
-        assert "General" in result
-        assert "Navigation" in result
+        assert list(result) == ["General", "Navigation"]
 
-
-class TestGetLayoutInfo:
-    def test_defaults(self):
-        result = get_layout_info({})
-        assert result["keyboard"] == "US"
-        assert result["system"] == "Darwin"
-
-    def test_custom_keyboard(self):
-        result = get_layout_info({"layout": {"keyboard": "DE"}})
-        assert result["keyboard"] == "DE"
-
-    def test_custom_system(self):
-        result = get_layout_info({"layout": {"system": "Linux"}})
-        assert result["system"] == "Linux"
-
-    def test_partial_layout(self):
-        result = get_layout_info({"layout": {"keyboard": "FR"}})
-        assert result["keyboard"] == "FR"
-        assert result["system"] == "Darwin"
-
-    def test_full_custom_layout(self):
-        result = get_layout_info({"layout": {"keyboard": "DVORAK", "system": "Windows"}})
-        assert result["keyboard"] == "DVORAK"
-        assert result["system"] == "Windows"
+    def test_does_not_mutate_sheet(self, valid_yaml_data):
+        data = Cheatsheet.model_validate(valid_yaml_data)
+        normalize_shortcuts(data, {})
+        assert list(data.shortcuts["General"]) == ["CMD+C"]
 
 
 class TestGenerateHtml:
     def test_returns_string(self, valid_yaml_data, sample_keyboard_layouts, sample_system_mappings):
         system_mappings = {"Darwin": sample_system_mappings}
-        result = generate_html(valid_yaml_data, sample_keyboard_layouts, system_mappings)
+        result = generate_html(Cheatsheet.model_validate(valid_yaml_data), sample_keyboard_layouts, system_mappings)
         assert result is not None
         assert isinstance(result, str)
 
     def test_contains_title(self, valid_yaml_data, sample_keyboard_layouts, sample_system_mappings):
         system_mappings = {"Darwin": sample_system_mappings}
-        result = generate_html(valid_yaml_data, sample_keyboard_layouts, system_mappings)
+        result = generate_html(Cheatsheet.model_validate(valid_yaml_data), sample_keyboard_layouts, system_mappings)
         assert result is not None
         assert valid_yaml_data["title"] in result
 
     def test_contains_html_structure(self, valid_yaml_data, sample_keyboard_layouts, sample_system_mappings):
         system_mappings = {"Darwin": sample_system_mappings}
-        result = generate_html(valid_yaml_data, sample_keyboard_layouts, system_mappings)
+        result = generate_html(Cheatsheet.model_validate(valid_yaml_data), sample_keyboard_layouts, system_mappings)
         assert result is not None
         assert "<" in result and ">" in result
 
@@ -160,7 +143,9 @@ class TestThemeIntegration:
         return {"Darwin": sample_system_mappings}
 
     def test_injects_token_block(self, valid_yaml_data, sample_keyboard_layouts, sample_system_mappings):
-        result = generate_html(dict(valid_yaml_data), sample_keyboard_layouts, self._sm(sample_system_mappings))
+        result = generate_html(
+            Cheatsheet.model_validate(valid_yaml_data), sample_keyboard_layouts, self._sm(sample_system_mappings)
+        )
         assert result is not None
         assert ":root {" in result
         assert "--kk-bg:" in result
@@ -168,20 +153,26 @@ class TestThemeIntegration:
 
     def test_unknown_theme_returns_none(self, valid_yaml_data, sample_keyboard_layouts, sample_system_mappings):
         data = {**valid_yaml_data, "theme": "does-not-exist-xyz"}
-        result = generate_html(data, sample_keyboard_layouts, self._sm(sample_system_mappings))
+        result = generate_html(
+            Cheatsheet.model_validate(data), sample_keyboard_layouts, self._sm(sample_system_mappings)
+        )
         assert result is None
 
     def test_inline_custom_css_emitted_and_sanitized(
         self, valid_yaml_data, sample_keyboard_layouts, sample_system_mappings
     ):
         data = {**valid_yaml_data, "custom_css_inline": ".x { color: red; } </style><script>evil()</script>"}
-        result = generate_html(data, sample_keyboard_layouts, self._sm(sample_system_mappings))
+        result = generate_html(
+            Cheatsheet.model_validate(data), sample_keyboard_layouts, self._sm(sample_system_mappings)
+        )
         assert result is not None
         assert ".x { color: red; }" in result
         assert "</style><script>" not in result  # breakout neutralized
 
     def test_no_theme_field_defaults_catppuccin(self, valid_yaml_data, sample_keyboard_layouts, sample_system_mappings):
-        result = generate_html(dict(valid_yaml_data), sample_keyboard_layouts, self._sm(sample_system_mappings))
+        result = generate_html(
+            Cheatsheet.model_validate(valid_yaml_data), sample_keyboard_layouts, self._sm(sample_system_mappings)
+        )
         assert result is not None
         assert "--kk-key-text: #f38ba8;" in result  # catppuccin dark key-text
 
@@ -196,7 +187,9 @@ class TestThemeIntegration:
         monkeypatch.setattr(gc, "THEMES_DIR", themes)
 
         data = {**valid_yaml_data, "theme": "vimdark"}
-        result = generate_html(data, sample_keyboard_layouts, self._sm(sample_system_mappings))
+        result = generate_html(
+            Cheatsheet.model_validate(data), sample_keyboard_layouts, self._sm(sample_system_mappings)
+        )
         assert result is not None
         assert 'id="dark-mode-toggle"' not in result  # single-mode: no toggle button
         assert "body.dark-mode {" not in result  # dark folded into :root
@@ -251,18 +244,27 @@ class TestCustomCssFile:
         assert load_custom_css_file(None) == ""
 
 
-class TestValidateAndLint:
-    def test_valid_file_returns_true(self, valid_fixtures):
-        assert validate_and_lint(valid_fixtures / "minimal.yaml") is True
+class TestLoadAndLint:
+    def test_valid_file_returns_sheet(self, valid_fixtures):
+        result = load_and_lint(valid_fixtures / "minimal.yaml")
+        assert result is not None
+        assert result.title == "Minimal Test"
 
-    def test_valid_full_featured_returns_true(self, valid_fixtures):
-        assert validate_and_lint(valid_fixtures / "full_featured.yaml") is True
+    def test_valid_full_featured_returns_sheet(self, valid_fixtures):
+        assert load_and_lint(valid_fixtures / "full_featured.yaml") is not None
 
-    def test_invalid_file_returns_false(self, invalid_fixtures):
-        assert validate_and_lint(invalid_fixtures / "missing_title.yaml") is False
+    def test_invalid_file_returns_none(self, invalid_fixtures):
+        assert load_and_lint(invalid_fixtures / "missing_title.yaml") is None
 
-    def test_malformed_file_returns_false(self, invalid_fixtures):
-        assert validate_and_lint(invalid_fixtures / "malformed.yaml") is False
+    def test_malformed_file_returns_none(self, invalid_fixtures):
+        assert load_and_lint(invalid_fixtures / "malformed.yaml") is None
+
+    def test_lint_warnings_do_not_fail(self, valid_fixtures, tmp_path):
+        noisy = tmp_path / "noisy.yaml"
+        noisy.write_text((valid_fixtures / "minimal.yaml").read_text().replace('Minimal Test"', 'Minimal Test"   '))
+        result = load_and_lint(noisy)
+        assert result is not None
+        assert result.title == "Minimal Test"
 
 
 class TestLoadLayout:

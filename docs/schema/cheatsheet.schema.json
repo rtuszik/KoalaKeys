@@ -1,145 +1,203 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://rtuszik.github.io/KoalaKeys/schema/cheatsheet.schema.json",
-  "title": "KoalaKeys Cheatsheet",
-  "description": "Schema for KoalaKeys YAML cheatsheets.",
-  "type": "object",
-  "additionalProperties": false,
-  "required": ["title", "layout", "shortcuts"],
-  "properties": {
-    "title": {
-      "type": "string",
-      "minLength": 1,
-      "description": "Title of the cheatsheet."
-    },
-    "RenderKeys": {
-      "type": "boolean",
-      "default": true,
-      "description": "When true (default), render keyboard layout with highlighted keys."
-    },
-    "AllowText": {
-      "type": "boolean",
-      "default": false,
-      "description": "When true, free-form shortcut text is allowed; requires RenderKeys=false."
-    },
-    "theme": {
-      "type": "string",
-      "minLength": 1,
-      "default": "catppuccin",
-      "description": "Theme name: a built-in (e.g. 'catppuccin') or a user theme in the project's themes/ directory. Defaults to 'catppuccin'."
-    },
-    "custom_css": {
-      "type": "string",
-      "description": "Filename of a custom CSS file (resolved from the project's styles/ directory), layered after the theme."
-    },
-    "custom_css_inline": {
-      "type": "string",
-      "description": "Inline custom CSS, emitted last in the cascade so it overrides the theme and the custom CSS file."
-    },
-    "layout": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["keyboard", "system"],
-      "properties": {
-        "keyboard": {
-          "type": "string",
-          "enum": ["US", "UK", "DE", "FR", "ES", "DVORAK"],
-          "description": "Keyboard layout."
-        },
-        "system": {
-          "type": "string",
-          "enum": ["Darwin", "Windows", "Linux"],
-          "description": "Operating system."
-        }
-      }
-    },
-    "shortcuts": {
-      "type": "object",
-      "minProperties": 1,
-      "description": "Categories mapped to shortcut definitions. Shortcuts use '+' for simultaneous keys (e.g., 'CMD+C') and '>' for sequential keys/chords (e.g., 'Super+T>W>S').",
-      "additionalProperties": {
-        "type": "object",
-        "minProperties": 1
-      }
-    }
-  },
-  "allOf": [
-    {
-      "description": "AllowText=true requires RenderKeys=false.",
-      "if": {
-        "properties": { "AllowText": { "const": true } },
-        "required": ["AllowText"]
-      },
-      "then": {
-        "properties": {
-          "RenderKeys": { "const": false },
-          "shortcuts": {
-            "additionalProperties": {
-              "additionalProperties": { "$ref": "#/$defs/shortcutEntry" }
-            }
-          }
-        }
-      }
-    },
-    {
-      "description": "When AllowText is not true, restrict shortcut key syntax. Supports '+' for simultaneous keys and '>' for sequential shortcuts (chords).",
-      "if": {
-        "not": {
-          "properties": { "AllowText": { "const": true } },
-          "required": ["AllowText"]
-        }
-      },
-      "then": {
-        "properties": {
-          "shortcuts": {
-            "additionalProperties": {
-              "type": "object",
-              "minProperties": 1,
-              "patternProperties": {
-                "^[A-Za-z0-9+⌘⌥⌃⇧←→↑↓\\s\\-\\|\\[\\],.:/`\"?<>=\\\\⌃]+$": {
-                  "$ref": "#/$defs/shortcutEntry"
+    "$defs": {
+        "Layout": {
+            "additionalProperties": false,
+            "properties": {
+                "keyboard": {
+                    "description": "Keyboard layout.",
+                    "enum": [
+                        "US",
+                        "UK",
+                        "DE",
+                        "FR",
+                        "ES",
+                        "DVORAK"
+                    ],
+                    "title": "Keyboard",
+                    "type": "string"
+                },
+                "system": {
+                    "description": "Operating system.",
+                    "enum": [
+                        "Darwin",
+                        "Windows",
+                        "Linux"
+                    ],
+                    "title": "System",
+                    "type": "string"
                 }
-              },
-              "additionalProperties": false
-            }
-          }
-        }
-      }
-    }
-  ],
-  "$defs": {
-    "shortcutEntry": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["description"],
-      "properties": {
-        "description": {
-          "type": "string",
-          "minLength": 1,
-          "description": "Human-readable description of the shortcut."
-        }
-      },
-      "examples": [
-        { "description": "Copy selected item" }
-      ]
-    }
-  },
-  "examples": [
-    {
-      "title": "KoalaKeys",
-      "RenderKeys": true,
-      "AllowText": false,
-      "layout": { "keyboard": "US", "system": "Darwin" },
-      "shortcuts": {
-        "General": {
-          "CMD+C": { "description": "Copy selected item" },
-          "CMD+Right": { "description": "Move cursor to end of line" }
+            },
+            "required": [
+                "keyboard",
+                "system"
+            ],
+            "title": "Layout",
+            "type": "object"
         },
-        "Sequential Shortcuts": {
-          "Super+T>W>S": { "description": "Multi-sequence shortcut example" },
-          "CTRL+K>CTRL+C": { "description": "Add line comment" }
+        "Shortcut": {
+            "additionalProperties": false,
+            "properties": {
+                "description": {
+                    "description": "Human-readable description of the shortcut.",
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "title": "Description",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "description"
+            ],
+            "title": "Shortcut",
+            "type": "object"
         }
-      }
-    }
-  ]
+    },
+    "$id": "https://rtuszik.github.io/KoalaKeys/schema/cheatsheet.schema.json",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "allOf": [
+        {
+            "description": "AllowText=true requires RenderKeys=false.",
+            "if": {
+                "properties": {
+                    "AllowText": {
+                        "const": true
+                    }
+                },
+                "required": [
+                    "AllowText"
+                ]
+            },
+            "then": {
+                "properties": {
+                    "RenderKeys": {
+                        "const": false
+                    }
+                },
+                "required": [
+                    "RenderKeys"
+                ]
+            }
+        },
+        {
+            "description": "When AllowText is not true, restrict shortcut key syntax. Supports '+' for simultaneous keys and '>' for sequential shortcuts (chords).",
+            "if": {
+                "not": {
+                    "properties": {
+                        "AllowText": {
+                            "const": true
+                        }
+                    },
+                    "required": [
+                        "AllowText"
+                    ]
+                }
+            },
+            "then": {
+                "properties": {
+                    "shortcuts": {
+                        "additionalProperties": {
+                            "propertyNames": {
+                                "pattern": "^[A-Za-z0-9+⌘⌥⌃⇧←→↑↓\\s\\-\\|\\[\\],.:/`\"?<>=\\\\⌃]+$"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    ],
+    "description": "Schema for KoalaKeys YAML cheatsheets.",
+    "examples": [
+        {
+            "AllowText": false,
+            "RenderKeys": true,
+            "layout": {
+                "keyboard": "US",
+                "system": "Darwin"
+            },
+            "shortcuts": {
+                "General": {
+                    "CMD+C": {
+                        "description": "Copy selected item"
+                    },
+                    "CMD+Right": {
+                        "description": "Move cursor to end of line"
+                    }
+                },
+                "Sequential Shortcuts": {
+                    "CTRL+K>CTRL+C": {
+                        "description": "Add line comment"
+                    },
+                    "Super+T>W>S": {
+                        "description": "Multi-sequence shortcut example"
+                    }
+                }
+            },
+            "title": "KoalaKeys"
+        }
+    ],
+    "properties": {
+        "title": {
+            "description": "Title of the cheatsheet.",
+            "minLength": 1,
+            "pattern": "\\S",
+            "title": "Title",
+            "type": "string"
+        },
+        "RenderKeys": {
+            "default": true,
+            "description": "When true (default), render keyboard layout with highlighted keys.",
+            "title": "Renderkeys",
+            "type": "boolean"
+        },
+        "AllowText": {
+            "default": false,
+            "description": "When true, free-form shortcut text is allowed; requires RenderKeys=false.",
+            "title": "Allowtext",
+            "type": "boolean"
+        },
+        "theme": {
+            "default": "catppuccin",
+            "description": "Theme name: a built-in (e.g. 'catppuccin') or a user theme in the project's themes/ directory.",
+            "minLength": 1,
+            "pattern": "\\S",
+            "title": "Theme",
+            "type": "string"
+        },
+        "custom_css": {
+            "default": "",
+            "description": "Filename of a custom CSS file (resolved from the project's styles/ directory), layered after the theme.",
+            "title": "Custom Css",
+            "type": "string"
+        },
+        "custom_css_inline": {
+            "default": "",
+            "description": "Inline custom CSS, emitted last in the cascade so it overrides the theme and the custom CSS file.",
+            "title": "Custom Css Inline",
+            "type": "string"
+        },
+        "layout": {
+            "$ref": "#/$defs/Layout"
+        },
+        "shortcuts": {
+            "additionalProperties": {
+                "additionalProperties": {
+                    "$ref": "#/$defs/Shortcut"
+                },
+                "minProperties": 1,
+                "type": "object"
+            },
+            "description": "Categories mapped to shortcut definitions. Shortcuts use '+' for simultaneous keys (e.g., 'CMD+C') and '>' for sequential keys/chords (e.g., 'Super+T>W>S').",
+            "minProperties": 1,
+            "title": "Shortcuts",
+            "type": "object"
+        }
+    },
+    "required": [
+        "title",
+        "layout",
+        "shortcuts"
+    ],
+    "title": "KoalaKeys Cheatsheet",
+    "type": "object"
 }

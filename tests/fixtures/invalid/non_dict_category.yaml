@@ -1,3 +1,6 @@
 title: "Non Dict Category"
+layout:
+  keyboard: US
+  system: Darwin
 shortcuts:
   General: "not a dict"

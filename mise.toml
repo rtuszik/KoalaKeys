@@ -50,6 +50,10 @@ alias = "fmt"
 description = "Type check with pyrefly"
 run = "uv run pyrefly check"
 
+[tasks.schema]
+description = "Regenerate docs/schema/cheatsheet.schema.json from the Pydantic models"
+run = "uv run python -m koalakeys.models > docs/schema/cheatsheet.schema.json"
+
 [tasks.deadcode]
 description = "Detect dead code with vulture"
 run = "uv run vulture --min-confidence 100 --exclude .venv ."

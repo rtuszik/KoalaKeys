@@ -1,165 +1,72 @@
-import re
+from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
+from pydantic import ValidationError
 from ruamel.yaml import YAML
 from ruamel.yaml.error import YAMLError
 
 from koalakeys.logger import get_logger
+from koalakeys.models import Cheatsheet
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from pydantic_core import ErrorDetails
 
 logger = get_logger()
 
 yaml_safe = YAML(typ="safe")
 
 
-def validate_required_keys(data):
-    required_keys = ["title", "shortcuts"]
-    for key in required_keys:
-        if key not in data:
-            logger.error(f"Missing required top-level key: '{key}'")
-            return False
-    return True
+class CheatsheetError(ValueError):
+    def __init__(self, path: Path, problems: list[str]) -> None:
+        self.path = path
+        self.problems = problems
+        super().__init__(f"{path}: " + "; ".join(problems))
 
 
-def validate_title(data):
-    if "title" in data and not isinstance(data["title"], str):
-        logger.error("Title must be a string")
-        return False
-    return True
+def _format_error(error: ErrorDetails) -> str:
+    loc = ".".join(str(part) for part in error["loc"])
+    ctx = error.get("ctx") or {}
+    msg = str(ctx["error"]) if error["type"] == "value_error" and "error" in ctx else error["msg"]
+    return f"{loc}: {msg}" if loc else msg
 
 
-def validate_render_options(data):
-    is_valid = True
-    render_keys = data.get("RenderKeys", True)
-    allow_text = data.get("AllowText", False)
-
-    if "RenderKeys" in data and not isinstance(render_keys, bool):
-        logger.error("RenderKeys must be a boolean value (true/false)")
-        is_valid = False
-
-    if "AllowText" in data and not isinstance(allow_text, bool):
-        logger.error("AllowText must be a boolean value (true/false)")
-        is_valid = False
-
-    if allow_text and render_keys:
-        logger.error("AllowText can only be true when RenderKeys is false")
-        is_valid = False
-
-    return is_valid
-
-
-def validate_styling(data):
-    is_valid = True
-
-    if "theme" in data and (not isinstance(data["theme"], str) or not data["theme"].strip()):
-        logger.error("theme must be a non-empty string")
-        is_valid = False
-
-    for field in ("custom_css", "custom_css_inline"):
-        if field in data and not isinstance(data[field], str):
-            logger.error(f"{field} must be a string")
-            is_valid = False
-
-    return is_valid
-
-
-def validate_layout(data):
-    if "layout" not in data:
-        return True
-
-    if not isinstance(data["layout"], dict):
-        logger.error("Layout must be a dictionary")
-        return False
-
-    valid_keyboards = ["US", "UK", "DE", "FR", "ES", "DVORAK"]
-    valid_systems = ["Darwin", "Linux", "Windows"]
-    is_valid = True
-
-    if "keyboard" in data["layout"] and data["layout"]["keyboard"] not in valid_keyboards:
-        logger.error(f"Invalid keyboard layout. Must be one of: {', '.join(valid_keyboards)}")
-        is_valid = False
-
-    if "system" in data["layout"] and data["layout"]["system"] not in valid_systems:
-        logger.error(f"Invalid system. Must be one of: {', '.join(valid_systems)}")
-        is_valid = False
-
-    return is_valid
-
-
-def validate_shortcuts(data):
-    if "shortcuts" not in data:
-        return True
-
-    if not isinstance(data["shortcuts"], dict):
-        logger.error("Shortcuts must be a dictionary")
-        return False
-
-    allow_text = data.get("AllowText", False)
-    is_valid = True
-
-    for category, shortcuts in data["shortcuts"].items():
-        if not isinstance(shortcuts, dict):
-            logger.error(f"Category '{category}' must contain a dictionary of shortcuts")
-            is_valid = False
-            continue
-
-        for shortcut, details in shortcuts.items():
-            if not isinstance(details, dict) or "description" not in details:
-                logger.error(f"Shortcut '{shortcut}' in category '{category}' must have a 'description' key")
-                is_valid = False
-            elif not isinstance(details["description"], str):
-                logger.error(f"Description for shortcut '{shortcut}' in category '{category}' must be a string")
-                is_valid = False
-
-            if not allow_text and not re.match(r'^[A-Za-z0-9+⌘⌥⌃⇧←→↑↓\s\-\|\[\],.:/`"?<>=\\⌃]+$', shortcut):
-                logger.error(f"Invalid shortcut format: '{shortcut}' in category '{category}'")
-                is_valid = False
-
-    return is_valid
-
-
-def validate_yaml(file_path):
+def load_cheatsheet(file_path: Path) -> Cheatsheet:
     try:
-        with open(file_path, encoding="utf-8") as file:
+        with file_path.open(encoding="utf-8") as file:
             data = yaml_safe.load(file)
-    except YAMLError as e:
-        logger.error(f"YAML parsing error in {file_path}: {e!s}")
-        return False
-    except FileNotFoundError:
-        logger.error(f"File not found: {file_path}")
-        return False
-    except Exception as e:
-        logger.error(f"Unexpected error reading {file_path}: {e!s}")
-        return False
+    except FileNotFoundError as e:
+        raise CheatsheetError(file_path, ["file not found"]) from e
+    except (OSError, UnicodeDecodeError, YAMLError) as e:
+        raise CheatsheetError(file_path, [f"cannot parse YAML: {e}"]) from e
 
     if data is None:
-        logger.error(f"Empty YAML file: {file_path}")
-        return False
-    if not isinstance(data, dict):
-        logger.error(f"Top-level YAML must be a mapping: {file_path}")
-        return False
+        raise CheatsheetError(file_path, ["file is empty"])
 
-    validators = [
-        validate_required_keys,
-        validate_title,
-        validate_render_options,
-        validate_styling,
-        validate_layout,
-        validate_shortcuts,
-    ]
-    results = [validator(data) for validator in validators]
-    is_valid = all(results)
+    try:
+        return Cheatsheet.model_validate(data)
+    except ValidationError as e:
+        raise CheatsheetError(file_path, [_format_error(err) for err in e.errors()]) from e
 
-    if is_valid:
-        logger.info(f"YAML validation successful: {file_path}")
-    else:
+
+def validate_yaml(file_path: Path) -> bool:
+    try:
+        load_cheatsheet(file_path)
+    except CheatsheetError as e:
+        for problem in e.problems:
+            logger.error(f"{file_path}: {problem}")
         logger.error(f"YAML validation failed: {file_path}")
+        return False
+    logger.info(f"YAML validation successful: {file_path}")
+    return True
 
-    return is_valid
 
-
-def lint_yaml(file_path):
+def lint_yaml(file_path: Path) -> list[str]:
     warnings = []
 
-    with open(file_path, encoding="utf-8") as file:
+    with file_path.open(encoding="utf-8") as file:
         lines = file.readlines()
 
     for i, line in enumerate(lines, start=1):
