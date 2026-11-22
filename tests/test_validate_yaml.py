@@ -1,149 +1,233 @@
-from koalakeys.validate_yaml import (
-    lint_yaml,
-    validate_layout,
-    validate_render_options,
-    validate_required_keys,
-    validate_shortcuts,
-    validate_styling,
-    validate_title,
-    validate_yaml,
-)
+import json
+import subprocess
+import sys
+from pathlib import Path
+
+import pytest
+
+from koalakeys.models import Cheatsheet, Shortcut
+from koalakeys.validate_yaml import CheatsheetError, lint_yaml, load_cheatsheet, validate_yaml
+
+SCHEMA_FILE = Path(__file__).parent.parent / "docs" / "schema" / "cheatsheet.schema.json"
+LAYOUT = {"keyboard": "US", "system": "Darwin"}
+SHORTCUTS = {"General": {"CMD+C": {"description": "Copy"}}}
 
 
-class TestValidateStyling:
-    def test_no_styling_fields_ok(self, valid_yaml_data):
-        assert validate_styling(valid_yaml_data) is True
-
-    def test_valid_theme(self, valid_yaml_data):
-        assert validate_styling({**valid_yaml_data, "theme": "catppuccin"}) is True
-
-    def test_theme_must_be_string(self, valid_yaml_data):
-        assert validate_styling({**valid_yaml_data, "theme": 123}) is False
-
-    def test_theme_must_be_non_empty(self, valid_yaml_data):
-        assert validate_styling({**valid_yaml_data, "theme": "  "}) is False
-
-    def test_custom_css_must_be_string(self, valid_yaml_data):
-        assert validate_styling({**valid_yaml_data, "custom_css": ["a.css"]}) is False
-
-    def test_custom_css_inline_string_ok(self, valid_yaml_data):
-        assert validate_styling({**valid_yaml_data, "custom_css_inline": "h1{}"}) is True
+def problems(tmp_path, text):
+    sheet = tmp_path / "sheet.yaml"
+    sheet.write_text(text, encoding="utf-8")
+    with pytest.raises(CheatsheetError) as exc:
+        load_cheatsheet(sheet)
+    return exc.value.problems
 
 
-class TestValidateRequiredKeys:
-    def test_valid_data(self, valid_yaml_data):
-        assert validate_required_keys(valid_yaml_data) is True
-
-    def test_missing_title(self):
-        data = {"shortcuts": {"General": {}}}
-        assert validate_required_keys(data) is False
-
-    def test_missing_shortcuts(self):
-        data = {"title": "Test"}
-        assert validate_required_keys(data) is False
-
-    def test_empty_data(self):
-        assert validate_required_keys({}) is False
+def validate(**fields):
+    return Cheatsheet.model_validate({"title": "T", "layout": LAYOUT, "shortcuts": SHORTCUTS, **fields})
 
 
-class TestValidateTitle:
-    def test_valid_string_title(self):
-        assert validate_title({"title": "My Cheatsheet"}) is True
+def error_locs(**fields):
+    from pydantic import ValidationError
 
-    def test_missing_title_key(self):
-        assert validate_title({}) is True
-
-    def test_invalid_int_title(self):
-        assert validate_title({"title": 123}) is False
-
-    def test_invalid_list_title(self):
-        assert validate_title({"title": ["a", "b"]}) is False
+    with pytest.raises(ValidationError) as exc:
+        validate(**fields)
+    return [".".join(map(str, e["loc"])) for e in exc.value.errors()]
 
 
-class TestValidateRenderOptions:
+class TestCheatsheetModel:
     def test_defaults(self):
-        assert validate_render_options({}) is True
+        sheet = validate()
+        assert sheet.render_keys is True
+        assert sheet.allow_text is False
+        assert sheet.theme == "catppuccin"
+        assert sheet.custom_css == ""
+        assert sheet.custom_css_inline == ""
 
-    def test_valid_render_keys_true(self):
-        assert validate_render_options({"RenderKeys": True}) is True
+    def test_aliases_populate_fields(self):
+        sheet = validate(RenderKeys=False, AllowText=True)
+        assert sheet.render_keys is False
+        assert sheet.allow_text is True
 
-    def test_valid_render_keys_false(self):
-        assert validate_render_options({"RenderKeys": False}) is True
+    @pytest.mark.parametrize("field", ["title", "layout", "shortcuts"])
+    def test_required_fields(self, field):
+        data = {"title": "T", "layout": LAYOUT, "shortcuts": SHORTCUTS}
+        del data[field]
+        with pytest.raises(ValueError, match=field):
+            Cheatsheet.model_validate(data)
 
-    def test_invalid_render_keys_string(self):
-        assert validate_render_options({"RenderKeys": "true"}) is False
+    @pytest.mark.parametrize("title", ["", "   ", 123, ["a"]])
+    def test_invalid_title(self, title):
+        assert error_locs(title=title) == ["title"]
 
-    def test_invalid_allow_text_string(self):
-        assert validate_render_options({"AllowText": "false"}) is False
+    @pytest.mark.parametrize(("field", "value"), [("RenderKeys", "true"), ("AllowText", "false"), ("RenderKeys", 1)])
+    def test_bools_are_strict(self, field, value):
+        assert error_locs(**{field: value}) == [field]
 
-    def test_conflict_allowtext_with_renderkeys(self):
-        assert validate_render_options({"AllowText": True}) is False
+    def test_allow_text_requires_render_keys_false(self):
+        with pytest.raises(ValueError, match="AllowText can only be true when RenderKeys is false"):
+            validate(AllowText=True)
 
-    def test_valid_allowtext_mode(self):
-        assert validate_render_options({"RenderKeys": False, "AllowText": True}) is True
+    @pytest.mark.parametrize("theme", ["", "  ", 123])
+    def test_invalid_theme(self, theme):
+        assert error_locs(theme=theme) == ["theme"]
 
+    @pytest.mark.parametrize("field", ["custom_css", "custom_css_inline"])
+    def test_css_fields_must_be_strings(self, field):
+        assert error_locs(**{field: ["a.css"]}) == [field]
 
-class TestValidateLayout:
-    def test_missing_layout(self):
-        assert validate_layout({}) is True
+    def test_unknown_top_level_key_rejected(self):
+        assert error_locs(colour="red") == ["colour"]
 
-    def test_valid_layout(self):
-        data = {"layout": {"keyboard": "US", "system": "Darwin"}}
-        assert validate_layout(data) is True
+    @pytest.mark.parametrize("keyboard", ["US", "UK", "DE", "FR", "ES", "DVORAK"])
+    def test_all_keyboards(self, keyboard):
+        assert validate(layout={"keyboard": keyboard, "system": "Darwin"}).layout.keyboard == keyboard
 
-    def test_valid_all_keyboards(self):
-        for kb in ["US", "UK", "DE", "FR", "ES", "DVORAK"]:
-            assert validate_layout({"layout": {"keyboard": kb}}) is True
+    @pytest.mark.parametrize("system", ["Darwin", "Linux", "Windows"])
+    def test_all_systems(self, system):
+        assert validate(layout={"keyboard": "US", "system": system}).layout.system == system
 
-    def test_valid_all_systems(self):
-        for sys in ["Darwin", "Linux", "Windows"]:
-            assert validate_layout({"layout": {"system": sys}}) is True
-
-    def test_invalid_keyboard(self):
-        data = {"layout": {"keyboard": "INVALID"}}
-        assert validate_layout(data) is False
-
-    def test_invalid_system(self):
-        data = {"layout": {"system": "INVALID"}}
-        assert validate_layout(data) is False
+    @pytest.mark.parametrize(
+        ("layout", "loc"),
+        [
+            ({"keyboard": "INVALID", "system": "Darwin"}, "layout.keyboard"),
+            ({"keyboard": "US", "system": "INVALID"}, "layout.system"),
+            ({"keyboard": "US"}, "layout.system"),
+            ({"keyboard": "US", "system": "Darwin", "extra": 1}, "layout.extra"),
+        ],
+    )
+    def test_invalid_layout(self, layout, loc):
+        assert error_locs(layout=layout) == [loc]
 
     def test_non_dict_layout(self):
-        assert validate_layout({"layout": "US"}) is False
+        assert error_locs(layout="US") == ["layout"]
 
+    @pytest.mark.parametrize(
+        ("shortcuts", "loc"),
+        [
+            ({}, "shortcuts"),
+            (["a", "b"], "shortcuts"),
+            ({"General": "not a dict"}, "shortcuts.General"),
+            ({"General": {}}, "shortcuts.General"),
+            ({"General": {"Ctrl+C": {"other": "value"}}}, "shortcuts.General.Ctrl+C.description"),
+            ({"General": {"Ctrl+C": {"description": 123}}}, "shortcuts.General.Ctrl+C.description"),
+            ({"General": {"Ctrl+C": {"description": ""}}}, "shortcuts.General.Ctrl+C.description"),
+        ],
+    )
+    def test_invalid_shortcuts(self, shortcuts, loc):
+        assert loc in error_locs(shortcuts=shortcuts)
 
-class TestValidateShortcuts:
-    def test_missing_shortcuts(self):
-        assert validate_shortcuts({}) is True
+    def test_invalid_shortcut_format_names_key(self):
+        with pytest.raises(ValueError, match=r"General\.Ctrl\+日"):
+            validate(shortcuts={"General": {"Ctrl+日": {"description": "Test"}}})
 
-    def test_valid_shortcuts(self, valid_yaml_data):
-        assert validate_shortcuts(valid_yaml_data) is True
+    @pytest.mark.parametrize("key", ["~", "_", ";", "{", "}", "$", "^", "'", "Ctrl+!", "Shift+@#%&*()", "ß", "Ä", "é"])
+    def test_accepts_layout_and_shifted_symbol_keys(self, key):
+        assert key in validate(shortcuts={"General": {key: {"description": "Test"}}}).shortcuts["General"]
 
-    def test_non_dict_shortcuts(self):
-        assert validate_shortcuts({"shortcuts": ["a", "b"]}) is False
-
-    def test_non_dict_category(self):
-        data = {"shortcuts": {"General": "not a dict"}}
-        assert validate_shortcuts(data) is False
-
-    def test_missing_description(self):
-        data = {"shortcuts": {"General": {"Ctrl+C": {"other": "value"}}}}
-        assert validate_shortcuts(data) is False
-
-    def test_non_string_description(self):
-        data = {"shortcuts": {"General": {"Ctrl+C": {"description": 123}}}}
-        assert validate_shortcuts(data) is False
-
-    def test_invalid_shortcut_format(self):
-        data = {"shortcuts": {"General": {"Ctrl+@#$": {"description": "Test"}}}}
-        assert validate_shortcuts(data) is False
+    @pytest.mark.parametrize("key", ["Ctrl+\x00", "Ctrl+🙂"])
+    def test_rejects_control_and_unsupported_characters(self, key):
+        with pytest.raises(ValueError, match="Invalid shortcut format"):
+            validate(shortcuts={"General": {key: {"description": "Test"}}})
 
     def test_allowtext_mode_accepts_text(self):
-        data = {
-            "AllowText": True,
-            "RenderKeys": False,
-            "shortcuts": {"Commands": {"kubectl get pods": {"description": "List pods"}}},
-        }
-        assert validate_shortcuts(data) is True
+        sheet = validate(
+            AllowText=True,
+            RenderKeys=False,
+            shortcuts={"Commands": {"kubectl get pods": {"description": "List pods"}}},
+        )
+        assert "kubectl get pods" in sheet.shortcuts["Commands"]
+
+    def test_model_is_frozen(self):
+        sheet = validate()
+        with pytest.raises(ValueError, match="frozen"):
+            sheet.title = "changed"  # pyrefly: ignore[read-only]
+
+
+class TestJsonSchema:
+    def test_committed_schema_is_up_to_date(self):
+        committed = json.loads(SCHEMA_FILE.read_text(encoding="utf-8"))
+        assert committed == Cheatsheet.model_json_schema(), "run `mise run schema` to regenerate"
+
+    def test_module_writes_schema_file(self, tmp_path):
+        target = tmp_path / "schema.json"
+        subprocess.run([sys.executable, "-m", "koalakeys.models", str(target)], check=True)
+        assert target.read_text(encoding="utf-8") == SCHEMA_FILE.read_text(encoding="utf-8")
+
+    def test_schema_uses_yaml_aliases(self):
+        props = Cheatsheet.model_json_schema()["properties"]
+        assert "RenderKeys" in props
+        assert "AllowText" in props
+        assert "render_keys" not in props
+
+
+class TestLoadCheatsheet:
+    def test_returns_model(self, valid_fixtures):
+        sheet = load_cheatsheet(valid_fixtures / "full_featured.yaml")
+        assert sheet.title == "Full Featured Test"
+        assert list(sheet.shortcuts) == ["General", "Navigation"]
+
+    def test_file_not_found(self, fixtures_dir):
+        with pytest.raises(CheatsheetError, match="file not found"):
+            load_cheatsheet(fixtures_dir / "nonexistent.yaml")
+
+    def test_empty_file(self, invalid_fixtures):
+        with pytest.raises(CheatsheetError, match="file is empty"):
+            load_cheatsheet(invalid_fixtures / "empty.yaml")
+
+    def test_malformed_yaml(self, invalid_fixtures):
+        with pytest.raises(CheatsheetError, match="cannot parse YAML"):
+            load_cheatsheet(invalid_fixtures / "malformed.yaml")
+
+    def test_invalid_utf8(self, tmp_path):
+        sheet = tmp_path / "broken.yaml"
+        sheet.write_bytes(b"title: \xff\xfe\n")
+        with pytest.raises(CheatsheetError, match="cannot parse YAML"):
+            load_cheatsheet(sheet)
+
+    def test_problems_name_field_path(self, tmp_path):
+        text = "title: T\nlayout: {keyboard: US, system: Darwin}\nshortcuts:\n  General:\n    Ctrl+C: {other: x}\n"
+        result = problems(tmp_path, text)
+        assert any(p.startswith("shortcuts.General.Ctrl+C.description:") for p in result)
+        assert any(p.startswith("shortcuts.General.Ctrl+C.other:") for p in result)
+
+    def test_model_error_has_no_location_prefix(self, tmp_path):
+        text = (
+            "title: T\nAllowText: true\nlayout: {keyboard: US, system: Darwin}\nshortcuts: {G: {a: {description: b}}}\n"
+        )
+        assert problems(tmp_path, text) == ["AllowText can only be true when RenderKeys is false"]
+
+    @pytest.mark.parametrize("text", ["title: 2001-99-99\n", "a: " + "[" * 5000 + "\n"])
+    def test_yaml_constructor_errors_become_cheatsheet_errors(self, tmp_path, text):
+        assert problems(tmp_path, text)[0].startswith("cannot parse YAML")
+
+    def test_numeric_keys_are_read_as_text(self, tmp_path):
+        text = "title: T\nlayout: {keyboard: US, system: Darwin}\nshortcuts:\n  2024:\n    1: {description: One}\n"
+        sheet = tmp_path / "sheet.yaml"
+        sheet.write_text(text, encoding="utf-8")
+        assert load_cheatsheet(sheet).shortcuts == {"2024": {"1": Shortcut(description="One")}}
+
+    @pytest.mark.parametrize(
+        ("shortcuts", "problem"),
+        [
+            (
+                "  1: {A: {description: a}}\n  '1': {B: {description: b}}\n",
+                "shortcuts: Duplicate keys after conversion to text: 1",
+            ),
+            (
+                "  G:\n    1: {description: a}\n    '1': {description: b}\n",
+                "shortcuts.G: Duplicate keys after conversion to text: 1",
+            ),
+        ],
+    )
+    def test_keys_that_collide_after_conversion_are_rejected(self, tmp_path, shortcuts, problem):
+        text = "title: T\nlayout: {keyboard: US, system: Darwin}\nshortcuts:\n" + shortcuts
+        assert problems(tmp_path, text) == [problem]
+
+    def test_boolean_key_error_tells_user_to_quote(self, tmp_path):
+        text = "title: T\nlayout: {keyboard: US, system: Darwin}\nshortcuts:\n  G:\n    true: {description: One}\n"
+        assert problems(tmp_path, text) == ["shortcuts.G.1.[key]: Input should be a valid string (quote the key)"]
+
+    def test_non_mapping_top_level(self, tmp_path):
+        assert problems(tmp_path, "- title\n- shortcuts\n")
 
 
 class TestValidateYaml:

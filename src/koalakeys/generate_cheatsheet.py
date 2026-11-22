@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+import html
 import os
 import re
 import sys
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from dotenv import load_dotenv
 from ruamel.yaml import YAML
@@ -11,7 +13,10 @@ from ruamel.yaml import YAML
 from koalakeys.logger import get_logger
 from koalakeys.template_renderer import render_template
 from koalakeys.theming import ThemeError, resolve_theme, sanitize_css
-from koalakeys.validate_yaml import lint_yaml, validate_yaml
+from koalakeys.validate_yaml import CheatsheetError, lint_yaml, load_cheatsheet
+
+if TYPE_CHECKING:
+    from koalakeys.models import Cheatsheet, Shortcut
 
 yaml_safe = YAML(typ="safe")
 
@@ -76,7 +81,7 @@ def consume_separator(shortcut: str, index: int) -> tuple[str, int]:
 def format_shortcut_part(part: str, system_mappings: dict) -> str:
     arrow_key_mappings = {"Up": "↑", "Down": "↓", "Left": "←", "Right": "→"}
 
-    mapped_part = system_mappings.get(part.lower(), part)
+    mapped_part = html.escape(system_mappings.get(part.lower(), part), quote=False)
     if mapped_part in ["⌘", "⌥", "⌃", "⇧"]:
         mapped_part = f'<span class="modifier-symbol">{mapped_part}</span>'
 
@@ -107,28 +112,12 @@ def replace_shortcut_names(shortcut, system_mappings):
         return shortcut
 
 
-def normalize_shortcuts(data, system_mappings):
-    normalized = {}
-    allow_text = data.get("AllowText", False)
-    try:
-        for section, shortcuts in data.get("shortcuts", {}).items():
-            normalized[section] = {}
-            for shortcut, details in shortcuts.items():
-                if allow_text:
-                    normalized[section][shortcut] = details
-                else:
-                    normalized_shortcut = replace_shortcut_names(shortcut, system_mappings)
-                    normalized[section][normalized_shortcut] = details
-    except Exception as e:
-        logging.error(f"Error normalizing shortcuts: {e}")
-    return normalized
-
-
-def get_layout_info(data):
-    layout = data.get("layout", {})
+def normalize_shortcuts(sheet: Cheatsheet, system_mappings: dict) -> dict[str, dict[str, Shortcut]]:
+    if sheet.allow_text:
+        return {section: dict(items) for section, items in sheet.shortcuts.items()}
     return {
-        "keyboard": layout.get("keyboard", "US"),
-        "system": layout.get("system", "Darwin"),
+        section: {replace_shortcut_names(key, system_mappings): details for key, details in items.items()}
+        for section, items in sheet.shortcuts.items()
     }
 
 
@@ -149,52 +138,57 @@ def load_custom_css_file(filename):
         return ""
 
 
-def apply_styling(data):
+def styling_context(sheet: Cheatsheet) -> dict | None:
     try:
-        theme = resolve_theme(data.get("theme"), themes_dir=THEMES_DIR)
+        theme = resolve_theme(sheet.theme, themes_dir=THEMES_DIR)
     except ThemeError as e:
         logging.error(f"Theme error: {e}")
-        return False
-
-    data["theme_token_css"] = theme.render_token_css()
-    data["theme_font_url"] = theme.font_url
-    data["theme_default_is_dark"] = theme.default_is_dark
-    data["theme_both_modes"] = theme.both_modes
-    data["theme_custom_css"] = theme.custom_css
-    data["custom_css_file"] = load_custom_css_file(data.get("custom_css"))
-    data["custom_css_inline"] = sanitize_css(str(data.get("custom_css_inline") or ""))
-    return True
-
-
-def generate_html(data, keyboard_layouts, system_mappings):
-    template_path = "cheatsheets/cheatsheet-template.html"
-    layout_info = get_layout_info(data)
-    data["shortcuts"] = normalize_shortcuts(data, system_mappings.get(layout_info["system"], {}))
-    data["layout"] = layout_info
-    data["keyboard_layout"] = keyboard_layouts.get(layout_info["keyboard"], {}).get("layout")
-    data["render_keys"] = data.get("RenderKeys", True)
-    data["allow_text"] = data.get("AllowText", False)
-
-    if not apply_styling(data):
         return None
 
-    return render_template(template_path, data)
+    return {
+        "theme_token_css": theme.render_token_css(),
+        "theme_font_url": theme.font_url,
+        "theme_default_is_dark": theme.default_is_dark,
+        "theme_both_modes": theme.both_modes,
+        "theme_custom_css": theme.custom_css,
+        "custom_css_file": load_custom_css_file(sheet.custom_css),
+        "custom_css_inline": sanitize_css(sheet.custom_css_inline),
+    }
 
 
-def validate_and_lint(yaml_file):
-    validation_result = validate_yaml(yaml_file)
-    warnings = lint_yaml(yaml_file)
+def generate_html(sheet: Cheatsheet, keyboard_layouts: dict, system_mappings: dict) -> str | None:
+    styling = styling_context(sheet)
+    if styling is None:
+        return None
 
-    if not validation_result:
+    context = {
+        "title": sheet.title,
+        "layout": sheet.layout,
+        "shortcuts": normalize_shortcuts(sheet, system_mappings.get(sheet.layout.system, {})),
+        "keyboard_layout": keyboard_layouts.get(sheet.layout.keyboard, {}).get("layout"),
+        "render_keys": sheet.render_keys,
+        "allow_text": sheet.allow_text,
+        **styling,
+    }
+    return render_template("cheatsheets/cheatsheet-template.html", context)
+
+
+def load_and_lint(yaml_file: Path) -> Cheatsheet | None:
+    try:
+        sheet = load_cheatsheet(yaml_file)
+    except CheatsheetError as e:
+        for problem in e.problems:
+            logging.error(f"{yaml_file}: {problem}")
         logging.error(f"Validation failed for {yaml_file}")
-        return False
+        return None
 
+    warnings = lint_yaml(yaml_file)
     if warnings:
         logging.warning(f"Linting warnings in {yaml_file}:")
         for warning in warnings:
             logging.warning(f"  - {warning}")
 
-    return True
+    return sheet
 
 
 def write_html_content(html_output, html_content):
@@ -207,25 +201,27 @@ def write_html_content(html_output, html_content):
     return True
 
 
-def main(yaml_file):
-    if not validate_and_lint(yaml_file):
-        return None, None
-
-    data = load_yaml(yaml_file)
-    if data is None or "title" not in data:
-        logging.error("Error: Invalid YAML file or missing 'title' field.")
+def main(yaml_file: Path, used_filenames: set[str] | None = None) -> tuple[str, str] | tuple[None, None]:
+    sheet = load_and_lint(yaml_file)
+    if sheet is None:
         return None, None
 
     keyboard_layouts, system_mappings = load_layout()
     if keyboard_layouts is None or system_mappings is None:
         return None, None
 
-    html_content = generate_html(data, keyboard_layouts, system_mappings)
+    html_content = generate_html(sheet, keyboard_layouts, system_mappings)
     if html_content is None:
         return None, None
 
-    base_filename = f"{data['title'].lower().replace(' ', '_')}_cheatsheet"
-    html_output = os.path.join(OUTPUT_DIR, f"{base_filename}.html")
+    slug = re.sub(r"[^\w-]+", "_", sheet.title.lower()).strip("_")
+    filename = f"{slug}_cheatsheet.html" if slug else "cheatsheet.html"
+    if used_filenames is not None:
+        if filename in used_filenames:
+            logging.error(f"{yaml_file}: output file {filename} is already used by another cheat sheet")
+            return None, None
+        used_filenames.add(filename)
+    html_output = os.path.join(OUTPUT_DIR, filename)
 
     if not write_html_content(html_output, html_content):
         logging.error(f"Failed to write HTML content to {html_output}")
@@ -233,7 +229,7 @@ def main(yaml_file):
 
     logging.info(f"Cheatsheet generated: {html_output}")
 
-    return data["title"], os.path.basename(html_output)
+    return sheet.title, filename
 
 
 def generate_index(cheatsheets):
@@ -242,7 +238,7 @@ def generate_index(cheatsheets):
 
 
 def generate_all() -> int:
-    yaml_files = list(CHEATSHEETS_DIR.glob("*.yaml"))
+    yaml_files = sorted(CHEATSHEETS_DIR.glob("*.yaml"))
 
     if not yaml_files:
         print("No YAML files found in the cheatsheets directory. Run `koalakeys init` to create one.")
@@ -252,8 +248,9 @@ def generate_all() -> int:
 
     cheatsheets = []
     failed = []
+    used_filenames: set[str] = set()
     for yaml_file in yaml_files:
-        title, filename = main(yaml_file)
+        title, filename = main(yaml_file, used_filenames)
         if title and filename:
             cheatsheets.append({"title": title, "filename": filename})
         else:

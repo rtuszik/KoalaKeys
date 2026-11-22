@@ -1,5 +1,8 @@
 title: "Invalid Shortcut Format"
+layout:
+  keyboard: US
+  system: Darwin
 shortcuts:
   General:
-    "Ctrl+@#$%^&*()":
-      description: "Invalid characters"
+    "Ctrl+日本":
+      description: "Characters outside the key set"

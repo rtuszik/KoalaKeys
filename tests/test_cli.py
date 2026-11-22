@@ -1,6 +1,6 @@
 from koalakeys.cli import main
 
-VALID_SHEET = 'title: Good\nshortcuts:\n  General:\n    "CMD+C":\n      description: "Copy"\n'
+VALID_SHEET = 'title: Good\nlayout:\n  keyboard: US\n  system: Darwin\nshortcuts:\n  General:\n    "CMD+C":\n      description: "Copy"\n'
 INVALID_SHEET = "title: Bad\n"  # missing required 'shortcuts'
 
 

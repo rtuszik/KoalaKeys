@@ -1,0 +1,25 @@
+{
+    "$schema": "https://biomejs.dev/schemas/2.6.5/schema.json",
+    "overrides": [
+        {
+            "includes": [
+                "renovate.json"
+            ],
+            "json": {
+                "parser": {
+                    "allowComments": true,
+                    "allowTrailingCommas": true
+                }
+            }
+        }
+    ],
+    "formatter": {
+        "indentStyle": "space",
+        "indentWidth": 4
+    },
+    "json": {
+        "formatter": {
+            "expand": "always"
+        }
+    }
+}

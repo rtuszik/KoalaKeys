@@ -1,4 +1,7 @@
 title: "Missing Description"
+layout:
+  keyboard: US
+  system: Darwin
 shortcuts:
   General:
     "Ctrl+C":
