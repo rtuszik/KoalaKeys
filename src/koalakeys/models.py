@@ -4,9 +4,9 @@ import json
 import re
 import sys
 from pathlib import Path
-from typing import TYPE_CHECKING, Annotated, Literal
+from typing import TYPE_CHECKING, Annotated, Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_validator
+from pydantic import BaseModel, BeforeValidator, ConfigDict, Field, StringConstraints, model_validator
 from pydantic.json_schema import GenerateJsonSchema
 
 from koalakeys.theming import DEFAULT_THEME
@@ -25,6 +25,18 @@ NonEmptyStr = Annotated[str, StringConstraints(min_length=1, pattern=r"\S")]
 Key = Annotated[str, Field(strict=False, coerce_numbers_to_str=True)]
 
 
+def _reject_colliding_keys(value: Any) -> Any:
+    if isinstance(value, dict):
+        keys = [str(key) for key in value]
+        duplicates = sorted({key for key in keys if keys.count(key) > 1})
+        if duplicates:
+            raise ValueError(f"Duplicate keys after conversion to text: {', '.join(duplicates)}")
+    return value
+
+
+UniqueKeys = BeforeValidator(_reject_colliding_keys)
+
+
 class _Model(BaseModel):
     model_config = ConfigDict(extra="forbid", strict=True, frozen=True)
 
@@ -38,7 +50,7 @@ class Layout(_Model):
     system: System = Field(description="Operating system.")
 
 
-Category = Annotated[dict[Key, Shortcut], Field(min_length=1)]
+Category = Annotated[dict[Key, Shortcut], Field(min_length=1), UniqueKeys]
 
 _ALLOW_TEXT_SET: JsonDict = {"properties": {"AllowText": {"const": True}}, "required": ["AllowText"]}
 
@@ -114,7 +126,7 @@ class Cheatsheet(_Model):
         description="Inline custom CSS, emitted last in the cascade so it overrides the theme and the custom CSS file.",
     )
     layout: Layout
-    shortcuts: dict[Key, Category] = Field(
+    shortcuts: Annotated[dict[Key, Category], UniqueKeys] = Field(
         min_length=1,
         description="Categories mapped to shortcut definitions. Shortcuts use '+' for simultaneous keys "
         "(e.g., 'CMD+C') and '>' for sequential keys/chords (e.g., 'Super+T>W>S').",

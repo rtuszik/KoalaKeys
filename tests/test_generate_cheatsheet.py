@@ -435,3 +435,21 @@ class TestCli:
         assert gc.generate_all() == 1
         assert "Minimal Test" in (out / "index.html").read_text(encoding="utf-8")
         assert "missing_title.yaml" in capsys.readouterr().out
+
+    def test_title_collision_fails_second_sheet_and_keeps_first_page(self, tmp_path, monkeypatch, capsys):
+        import koalakeys.generate_cheatsheet as gc
+
+        sheets = tmp_path / "cheatsheets"
+        sheets.mkdir()
+        body = "layout: {keyboard: US, system: Darwin}\nshortcuts:\n  G:\n    A: {description: %s}\n"
+        (sheets / "a.yaml").write_text("title: C++\n" + body % "from plus", encoding="utf-8")
+        (sheets / "b.yaml").write_text("title: 'C#'\n" + body % "from sharp", encoding="utf-8")
+        out = tmp_path / "output"
+        monkeypatch.setattr(gc, "CHEATSHEETS_DIR", sheets)
+        monkeypatch.setattr(gc, "OUTPUT_DIR", out)
+
+        assert gc.generate_all() == 1
+        assert "from plus" in (out / "c_cheatsheet.html").read_text(encoding="utf-8")
+        assert "b.yaml" in capsys.readouterr().out
+        index = (out / "index.html").read_text(encoding="utf-8")
+        assert index.count("c_cheatsheet.html") == 1

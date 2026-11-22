@@ -201,7 +201,7 @@ def write_html_content(html_output, html_content):
     return True
 
 
-def main(yaml_file: Path) -> tuple[str, str] | tuple[None, None]:
+def main(yaml_file: Path, used_filenames: set[str] | None = None) -> tuple[str, str] | tuple[None, None]:
     sheet = load_and_lint(yaml_file)
     if sheet is None:
         return None, None
@@ -215,8 +215,13 @@ def main(yaml_file: Path) -> tuple[str, str] | tuple[None, None]:
         return None, None
 
     slug = re.sub(r"[^\w-]+", "_", sheet.title.lower()).strip("_")
-    base_filename = f"{slug}_cheatsheet" if slug else "cheatsheet"
-    html_output = os.path.join(OUTPUT_DIR, f"{base_filename}.html")
+    filename = f"{slug}_cheatsheet.html" if slug else "cheatsheet.html"
+    if used_filenames is not None:
+        if filename in used_filenames:
+            logging.error(f"{yaml_file}: output file {filename} is already used by another cheat sheet")
+            return None, None
+        used_filenames.add(filename)
+    html_output = os.path.join(OUTPUT_DIR, filename)
 
     if not write_html_content(html_output, html_content):
         logging.error(f"Failed to write HTML content to {html_output}")
@@ -224,7 +229,7 @@ def main(yaml_file: Path) -> tuple[str, str] | tuple[None, None]:
 
     logging.info(f"Cheatsheet generated: {html_output}")
 
-    return sheet.title, os.path.basename(html_output)
+    return sheet.title, filename
 
 
 def generate_index(cheatsheets):
@@ -233,7 +238,7 @@ def generate_index(cheatsheets):
 
 
 def generate_all() -> int:
-    yaml_files = list(CHEATSHEETS_DIR.glob("*.yaml"))
+    yaml_files = sorted(CHEATSHEETS_DIR.glob("*.yaml"))
 
     if not yaml_files:
         print("No YAML files found in the cheatsheets directory. Run `koalakeys init` to create one.")
@@ -243,8 +248,9 @@ def generate_all() -> int:
 
     cheatsheets = []
     failed = []
+    used_filenames: set[str] = set()
     for yaml_file in yaml_files:
-        title, filename = main(yaml_file)
+        title, filename = main(yaml_file, used_filenames)
         if title and filename:
             cheatsheets.append({"title": title, "filename": filename})
         else:

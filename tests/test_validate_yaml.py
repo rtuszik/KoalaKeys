@@ -205,6 +205,23 @@ class TestLoadCheatsheet:
         sheet.write_text(text, encoding="utf-8")
         assert load_cheatsheet(sheet).shortcuts == {"2024": {"1": Shortcut(description="One")}}
 
+    @pytest.mark.parametrize(
+        ("shortcuts", "problem"),
+        [
+            (
+                "  1: {A: {description: a}}\n  '1': {B: {description: b}}\n",
+                "shortcuts: Duplicate keys after conversion to text: 1",
+            ),
+            (
+                "  G:\n    1: {description: a}\n    '1': {description: b}\n",
+                "shortcuts.G: Duplicate keys after conversion to text: 1",
+            ),
+        ],
+    )
+    def test_keys_that_collide_after_conversion_are_rejected(self, tmp_path, shortcuts, problem):
+        text = "title: T\nlayout: {keyboard: US, system: Darwin}\nshortcuts:\n" + shortcuts
+        assert problems(tmp_path, text) == [problem]
+
     def test_boolean_key_error_tells_user_to_quote(self, tmp_path):
         text = "title: T\nlayout: {keyboard: US, system: Darwin}\nshortcuts:\n  G:\n    true: {description: One}\n"
         assert problems(tmp_path, text) == ["shortcuts.G.1.[key]: Input should be a valid string (quote the key)"]
