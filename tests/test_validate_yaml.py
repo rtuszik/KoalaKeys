@@ -114,8 +114,17 @@ class TestCheatsheetModel:
         assert loc in error_locs(shortcuts=shortcuts)
 
     def test_invalid_shortcut_format_names_key(self):
-        with pytest.raises(ValueError, match=r"General\.Ctrl\+@#\$"):
-            validate(shortcuts={"General": {"Ctrl+@#$": {"description": "Test"}}})
+        with pytest.raises(ValueError, match=r"General\.Ctrl\+日"):
+            validate(shortcuts={"General": {"Ctrl+日": {"description": "Test"}}})
+
+    @pytest.mark.parametrize("key", ["~", "_", ";", "{", "}", "$", "^", "'", "Ctrl+!", "Shift+@#%&*()", "ß", "Ä", "é"])
+    def test_accepts_layout_and_shifted_symbol_keys(self, key):
+        assert key in validate(shortcuts={"General": {key: {"description": "Test"}}}).shortcuts["General"]
+
+    @pytest.mark.parametrize("key", ["Ctrl+\x00", "Ctrl+🙂"])
+    def test_rejects_control_and_unsupported_characters(self, key):
+        with pytest.raises(ValueError, match="Invalid shortcut format"):
+            validate(shortcuts={"General": {key: {"description": "Test"}}})
 
     def test_allowtext_mode_accepts_text(self):
         sheet = validate(

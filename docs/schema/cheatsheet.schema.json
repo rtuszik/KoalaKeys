@@ -98,7 +98,7 @@
                     "shortcuts": {
                         "additionalProperties": {
                             "propertyNames": {
-                                "pattern": "^[A-Za-z0-9+⌘⌥⌃⇧←→↑↓\\s\\-\\|\\[\\],.:/`\"?<>=\\\\⌃]+$"
+                                "pattern": "^[\\x20-\\x7E\\s⌘⌥⌃⇧←→↑↓¡²´ºÄÖÜÑäöüñßàçèéù]+$"
                             }
                         }
                     }

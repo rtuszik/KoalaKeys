@@ -12,7 +12,8 @@ from koalakeys.theming import DEFAULT_THEME
 if TYPE_CHECKING:
     from pydantic.config import JsonDict
 
-KEY_PATTERN = r'^[A-Za-z0-9+⌘⌥⌃⇧←→↑↓\s\-\|\[\],.:/`"?<>=\\⌃]+$'
+# Printable ASCII plus the glyphs used by the bundled layouts and system mappings.
+KEY_PATTERN = r"^[\x20-\x7E\s⌘⌥⌃⇧←→↑↓¡²´ºÄÖÜÑäöüñßàçèéù]+$"
 _KEY_RE = re.compile(KEY_PATTERN)
 
 Keyboard = Literal["US", "UK", "DE", "FR", "ES", "DVORAK"]
