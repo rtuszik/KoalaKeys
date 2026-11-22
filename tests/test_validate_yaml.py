@@ -1,9 +1,11 @@
 import json
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
 
-from koalakeys.models import Cheatsheet
+from koalakeys.models import Cheatsheet, Shortcut
 from koalakeys.validate_yaml import CheatsheetError, lint_yaml, load_cheatsheet, validate_yaml
 
 SCHEMA_FILE = Path(__file__).parent.parent / "docs" / "schema" / "cheatsheet.schema.json"
@@ -145,6 +147,11 @@ class TestJsonSchema:
         committed = json.loads(SCHEMA_FILE.read_text(encoding="utf-8"))
         assert committed == Cheatsheet.model_json_schema(), "run `mise run schema` to regenerate"
 
+    def test_module_writes_schema_file(self, tmp_path):
+        target = tmp_path / "schema.json"
+        subprocess.run([sys.executable, "-m", "koalakeys.models", str(target)], check=True)
+        assert target.read_text(encoding="utf-8") == SCHEMA_FILE.read_text(encoding="utf-8")
+
     def test_schema_uses_yaml_aliases(self):
         props = Cheatsheet.model_json_schema()["properties"]
         assert "RenderKeys" in props
@@ -187,6 +194,20 @@ class TestLoadCheatsheet:
             "title: T\nAllowText: true\nlayout: {keyboard: US, system: Darwin}\nshortcuts: {G: {a: {description: b}}}\n"
         )
         assert problems(tmp_path, text) == ["AllowText can only be true when RenderKeys is false"]
+
+    @pytest.mark.parametrize("text", ["title: 2001-99-99\n", "a: " + "[" * 5000 + "\n"])
+    def test_yaml_constructor_errors_become_cheatsheet_errors(self, tmp_path, text):
+        assert problems(tmp_path, text)[0].startswith("cannot parse YAML")
+
+    def test_numeric_keys_are_read_as_text(self, tmp_path):
+        text = "title: T\nlayout: {keyboard: US, system: Darwin}\nshortcuts:\n  2024:\n    1: {description: One}\n"
+        sheet = tmp_path / "sheet.yaml"
+        sheet.write_text(text, encoding="utf-8")
+        assert load_cheatsheet(sheet).shortcuts == {"2024": {"1": Shortcut(description="One")}}
+
+    def test_boolean_key_error_tells_user_to_quote(self, tmp_path):
+        text = "title: T\nlayout: {keyboard: US, system: Darwin}\nshortcuts:\n  G:\n    true: {description: One}\n"
+        assert problems(tmp_path, text) == ["shortcuts.G.1.[key]: Input should be a valid string (quote the key)"]
 
     def test_non_mapping_top_level(self, tmp_path):
         assert problems(tmp_path, "- title\n- shortcuts\n")

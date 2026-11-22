@@ -212,6 +212,13 @@ The system checks for:
 3. Valid values for `keyboard` and `system` in the `layout` section
 4. Proper structure of the `shortcuts` section
 
+Validation is strict:
+
+- `layout` is required. There is no default layout.
+- Unknown keys are rejected at every level.
+- `title`, each `description`, each category and `shortcuts` must not be empty.
+- Numeric keys such as `1:` are read as text. Quote the keys `"true"`, `"false"` and `"null"`.
+
 ### Linting
 
 The linting process checks for:

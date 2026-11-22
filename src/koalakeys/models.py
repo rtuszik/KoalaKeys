@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import json
 import re
+import sys
+from pathlib import Path
 from typing import TYPE_CHECKING, Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_validator
@@ -19,6 +21,8 @@ _KEY_RE = re.compile(KEY_PATTERN)
 Keyboard = Literal["US", "UK", "DE", "FR", "ES", "DVORAK"]
 System = Literal["Darwin", "Windows", "Linux"]
 NonEmptyStr = Annotated[str, StringConstraints(min_length=1, pattern=r"\S")]
+# YAML reads unquoted `1:` as a number.
+Key = Annotated[str, Field(strict=False, coerce_numbers_to_str=True)]
 
 
 class _Model(BaseModel):
@@ -34,7 +38,7 @@ class Layout(_Model):
     system: System = Field(description="Operating system.")
 
 
-Category = Annotated[dict[str, Shortcut], Field(min_length=1)]
+Category = Annotated[dict[Key, Shortcut], Field(min_length=1)]
 
 _ALLOW_TEXT_SET: JsonDict = {"properties": {"AllowText": {"const": True}}, "required": ["AllowText"]}
 
@@ -110,7 +114,7 @@ class Cheatsheet(_Model):
         description="Inline custom CSS, emitted last in the cascade so it overrides the theme and the custom CSS file.",
     )
     layout: Layout
-    shortcuts: dict[str, Category] = Field(
+    shortcuts: dict[Key, Category] = Field(
         min_length=1,
         description="Categories mapped to shortcut definitions. Shortcuts use '+' for simultaneous keys "
         "(e.g., 'CMD+C') and '>' for sequential keys/chords (e.g., 'Super+T>W>S').",
@@ -128,4 +132,5 @@ class Cheatsheet(_Model):
 
 
 if __name__ == "__main__":
-    print(json.dumps(Cheatsheet.model_json_schema(), indent=4, ensure_ascii=False))
+    schema = json.dumps(Cheatsheet.model_json_schema(), indent=4, ensure_ascii=False)
+    Path(sys.argv[1]).write_text(schema + "\n", encoding="utf-8")

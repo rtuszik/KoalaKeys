@@ -30,6 +30,8 @@ def _format_error(error: ErrorDetails) -> str:
     loc = ".".join(str(part) for part in error["loc"])
     ctx = error.get("ctx") or {}
     msg = str(ctx["error"]) if error["type"] == "value_error" and "error" in ctx else error["msg"]
+    if error["loc"] and error["loc"][-1] == "[key]":
+        msg += " (quote the key)"
     return f"{loc}: {msg}" if loc else msg
 
 
@@ -39,7 +41,7 @@ def load_cheatsheet(file_path: Path) -> Cheatsheet:
             data = yaml_safe.load(file)
     except FileNotFoundError as e:
         raise CheatsheetError(file_path, ["file not found"]) from e
-    except (OSError, UnicodeDecodeError, YAMLError) as e:
+    except (OSError, ValueError, RecursionError, YAMLError) as e:
         raise CheatsheetError(file_path, [f"cannot parse YAML: {e}"]) from e
 
     if data is None:

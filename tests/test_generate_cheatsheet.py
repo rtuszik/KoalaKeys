@@ -77,6 +77,25 @@ class TestReplaceShortcutNamesWithMappings:
         assert "C" in result
 
 
+class TestShortcutHtmlEscaping:
+    def test_key_parts_are_escaped(self):
+        result = replace_shortcut_names("<img src=x onerror=alert(1)+&", {})
+        assert result == "&lt;img src=x onerror=alert(1)<sep>&amp;"
+
+    def test_modifier_symbol_span_is_kept(self):
+        assert replace_shortcut_names("cmd", {"cmd": "⌘"}) == '<span class="modifier-symbol">⌘</span>'
+
+    def test_rendered_page_has_no_raw_key_markup(self):
+        html = generate_html(
+            sheet(shortcuts={"General": {"<img src=x onerror=alert(1)+A": {"description": "Test"}}}),
+            {"US": {"layout": []}},
+            {"Darwin": {}},
+        )
+        assert html is not None
+        assert "<img src=x" not in html
+        assert "&lt;img src=x onerror=alert(1)" in html
+
+
 class TestNormalizeShortcuts:
     def test_basic_normalization(self, valid_yaml_data):
         result = normalize_shortcuts(Cheatsheet.model_validate(valid_yaml_data), {})

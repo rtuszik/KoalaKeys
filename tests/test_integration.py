@@ -1,5 +1,7 @@
 # End-to-end integration tests for cheatsheet generation.
 
+import pytest
+
 from koalakeys.generate_cheatsheet import generate_index, main
 
 
@@ -60,3 +62,23 @@ class TestIndexIntegration:
             assert filename is not None
             assert title in index_html
             assert filename in index_html
+
+    @pytest.mark.parametrize(
+        ("title", "expected"),
+        [
+            ("Vim/Neovim", "vim_neovim_cheatsheet.html"),
+            ("../x", "x_cheatsheet.html"),
+            ("Built-in Functions", "built-in_functions_cheatsheet.html"),
+            ("Übersicht (macOS)", "übersicht_macos_cheatsheet.html"),
+            ("///", "cheatsheet.html"),
+        ],
+    )
+    def test_title_cannot_leave_output_directory(self, tmp_path, isolated_output, title, expected):
+        source = tmp_path / "sheet.yaml"
+        source.write_text(
+            f"title: {title!r}\nlayout: {{keyboard: US, system: Darwin}}\nshortcuts:\n  G:\n    A: {{description: a}}\n",
+            encoding="utf-8",
+        )
+        _, filename = main(source)
+        assert filename == expected
+        assert (isolated_output / expected).exists()

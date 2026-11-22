@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import html
 import os
 import re
 import sys
@@ -80,7 +81,7 @@ def consume_separator(shortcut: str, index: int) -> tuple[str, int]:
 def format_shortcut_part(part: str, system_mappings: dict) -> str:
     arrow_key_mappings = {"Up": "↑", "Down": "↓", "Left": "←", "Right": "→"}
 
-    mapped_part = system_mappings.get(part.lower(), part)
+    mapped_part = html.escape(system_mappings.get(part.lower(), part), quote=False)
     if mapped_part in ["⌘", "⌥", "⌃", "⇧"]:
         mapped_part = f'<span class="modifier-symbol">{mapped_part}</span>'
 
@@ -213,7 +214,8 @@ def main(yaml_file: Path) -> tuple[str, str] | tuple[None, None]:
     if html_content is None:
         return None, None
 
-    base_filename = f"{sheet.title.lower().replace(' ', '_')}_cheatsheet"
+    slug = re.sub(r"[^\w-]+", "_", sheet.title.lower()).strip("_")
+    base_filename = f"{slug}_cheatsheet" if slug else "cheatsheet"
     html_output = os.path.join(OUTPUT_DIR, f"{base_filename}.html")
 
     if not write_html_content(html_output, html_content):
